@@ -1,10 +1,10 @@
 "use client";
-import { lusitana } from "@/fonts/fonts";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { Button } from "../global/Button";
 import { Loading } from "../global/Loading";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 type Props = {
   title: string;
@@ -14,10 +14,30 @@ type Props = {
 
 export function Form({ title, children, type }: Props) {
   const errorInitialState = { message: "esto es un error" };
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(errorInitialState);
+  const END_POINT =
+    type === "Register" ? "/api/auth/signup" : "/api/auth/login";
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    const formData = new FormData(e.currentTarget);
+    const response = await fetch(END_POINT, {
+      method: "POST",
+      body: JSON.stringify(Object.fromEntries(formData)),
+    });
+    const data = await response.json();
+    if (response.ok) {
+      setError(errorInitialState);
+      router.push("/dashboard");
+    } else {
+      setError({ message: data.message });
+    }
+    setLoading(false);
+  };
   return (
-    <form className="space-y-3">
+    <form className="space-y-3" onSubmit={handleSubmit}>
       <div className="flex-1 rounded-lg bg-gray-800 px-6 pb-0 pt-8">
         <h1 className={`mb-3 text-2xl text-primary-200`}>{title}</h1>
         {children}
