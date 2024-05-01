@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model Banco {
+  id                    String              @id @default(uuid())
+  nombre                String
+  cuentas               CuentaBancaria[]
+  detalle               OperacionDetalle[] 
+}
+
+
+model CuentaBancaria {
+  id                    String              @id @default(uuid())
+  numeroCuenta          String              @unique
+  banco                 Banco               @relation(fields: [bancoId], references: [id])
+  bancoId               String
+  esCuentaAhorro        Boolean
+  saldo                 Int
+  saldoDisponible       Int
+  detalle               OperacionDetalle[] 
+}
+
+
+model Entidad {
+  id                    String              @id @default(uuid())
+  nombre                String              @unique
+  ruc                   String              @unique
+  Operacion             Operacion[]
+}
+
+
+model TipoOperacion {
+  id                    String              @id @default(uuid())
+  nombre                String              @unique
+  esDebito              Boolean
+  afectaSaldo           Boolean
+  Operacion             Operacion[]
+}
+
+
+model Operacion {
+  id                  String                @id @default(uuid())
+  tipoOperacion       TipoOperacion         @relation(fields: [tipoOperacionId], references: [id])
+  tipoOperacionId     String
+  entidadDestino      Entidad               @relation(fields: [entidadDestinoId], references: [id])
+  entidadDestinoId    String
+  numeroComprobante   Int
+  fechaOperacion      DateTime
+  fechaLimite         DateTime
+  monto               Int
+  descripcion         String
+  detalle             OperacionDetalle[] 
+}
+
+
+model OperacionDetalle {
+  id                  String                @id @default(uuid())
+  operacion           Operacion             @relation(fields: [operacionId], references: [id])
+  operacionId         String
+  banco               Banco                 @relation(fields: [bancoId], references: [id])
+  bancoId             String
+  cuenta              CuentaBancaria        @relation(fields: [cuentaId], references: [id])
+  cuentaId            String
+  esOrigen            Boolean
+}
+
+model User {
+  id String @id @default(uuid())
+  username String @unique
+  password String
+}

@@ -10,32 +10,16 @@ type Props = {
   title: string;
   children: React.ReactNode;
   type: "Register" | "Log in";
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 };
 
-export function Form({ title, children, type }: Props) {
+export function Form({ title, children, type, handleSubmit }: Props) {
   const errorInitialState = { message: "esto es un error" };
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(errorInitialState);
-  const END_POINT =
-    type === "Register" ? "/api/auth/signup" : "/api/auth/login";
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    const formData = new FormData(e.currentTarget);
-    const response = await fetch(END_POINT, {
-      method: "POST",
-      body: JSON.stringify(Object.fromEntries(formData)),
-    });
-    const data = await response.json();
-    if (response.ok) {
-      setError(errorInitialState);
-      router.push("/dashboard");
-    } else {
-      setError({ message: data.message });
-    }
-    setLoading(false);
-  };
+  const SignIn = "/api/auth/signup";
+
   return (
     <form className="space-y-3" onSubmit={handleSubmit}>
       <div className="flex-1 rounded-lg bg-gray-800 px-6 pb-0 pt-8">
