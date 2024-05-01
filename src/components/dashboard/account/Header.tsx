@@ -20,7 +20,7 @@ const menu: MenuItem[] = [
 
 export default function Header() {
   return (
-    <header className="flex h-full flex-col px-3 py-4 md:px-2">
+    <header className="flex h-full px-3 py-4 md:px-2">
       <h1>Cuentas</h1>
       <section>
         {menu.map((data, index) => (
