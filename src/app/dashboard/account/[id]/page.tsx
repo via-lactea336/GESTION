@@ -1,5 +1,3 @@
-import React from 'react';
-
 const AccountDetailsTab = () => {
     const userData = {
         accountType: "Cuenta de Ahorro",
