@@ -11,7 +11,7 @@ const AccountDetailsTab = () => {
     return (
         <div className="flex flex-col h-full -mt-8">
             {/* Encabezado con título y botón de retroceso */}
-            <div className="flex justify-between items-center bg-violet-600 p-4 border-2 border-black">
+            <div className="flex justify-between items-center bg-primary-600 p-4 border-2 border-black">
                 <h1 className="text-4xl font-bold mt-10 mb-10">Detalle cuentas</h1>
                 <button
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 -mt-20 rounded"
@@ -21,7 +21,7 @@ const AccountDetailsTab = () => {
             </div>
 
             {/* Contenido principal */}
-            <div className="flex-grow bg-violet-400 shadow-md border-2 border-black pt-10 pb-10 pl-10 flex flex-row">
+            <div className="flex-grow bg-primary-200 shadow-md border-2 border-black pt-10 pb-10 pl-10 flex flex-row">
                 {/* Datos de la cuenta */}
                 <img
                     src="https://img.freepik.com/vector-gratis/hucha_53876-25494.jpg?size=338&ext=jpg&ga=GA1.1.1687694167.1714694400&semt=ais"
@@ -51,7 +51,7 @@ const AccountDetailsTab = () => {
                 </div>
             </div>
             <h1 className="text-3xl font-bold mt-10">Movimientos</h1>
-            <div className="flex-grow bg-violet-400 shadow-md border-2 border-black p-10 flex flex-row">
+            <div className="flex-grow bg-primary-200 shadow-md border-2 border-black p-10 flex flex-row">
                 <table className="border-collapse w-full">
                     <tr>
                         <td>
@@ -82,13 +82,35 @@ const AccountDetailsTab = () => {
                             <h1 className="text-xl font-bold mt-1">10-02-2024</h1>
                         </td>
                         <td>
-                            <h1 className="text-xl font-bold mt-1">Inserse Descripcion aqui</h1>
+                            <h1 className="text-xl font-bold mt-1 text-black">Inserse Descripcion aqui</h1>
                         </td>
                         <td>
-                            <h1 className="text-xl font-bold mt-1">$200.00</h1>
+                            <h1 className="text-xl font-bold mt-1 text-green-500">+200.00$</h1>
                         </td>
                         <td>
-                            <h1 className="text-xl font-bold mt-1">$3000.00</h1>
+                            <h1 className="text-xl font-bold mt-1 text-black">3000.00$</h1>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                        <img
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNIUWq1QStgYW9LGyxTzCkFbvkMqavYkXkWXTaRO7P-Q&s"
+                            alt="Account"
+                            className="w-10 h-10 object-cover rounded-full bg-violet-400"
+                        />
+                        </td>
+                        <td>
+                            <h1 className="text-xl font-bold mt-1">10-02-2024</h1>
+                        </td>
+                        <td>
+                            <h1 className="text-xl font-bold mt-1 text-black">Inserse Descripcion aqui</h1>
+                        </td>
+                        <td>
+                            <h1 className="text-xl font-bold mt-1 text-red-500">-200.00$</h1>
+                        </td>
+                        <td>
+                            <h1 className="text-xl font-bold mt-1 text-black">3000.00$</h1>
                         </td>
                     </tr>
                 </table>
