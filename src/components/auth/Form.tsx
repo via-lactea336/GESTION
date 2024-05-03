@@ -8,7 +8,7 @@ import { useState } from "react";
 type Props = {
   title: string;
   children: React.ReactNode;
-  type: "Register" | "Log in";
+  type: "Iniciar Sesión";
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 };
 
