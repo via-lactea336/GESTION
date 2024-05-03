@@ -25,7 +25,6 @@ export default function LoginForm() {
   return (
     <Form
       title="Por favor, inicie sesión para continuar."
-      type="Iniciar Sesión"
       handleSubmit={handleSubmit}
     >
       <div className="space-y-3">

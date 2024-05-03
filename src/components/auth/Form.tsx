@@ -8,11 +8,10 @@ import { useState } from "react";
 type Props = {
   title: string;
   children: React.ReactNode;
-  type: "Iniciar Sesión";
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 };
 
-export function Form({ title, children, type, handleSubmit }: Props) {
+export function Form({ title, children, handleSubmit }: Props) {
   const errorInitialState = { message: "" };
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(errorInitialState);
@@ -35,7 +34,7 @@ export function Form({ title, children, type, handleSubmit }: Props) {
       <div className="flex-1 rounded-lg bg-gray-800 px-6 pb-0 pt-8">
         <h1 className={`mb-3 text-2xl text-primary-200`}>{title}</h1>
         {children}
-        <AuthButton loading={loading} buttonText={type} />
+        <AuthButton loading={loading} buttonText={"Iniciar Sesión"} />
         <div className="flex h-12 items-center space-x-1 py-2">
           {error.message && (
             <p
