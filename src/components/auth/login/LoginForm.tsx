@@ -24,13 +24,13 @@ export default function LoginForm() {
   };
   return (
     <Form
-      title="Please log in to continue."
-      type="Log in"
+      title="Por favor, inicie sesión para continuar."
+      type="Iniciar Sesión"
       handleSubmit={handleSubmit}
     >
       <div className="space-y-3">
         <label className="text-primary-200" htmlFor="username">
-          User Name
+          Nombre de usuario
         </label>
         <div className="relative">
           <input
@@ -38,16 +38,16 @@ export default function LoginForm() {
             id="username"
             type="text"
             name="username"
-            placeholder="Enter your username"
+            placeholder="Ingrese su nombre"
             autoComplete="name"
             required
           />
           <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-400 peer-focus:text-gray-300" />
         </div>
         <PasswordField
-          label="Password"
+          label="Contraseña"
           name="password"
-          placeholder="Password"
+          placeholder="Contraseña"
           validate={false}
         />
       </div>

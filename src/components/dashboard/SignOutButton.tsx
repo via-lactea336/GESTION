@@ -19,7 +19,7 @@ export default function SignOutButton() {
       className="flex text-primary-400 h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-800 p-3 text-sm font-medium hover:bg-gray-700 md:flex-none md:justify-start md:p-2 md:px-3"
     >
       <PowerIcon className="w-6" />
-      <div className="hidden md:block">Sign Out</div>
+      <div className="hidden md:block">Cerrar Sesión</div>
       {message && (
         <div className="flex items-center gap-2 text-red-500">
           <ExclamationCircleIcon className="w-4" />
