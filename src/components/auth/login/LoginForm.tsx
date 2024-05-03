@@ -16,7 +16,11 @@ export default function LoginForm() {
     const username = target.username.value;
     const password = target.password.value;
     const error = await login({ username, password });
-    if (!error) router.push("/dashboard");
+    if (!error) {
+      router.push("/dashboard");
+    } else {
+      throw new Error(error);
+    }
   };
   return (
     <Form

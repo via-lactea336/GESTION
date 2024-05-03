@@ -12,5 +12,5 @@ export const login = async (credentials: {
     ...userData,
     redirect: false,
   });
-  return !!response?.error;
+  return response?.error;
 };
