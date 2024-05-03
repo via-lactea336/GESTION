@@ -4,7 +4,6 @@ import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { Button } from "../global/Button";
 import { Loading } from "../global/Loading";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 type Props = {
   title: string;
@@ -14,14 +13,25 @@ type Props = {
 };
 
 export function Form({ title, children, type, handleSubmit }: Props) {
-  const errorInitialState = { message: "esto es un error" };
-  const router = useRouter();
+  const errorInitialState = { message: "" };
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(errorInitialState);
-  const SignIn = "/api/auth/signup";
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await handleSubmit(e);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError({ message: error.message });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <form className="space-y-3" onSubmit={handleSubmit}>
+    <form className="space-y-3" onSubmit={onSubmit}>
       <div className="flex-1 rounded-lg bg-gray-800 px-6 pb-0 pt-8">
         <h1 className={`mb-3 text-2xl text-primary-200`}>{title}</h1>
         {children}
@@ -35,7 +45,7 @@ export function Form({ title, children, type, handleSubmit }: Props) {
               aria-atomic="true"
             >
               <ExclamationCircleIcon className="h-5 w-5 inline" />
-              <span className="ml-1 uppercase">{error.message}</span>
+              <span className="ml-1 uppercase text-xs">{error.message}</span>
             </p>
           )}
         </div>

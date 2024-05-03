@@ -21,21 +21,22 @@ datasource db {
 
 model Banco {
   id                    String              @id @default(uuid())
-  nombre                String
+  nombre                String              @unique
   cuentas               CuentaBancaria[]
-  detalle               OperacionDetalle[] 
 }
 
 
 model CuentaBancaria {
   id                    String              @id @default(uuid())
   numeroCuenta          String              @unique
-  banco                 Banco               @relation(fields: [bancoId], references: [id])
+  banco                 Banco               @relation(fields: [bancoId], references: [id], onDelete: Cascade)
   bancoId               String
+  entidad               Entidad             @relation(fields: [entidadId], references: [id], onDelete: Cascade)
+  entidadId             String 
   esCuentaAhorro        Boolean
   saldo                 Int
   saldoDisponible       Int
-  detalle               OperacionDetalle[] 
+  operaciones           Operacion[]
 }
 
 
@@ -43,7 +44,7 @@ model Entidad {
   id                    String              @id @default(uuid())
   nombre                String              @unique
   ruc                   String              @unique
-  Operacion             Operacion[]
+  CuentaBancaria        CuentaBancaria[]
 }
 
 
@@ -58,29 +59,24 @@ model TipoOperacion {
 
 model Operacion {
   id                  String                @id @default(uuid())
-  tipoOperacion       TipoOperacion         @relation(fields: [tipoOperacionId], references: [id])
+  tipoOperacion       TipoOperacion         @relation(fields: [tipoOperacionId], references: [id], onDelete: Cascade)
   tipoOperacionId     String
-  entidadDestino      Entidad               @relation(fields: [entidadDestinoId], references: [id])
-  entidadDestinoId    String
-  numeroComprobante   Int
-  fechaOperacion      DateTime
-  fechaLimite         DateTime
+  fechaOperacion      DateTime              @default(now())
   monto               Int
-  descripcion         String
-  detalle             OperacionDetalle[] 
+ 
+  cuentaBancariaOrigen CuentaBancaria       @relation(fields: [cuentaBancariaOrigenId], references: [id], onDelete: Cascade)
+  cuentaBancariaOrigenId String
+
+  bancoInvolucrado    String           
+  nombreInvolucrado   String
+  cuentaInvolucrado   String
+  rucInvolucrado      String
+
+  concepto            String
+
+  numeroComprobante   String
 }
 
-
-model OperacionDetalle {
-  id                  String                @id @default(uuid())
-  operacion           Operacion             @relation(fields: [operacionId], references: [id])
-  operacionId         String
-  banco               Banco                 @relation(fields: [bancoId], references: [id])
-  bancoId             String
-  cuenta              CuentaBancaria        @relation(fields: [cuentaId], references: [id])
-  cuentaId            String
-  esOrigen            Boolean
-}
 
 model User {
   id String @id @default(uuid())
