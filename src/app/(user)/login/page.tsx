@@ -1,6 +1,5 @@
 import AcmeLogo from "@/components/global/Logo";
 import LoginForm from "@/components/auth/login/LoginForm";
-import Link from "next/link";
 
 export default function LoginPage() {
   return (
@@ -12,16 +11,6 @@ export default function LoginPage() {
           </div>
         </div>
         <LoginForm />
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-primary-200">
-            You don&apos;t have an account?
-          </span>
-          <Link href="/register">
-            <span className="text-primary-500 text-xs uppercase font-semibold md:text-sm">
-              Create an account
-            </span>
-          </Link>
-        </div>
       </div>
     </main>
   );
