@@ -10,7 +10,7 @@ export default function Page() {
         <h1 className="text-4xl font-bold text-center pt-3 text-primary-900">
           Cuentas
         </h1>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           <BankAccount
             accountType="Cuenta Corriente"
             bankName="Banco Familiar"
