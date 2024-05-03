@@ -1,9 +1,9 @@
-"use cliente";
+"use client";
 import { AtSymbolIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { Form } from "../Form";
 import PasswordField from "../PasswordField";
 import signUp from "@/lib/auth/signUp";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
   const router = useRouter();
