@@ -8,17 +8,14 @@ import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiRes
 export async function POST(req: NextRequest) {
   
   const body: Operacion = await req.json();
-  const { tipoOperacionId, monto, descripcion, numeroComprobante } = body;
+  const { tipoOperacionId, cuentaBancariaOrigenId, monto, concepto, numeroComprobante, cuentaInvolucrado, nombreInvolucrado, bancoInvolucrado, rucInvolucrado  } = body;
   
-  if(!tipoOperacionId || !monto || !numeroComprobante || !descripcion) return generateApiErrorResponse("Missing data to create the operation", 400) //Validate credentials
+  if(!tipoOperacionId || !monto || !numeroComprobante || !concepto || !cuentaBancariaOrigenId || !cuentaInvolucrado || !nombreInvolucrado || !bancoInvolucrado || !rucInvolucrado) return generateApiErrorResponse("Missing data to create the operation", 400) //Validate credentials
 
   try{
     const operacion = await prisma.operacion.create({
       data: {
-        tipoOperacionId,
-        monto,
-        descripcion,
-        numeroComprobante
+        tipoOperacionId, cuentaBancariaOrigenId, monto, concepto, numeroComprobante, cuentaInvolucrado, nombreInvolucrado, bancoInvolucrado, rucInvolucrado
       }
     })
   

@@ -42,7 +42,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   try {
     const operacion = await prisma.operacion.update({
       where: {
-        id
+        id: id
       },
       data: newData
     });

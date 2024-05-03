@@ -36,6 +36,7 @@ model CuentaBancaria {
   esCuentaAhorro        Boolean
   saldo                 Int
   saldoDisponible       Int
+  operaciones           Operacion[]
 }
 
 
@@ -62,9 +63,20 @@ model Operacion {
   tipoOperacionId     String
   fechaOperacion      DateTime              @default(now())
   monto               Int
-  descripcion         String
+ 
+  cuentaBancariaOrigen CuentaBancaria       @relation(fields: [cuentaBancariaOrigenId], references: [id], onDelete: Cascade)
+  cuentaBancariaOrigenId String
+
+  bancoInvolucrado    String           
+  nombreInvolucrado   String
+  cuentaInvolucrado   String
+  rucInvolucrado      String
+
+  concepto            String
+
   numeroComprobante   String
 }
+
 
 model User {
   id String @id @default(uuid())
