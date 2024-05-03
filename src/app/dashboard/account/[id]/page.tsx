@@ -2,8 +2,8 @@ import React from 'react';
 
 const AccountDetailsTab = () => {
     const userData = {
-        accountType: "Cuenta Corriente",
-        accountName: "Coyote",
+        accountType: "Cuenta de Ahorro",
+        accountName: "Coyote Acme",
         availableBalance: 3000,
         retainedBalance: 2000
     };
@@ -24,9 +24,9 @@ const AccountDetailsTab = () => {
             <div className="flex-grow bg-violet-400 shadow-md border-2 border-black pt-10 pb-10 pl-10 flex flex-row">
                 {/* Datos de la cuenta */}
                 <img
-                    src="https://via.placeholder.com/150"
+                    src="https://img.freepik.com/vector-gratis/hucha_53876-25494.jpg?size=338&ext=jpg&ga=GA1.1.1687694167.1714694400&semt=ais"
                     alt="Account"
-                    className="w-30 h-15 object-cover mr-12"
+                    className="w-20 h-20 object-cover mr-12 mt-10"
                 />
                 <div className="flex-1 mr-8 mt-12">
                     <div className="mb-4 flex items-center">
@@ -51,11 +51,50 @@ const AccountDetailsTab = () => {
                 </div>
             </div>
             <h1 className="text-3xl font-bold mt-10">Movimientos</h1>
-            <div className="flex-grow bg-violet-400 shadow-md border-2 border-black pt-10 pb-10 pl-10 flex flex-row">
-                
+            <div className="flex-grow bg-violet-400 shadow-md border-2 border-black p-10 flex flex-row">
+                <table className="border-collapse w-full">
+                    <tr>
+                        <td>
+                            <h1 className="text-xl font-bold mt-1 text-black">Operacion</h1>
+                        </td>
+                        <td >
+                            <h1 className="text-xl font-bold mt-1 text-black">Fecha</h1>
+                        </td>
+                        <td>
+                            <h1 className="text-xl font-bold mt-1 text-black">Descripcion</h1>
+                        </td>
+                        <td>
+                            <h1 className="text-xl font-bold mt-1 text-black">Monto Transaccion</h1>
+                        </td>
+                        <td>
+                            <h1 className="text-xl font-bold mt-1 text-black">Saldo Actual</h1>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                        <img
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNIUWq1QStgYW9LGyxTzCkFbvkMqavYkXkWXTaRO7P-Q&s"
+                            alt="Account"
+                            className="w-10 h-10 object-cover rounded-full bg-violet-400"
+                        />
+                        </td>
+                        <td>
+                            <h1 className="text-xl font-bold mt-1">10-02-2024</h1>
+                        </td>
+                        <td>
+                            <h1 className="text-xl font-bold mt-1">Inserse Descripcion aqui</h1>
+                        </td>
+                        <td>
+                            <h1 className="text-xl font-bold mt-1">$200.00</h1>
+                        </td>
+                        <td>
+                            <h1 className="text-xl font-bold mt-1">$3000.00</h1>
+                        </td>
+                    </tr>
+                </table>
+
             </div>
         </div>
     );
 };
-
 export default AccountDetailsTab;
