@@ -2,6 +2,7 @@
 import { ExclamationCircleIcon, PowerIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { logout } from "@/lib/auth/logout";
 export default function SignOutButton() {
   const [message, setMessage] = useState("");
   const router = useRouter();
@@ -9,10 +10,8 @@ export default function SignOutButton() {
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    /*const response = await logout();
-    if (response.error) return setMessage(response.error);
+    await logout();
     router.push("/login");
-    */
   };
   return (
     <button
