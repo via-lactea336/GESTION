@@ -40,7 +40,7 @@ importers:
         specifier: ^5.0.2
         version: 5.0.2
       '@types/node':
-        specifier: ^20
+        specifier: ^20.12.7
         version: 20.12.7
       '@types/react':
         specifier: ^18
@@ -61,7 +61,7 @@ importers:
         specifier: ^3.4.1
         version: 3.4.3
       typescript:
-        specifier: ^5
+        specifier: ^5.4.5
         version: 5.4.5
 
 packages:
