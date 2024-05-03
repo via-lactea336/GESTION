@@ -73,44 +73,44 @@ const AccountDetailsTab = () => {
                     <tr>
                         <td>
                         <img
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNIUWq1QStgYW9LGyxTzCkFbvkMqavYkXkWXTaRO7P-Q&s"
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6lo6gclz5yoqrqK6NRz4qp5T2NDyBgcDfFx-IxBUTew&s"
                             alt="Account"
-                            className="w-10 h-10 object-cover rounded-full bg-violet-400"
+                            className="w-10 h-10 object-cover rounded-full bg-violet-400 mt-5 mb-5 ml-5"
                         />
                         </td>
                         <td>
-                            <h1 className="text-xl font-bold mt-1">10-02-2024</h1>
+                            <h1 className="text-base font-normal mt-1 text-black">10-02-2024</h1>
                         </td>
                         <td>
-                            <h1 className="text-xl font-bold mt-1 text-black">Inserse Descripcion aqui</h1>
+                            <h1 className="text-base font-normal mt-1 text-black">Inserse Descripcion aqui</h1>
                         </td>
                         <td>
                             <h1 className="text-xl font-bold mt-1 text-green-500">+200.00$</h1>
                         </td>
                         <td>
-                            <h1 className="text-xl font-bold mt-1 text-black">3000.00$</h1>
+                            <h1 className="text-base font-normal mt-1 text-black">3000.00$</h1>
                         </td>
                     </tr>
 
                     <tr>
                         <td>
                         <img
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNIUWq1QStgYW9LGyxTzCkFbvkMqavYkXkWXTaRO7P-Q&s"
+                            src="https://c1.klipartz.com/pngpicture/658/794/sticker-png-banking-arrow-money-bank-account-wire-transfer-electronic-funds-transfer-demand-deposit-mobile-banking-stanbic-ibtc-bank.png"
                             alt="Account"
-                            className="w-10 h-10 object-cover rounded-full bg-violet-400"
+                            className="w-10 h-10 object-cover rounded-full bg-violet-400 mt-5 mb-5 ml-5"
                         />
                         </td>
                         <td>
-                            <h1 className="text-xl font-bold mt-1">10-02-2024</h1>
+                            <h1 className="text-base font-normal mt-1 text-black">10-02-2024</h1>
                         </td>
                         <td>
-                            <h1 className="text-xl font-bold mt-1 text-black">Inserse Descripcion aqui</h1>
+                            <h1 className="text-base font-normal mt-1 text-black">Inserse Descripcion aqui</h1>
                         </td>
                         <td>
                             <h1 className="text-xl font-bold mt-1 text-red-500">-200.00$</h1>
                         </td>
                         <td>
-                            <h1 className="text-xl font-bold mt-1 text-black">3000.00$</h1>
+                            <h1 className="text-base font-normal mt-1 text-black">2800.00$</h1>
                         </td>
                     </tr>
                 </table>
