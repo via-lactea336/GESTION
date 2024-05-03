@@ -16,7 +16,7 @@ export default function RegisterForm() {
     const username = target.username.value;
     const password = target.password.value;
     const error = await signUp(username, password);
-    if (!error) router.push("/dashboard");
+    if (!error) router.push("/login");
   };
   return (
     <Form
