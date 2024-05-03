@@ -14,7 +14,6 @@ export default function Page() {
           <BankAccount accountType="Cuenta de Ahorro" bankName="Banco Continental" ruc="7894561-2" company="X" amount={10000} accountId="2" />
         </div>
       </div>
-      
     </div>
   );
 }
