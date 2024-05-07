@@ -8,11 +8,17 @@ type MenuItem = {
 const menu: MenuItem[] = [
   {
     label: "Bancos",
-    options: ["Todos","Banco Familiar", "Banco Vision", "Banco ITAU", "Banco Nacional de Fomento"],
+    options: [
+      "Todos",
+      "Banco Familiar",
+      "Banco Vision",
+      "Banco ITAU",
+      "Banco Nacional de Fomento",
+    ],
   },
   {
     label: "Tipo de cta",
-    options: ["Todos","Cuenta Corriente", "Cuenta de ahorro"],
+    options: ["Todos", "Cuenta Corriente", "Cuenta de ahorro"],
   },
   {
     label: "Ver saldos",
