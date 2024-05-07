@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
   }catch(err){
     //If the bank account already exists then return an error
     if(err instanceof PrismaClientKnownRequestError && err.code === "P2002") return generateApiErrorResponse("Bank account already exists", 400)
+    if(err instanceof Error) return generateApiErrorResponse(err.message, 500)
     else return generateApiErrorResponse("Something went wrong", 500)
   }  
   

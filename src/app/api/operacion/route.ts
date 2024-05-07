@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { Operacion } from "@prisma/client";
 import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
 import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiResponse";
+import reflejarOperacion from "@/lib/operacion/reflejarOperacion";
 
 
 export async function POST(req: NextRequest) {
@@ -16,10 +17,16 @@ export async function POST(req: NextRequest) {
     const operacion = await prisma.operacion.create({
       data: {
         tipoOperacionId, cuentaBancariaOrigenId, monto, concepto, numeroComprobante, cuentaInvolucrado, nombreInvolucrado, bancoInvolucrado, rucInvolucrado
+      },
+      include: {
+        tipoOperacion: true
       }
     })
   
     if(!operacion) return generateApiErrorResponse("Error generating operation", 400)  
+
+    //Refleja el incremento o decremento en el saldo de la cuenta bancaria siguien las propiedades del tipo de Operacion
+    reflejarOperacion(cuentaBancariaOrigenId, monto, operacion.tipoOperacion.afectaSaldo, operacion.tipoOperacion.esDebito)
 
     return generateApiSuccessResponse(200, "operation added successfully")
   
