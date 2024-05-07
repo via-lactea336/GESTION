@@ -22,6 +22,7 @@ datasource db {
 model Banco {
   id                    String              @id @default(uuid())
   nombre                String              @unique
+  deleted               DateTime?
   cuentas               CuentaBancaria[]
 }
 
@@ -29,13 +30,14 @@ model Banco {
 model CuentaBancaria {
   id                    String              @id @default(uuid())
   numeroCuenta          String              @unique
-  banco                 Banco               @relation(fields: [bancoId], references: [id], onDelete: Cascade)
+  banco                 Banco               @relation(fields: [bancoId], references: [id], onDelete: NoAction)
   bancoId               String
-  entidad               Entidad             @relation(fields: [entidadId], references: [id], onDelete: Cascade)
+  entidad               Entidad             @relation(fields: [entidadId], references: [id], onDelete: NoAction)
   entidadId             String 
   esCuentaAhorro        Boolean
   saldo                 Int
   saldoDisponible       Int
+  deleted               DateTime?
   operaciones           Operacion[]
 }
 
@@ -59,12 +61,12 @@ model TipoOperacion {
 
 model Operacion {
   id                  String                @id @default(uuid())
-  tipoOperacion       TipoOperacion         @relation(fields: [tipoOperacionId], references: [id], onDelete: Cascade)
+  tipoOperacion       TipoOperacion         @relation(fields: [tipoOperacionId], references: [id], onDelete: NoAction)
   tipoOperacionId     String
   fechaOperacion      DateTime              @default(now())
   monto               Int
  
-  cuentaBancariaOrigen CuentaBancaria       @relation(fields: [cuentaBancariaOrigenId], references: [id], onDelete: Cascade)
+  cuentaBancariaOrigen CuentaBancaria       @relation(fields: [cuentaBancariaOrigenId], references: [id], onDelete: NoAction)
   cuentaBancariaOrigenId String
 
   bancoInvolucrado    String           
