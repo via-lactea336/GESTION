@@ -7,7 +7,7 @@ export type ErrorProps = {
 };
 
 export type ApiResponseData<T=undefined> = {
-  data?: T
+  data: T
   message?: string
   error?: string
   success: boolean
