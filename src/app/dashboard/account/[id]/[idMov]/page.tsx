@@ -1,71 +1,84 @@
 'use client'
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import { useRouter } from 'next/navigation';
+import obtenerOperacionPorId from "../../../../../lib/operacion/obtenerOperacionPorId";
 
 export default function Page() {
 
-    const [dateTime, setDateTime] = useState("");
-    const [monto, setMonto] = useState("");
-    const [numComprobante, setNumComprobante] = useState("");
-    const [motivo, setMotivo] = useState("");
-    const [concepto, setConcepto] = useState("");
-    const [nombreDestino, setNombreDestino] = useState("");
-    const [numCuentaDestino, setNumCuentaDestino] = useState("");
-    const [bancoDestino, setBancoDestino] = useState("");
-    const [nombreOrigen, setNombreOrigen] = useState("");
-    const [numCuentaOrigen, setNumCuentaOrigen] = useState("");
+    const [dateTime, setDateTime] = useState("undefined");
+    const [monto, setMonto] = useState("0");
+    const [numComprobante, setNumComprobante] = useState("undefined");
+    const [concepto, setConcepto] = useState("undefined");
+    const [nombreDestino, setNombreDestino] = useState("undefined");
+    const [numCuentaDestino, setNumCuentaDestino] = useState("undefined");
+    const [bancoDestino, setBancoDestino] = useState("undefined");
+    const [nombreOrigen, setNombreOrigen] = useState("undefined");
+    const [numCuentaOrigen, setNumCuentaOrigen] = useState("undefined");
 
     const { idMov } = useParams();
+    const router = useRouter();
 
     const getTransferencia = async () => {
-        try {
-            const response = await fetch(`http://localhost:8000/pirate/${idMov}`);
-            const result = await response.json();
-            console.log(result);
-            setDateTime(result.name);
-            setMonto(result.pirate_catch_phrase);
-            setNumComprobante(result.crew_position);
-            setMotivo(result.number_of_treasures);
-            setConcepto(result.peg_leg);
-            setNombreDestino(result.eye_patch);
-            setNumCuentaDestino(result.hook_hand);
-            setBancoDestino(result.hook_hand);
-            setNombreOrigen(result.hook_hand);
-            setNumCuentaOrigen(result.hook_hand);
-        } catch (error) {
-            console.log(error);
+        const data = await obtenerOperacionPorId(idMov as string)
+        console.log(data)
+
+        if(data == undefined || typeof(data) === 'string'||data.success === false) {
+            router.push('not-found');
+            return;
         }
+
+        const fechaHora = new Date(data.data.fechaOperacion);
+        const formattedDateTime = fechaHora.toLocaleString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+        });
+        setDateTime(formattedDateTime);
+        const formattedMonto = data.data.monto.toLocaleString('es-ES');
+        setMonto(formattedMonto);
+        setNumComprobante(data.data.numeroComprobante);
+        setConcepto(data.data.concepto);
+        setNombreDestino(data.data.nombreInvolucrado);
+        setNumCuentaDestino(data.data.cuentaInvolucrado);
+        setBancoDestino(data.data.bancoInvolucrado);
+        //setNombreOrigen(data.data.cuentaBancariaOrigen);
+        setNumCuentaOrigen(data.data.cuentaBancariaOrigenId);
     };
 
+
     useEffect(() => {
-        //getTransferencia();
-    }, []);
+        getTransferencia();
+    });
+
+    const handleCloseButtonClick = () => {
+        router.back();
+    };
 
     return (
         <div className="flex flex-col items-center justify-center h-full">
             <div className="w-1/2 py-4 border-b border-gray-300">
                 <h1 className="text-2xl font-bold pb-4">Comprobante de Transferencia</h1>
                 <div className="flex items-center ">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-calendar-clock"><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h5"/><path d="M17.5 17.5 16 16.3V14"/><circle cx="16" cy="16" r="6"/></svg>
-                    <p className="text-lg px-2">Fecha: {dateTime}03/04/2005</p>
-                </div>                
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-calendar-clock"><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5" /><path d="M16 2v4" /><path d="M8 2v4" /><path d="M3 10h5" /><path d="M17.5 17.5 16 16.3V14" /><circle cx="16" cy="16" r="6" /></svg>
+                    <p className="text-lg px-2">Fecha: {dateTime}</p>
+                </div>
             </div>
             <div className="w-1/2 py-4 border-b border-gray-300">
                 <div className="flex justify-between w-full">
                     <p className="w-1/3 text-base">Monto:</p>
-                    <p className="w-2/3 text-base text-right">{monto}123.369</p>
+                    <p className="w-2/3 text-base text-right">{monto}</p>
                 </div>
                 <div className="flex justify-between w-full">
                     <p className="w-1/3 text-base">Comprobante:</p>
-                    <p className="w-2/3 text-base text-right">{numComprobante}01235</p>
-                </div>
-                <div className="flex justify-between w-full">
-                    <p className="w-1/3 text-base">Motivo:</p>
-                    <p className="w-2/3 text-base text-right">{motivo}Pago a proveedores</p>
+                    <p className="w-2/3 text-base text-right">{numComprobante}</p>
                 </div>
                 <div className="flex justify-between w-full">
                     <p className="w-1/3 text-base">Concepto:</p>
-                    <p className="w-2/3 text-base text-right">{concepto}Pizza de Taylor</p>
+                    <p className="w-2/3 text-base text-right">{concepto}</p>
                 </div>
             </div>
 
@@ -76,15 +89,15 @@ export default function Page() {
                 </div>
                 <div className="flex justify-between w-full">
                     <p className="w-1/3 text-base">Nombre:</p>
-                    <p className="w-2/3 text-base text-right">{nombreDestino}Pizza Hut Enc.</p>
+                    <p className="w-2/3 text-base text-right">{nombreDestino}</p>
                 </div>
                 <div className="flex justify-between w-full">
                     <p className="w-1/3 text-base">Cuenta:</p>
-                    <p className="w-2/3 text-base text-right">{numCuentaDestino}034023453042304</p>
+                    <p className="w-2/3 text-base text-right">{numCuentaDestino}</p>
                 </div>
                 <div className="flex justify-between w-full">
                     <p className="w-1/3 text-base">Banco:</p>
-                    <p className="w-2/3 text-base text-right">{bancoDestino}Banco GNB</p>
+                    <p className="w-2/3 text-base text-right">{bancoDestino}</p>
                 </div>
             </div>
             <div className="w-1/2 pb-4 border-b border-gray-300">
@@ -94,11 +107,11 @@ export default function Page() {
                 </div>
                 <div className="flex justify-between w-full">
                     <p className="w-1/3 text-base">Nombre:</p>
-                    <p className="w-2/3 text-base text-right">{nombreOrigen}Taylor</p>
+                    <p className="w-2/3 text-base text-right">{nombreOrigen}</p>
                 </div>
                 <div className="flex justify-between w-full">
                     <p className="w-1/3 text-base">Cuenta:</p>
-                    <p className="w-2/3 text-base text-right">{numCuentaOrigen}6425642626626</p>
+                    <p className="w-2/3 text-base text-right">{numCuentaOrigen}</p>
                 </div>
             </div>
             <div className="w-1/2 py-4 border-gray-300">
@@ -111,7 +124,7 @@ export default function Page() {
                     <p className="pb-4 px-2">No válido como comprobante legal</p>
                 </div>
                 <div className="flex justify-center">
-                    <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Cerrar</button>
+                    <button onClick={handleCloseButtonClick} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Cerrar</button>
                 </div>
             </div>
 

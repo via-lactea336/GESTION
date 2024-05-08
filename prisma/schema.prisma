@@ -65,7 +65,7 @@ model Operacion {
   tipoOperacionId     String
   fechaOperacion      DateTime              @default(now())
   monto               Int
- 
+
   cuentaBancariaOrigen CuentaBancaria       @relation(fields: [cuentaBancariaOrigenId], references: [id], onDelete: Cascade)
   cuentaBancariaOrigenId String
 
