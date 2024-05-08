@@ -16,7 +16,7 @@ const BankAccount: React.FC<BankAccountProps> = ({
   accountId,
 }) => {
   return (
-    <div className="bg-primary-400 py-6 px-4 rounded-md shadow-md m-12 [min-width:250px]">
+    <div className="bg-primary-400 py-6 px-4 rounded-md shadow-md [min-width:250px]">
       <h2 className="text-lg font-bold">{accountType}</h2>
       <p className="text-sm text-black">{bankName}</p>
       <p className="text-sm text-black"> {ruc}</p>
