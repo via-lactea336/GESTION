@@ -1,47 +1,51 @@
 'use client'
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-//import { useRouter } from 'next/router';
-//import obtenerOperacionPorId from "../../../../../lib/operacion/obtenerOperacionPorId";
+import { useRouter } from 'next/navigation';
+import obtenerOperacionPorId from "../../../../../lib/operacion/obtenerOperacionPorId";
 
 export default function Page() {
 
-    const [dateTime, setDateTime] = useState("");
-    const [monto, setMonto] = useState("");
-    const [numComprobante, setNumComprobante] = useState("");
-    const [concepto, setConcepto] = useState("");
-    const [nombreDestino, setNombreDestino] = useState("");
-    const [numCuentaDestino, setNumCuentaDestino] = useState("");
-    const [bancoDestino, setBancoDestino] = useState("");
-    const [nombreOrigen, setNombreOrigen] = useState("");
-    const [numCuentaOrigen, setNumCuentaOrigen] = useState("");
+    const [dateTime, setDateTime] = useState("undefined");
+    const [monto, setMonto] = useState(0);
+    const [numComprobante, setNumComprobante] = useState("undefined");
+    const [concepto, setConcepto] = useState("undefined");
+    const [nombreDestino, setNombreDestino] = useState("undefined");
+    const [numCuentaDestino, setNumCuentaDestino] = useState("undefined");
+    const [bancoDestino, setBancoDestino] = useState("undefined");
+    const [nombreOrigen, setNombreOrigen] = useState("undefined");
+    const [numCuentaOrigen, setNumCuentaOrigen] = useState("undefined");
 
     const { idMov } = useParams();
-    //const router = useRouter();
+    const router = useRouter();
 
     const getTransferencia = async () => {
-        try {
-            const response = await fetch(`/api/operacion/${idMov}`, {
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            })
-            const data = await response.json()
+        const data = await obtenerOperacionPorId(idMov as string)
+        console.log(data)
 
-            setDateTime(data.fechaOperacion);
-            setMonto(data.monto);
-            setNumComprobante(data.numeroComprobante);
-            setConcepto(data.concepto);
-            setNombreDestino(data.nombreInvolucrado);
-            setNumCuentaDestino(data.cuentaInvolucrado);
-            setBancoDestino(data.bancoInvolucrado);
-            setNombreOrigen(data.cuentaBancariaOrigen);
-            setNumCuentaOrigen(data.cuentaBancariaOrigenId);
-
-        } catch (error) {
-            //router.push('/not-found');
-            console.log(error)
+        if(data == undefined || typeof(data) === 'string'||data.success === false) {
+            router.push('not-found');
+            return;
         }
+
+        const fechaHora = new Date(data.data.fechaOperacion);
+        const formattedDateTime = fechaHora.toLocaleString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+        });
+        setDateTime(formattedDateTime);
+        setMonto(data.data.monto);
+        setNumComprobante(data.data.numeroComprobante);
+        setConcepto(data.data.concepto);
+        setNombreDestino(data.data.nombreInvolucrado);
+        setNumCuentaDestino(data.data.cuentaInvolucrado);
+        setBancoDestino(data.data.bancoInvolucrado);
+        //setNombreOrigen(data.data.cuentaBancariaOrigen);
+        setNumCuentaOrigen(data.data.cuentaBancariaOrigenId);
     };
 
 
