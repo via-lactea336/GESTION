@@ -7,7 +7,7 @@ import obtenerOperacionPorId from "../../../../../lib/operacion/obtenerOperacion
 export default function Page() {
 
     const [dateTime, setDateTime] = useState("undefined");
-    const [monto, setMonto] = useState(0);
+    const [monto, setMonto] = useState("0");
     const [numComprobante, setNumComprobante] = useState("undefined");
     const [concepto, setConcepto] = useState("undefined");
     const [nombreDestino, setNombreDestino] = useState("undefined");
@@ -38,7 +38,8 @@ export default function Page() {
         hour12: false
         });
         setDateTime(formattedDateTime);
-        setMonto(data.data.monto);
+        const formattedMonto = data.data.monto.toLocaleString('es-ES');
+        setMonto(formattedMonto);
         setNumComprobante(data.data.numeroComprobante);
         setConcepto(data.data.concepto);
         setNombreDestino(data.data.nombreInvolucrado);
@@ -52,6 +53,10 @@ export default function Page() {
     useEffect(() => {
         getTransferencia();
     });
+
+    const handleCloseButtonClick = () => {
+        router.back();
+    };
 
     return (
         <div className="flex flex-col items-center justify-center h-full">
@@ -119,7 +124,7 @@ export default function Page() {
                     <p className="pb-4 px-2">No válido como comprobante legal</p>
                 </div>
                 <div className="flex justify-center">
-                    <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Cerrar</button>
+                    <button onClick={handleCloseButtonClick} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Cerrar</button>
                 </div>
             </div>
 
