@@ -20,7 +20,7 @@ const Header: React.FC = () => {
   return (
     <header className="flex gap-3 justify-between items-center flex-wrap px-8 py-4 w-full rounded-md bg-primary-800 text-white">
       <h1 className="text-2xl font-bold">Cuentas</h1>
-      <nav className="flex flex-wrap  items-center gap-3">
+      <nav className="flex flex-wrap  items-center gap-6">
         {menu.map((data, index) => (
           <div key={index} className="flex items-center gap-3">
             <h3 className="mr-2">{data.label}</h3>
@@ -31,7 +31,7 @@ const Header: React.FC = () => {
             </select>
           </div>
         ))}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <h3>Ver saldos</h3>
           <input
             type="checkbox"
