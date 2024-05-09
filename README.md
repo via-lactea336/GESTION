@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Tesorería y Bancos 💰🏦
 
-## Getting Started
+Este proyecto desarrollado con TypeScript, Tailwind, Next.js, Prisma y PostgreSQL aborda la gestión y control de las cuentas bancarias de una empresa, así como el registro y seguimiento de los movimientos financieros asociados. A continuación, se detallan los requerimientos funcionales que cubre el módulo de Tesorería y Bancos:
 
-First, run the development server:
+## Requerimientos Funcionales
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Gestión de Cuentas Bancarias:**
+   - Definición de bancos y cuentas bancarias de la empresa en el sistema financiero nacional. Las cuentas pueden ser cuentas corrientes o cuentas de ahorro.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Registro de Pagos a Proveedores:**
+   - Los pagos realizados mediante cheques generarán un movimiento bancario de débito asociado a la cuenta bancaria correspondiente. El cheque quedará con estado emitido y afectará el saldo de la cuenta bancaria.
+   - Los pagos a proveedores mediante transferencias bancarias también generarán un movimiento bancario de débito asociado a la cuenta bancaria correspondiente, afectando el saldo y el saldo disponible.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Otros Movimientos Bancarios:**
+   - Se deben registrar otros movimientos bancarios, tanto de crédito como de débito, como costos por emisión de chequeras, intereses pagados, multas por deficiencia en firma, depósitos, entre otros. Estos movimientos afectarán el saldo y el saldo disponible de la cuenta bancaria.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+4. **Conciliación Bancaria:**
+   - Se realizará una conciliación bancaria para controlar los cheques emitidos y registrar la fecha de pago de cada uno de ellos. Una vez actualizada la fecha de pago del cheque, se descontará del saldo disponible de la cuenta bancaria.
 
-## Learn More
+5. **Registro de Depósitos Bancarios:**
+   - Se registrarán los depósitos bancarios que pueden corresponder a efectivo, cheques del mismo banco y cheques de otros bancos. Estos depósitos afectarán el saldo y el saldo disponible de la cuenta bancaria. Los cheques de otros bancos afectarán el saldo una vez confirmada la operación por el Banco, pasadas las 48 horas hábiles. En caso de rechazo del cheque, se registrará un movimiento para revertir el saldo por el rechazo.
 
-To learn more about Next.js, take a look at the following resources:
+## Configuración del Proyecto
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+1. **Clonar el Repositorio:**
+   ```bash
+   git clone https://github.com/via-lactea336/GESTION.git
