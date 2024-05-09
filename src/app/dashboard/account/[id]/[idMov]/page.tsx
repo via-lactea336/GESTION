@@ -41,10 +41,7 @@ export default function Page() {
       hour12: false,
     });
     setDateTime(formattedDateTime);
-    const formattedMonto = data.data.monto.toLocaleString("es-PY", {
-      style: "currency",
-      currency: "PYG",
-    });
+    const formattedMonto = data.data.monto.toLocaleString();
     setMonto(formattedMonto);
     setNumComprobante(data.data.numeroComprobante);
     setConcepto(data.data.concepto);
