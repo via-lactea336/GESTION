@@ -25,3 +25,30 @@ Este proyecto desarrollado con TypeScript, Tailwind, Next.js, Prisma y PostgreSQ
 1. **Clonar el Repositorio:**
    ```bash
    git clone https://github.com/via-lactea336/GESTION.git
+
+2. **Instalar las Dependencias:**
+   ```bash
+   pnpm install
+
+3. **Configurar las Variables de Entorno:**
+    - Crear un archivo `.env.local` en la raíz del proyecto con las siguientes variables de entorno:
+      ```env
+      DATABASE_URL="postgresql://usuario:contraseña@localhost:5432/tesoreria"
+      ```
+    - Reemplazar `usuario` y `contraseña` por las credenciales de acceso a la base de datos PostgreSQL.
+
+4. **Ejecutar las Migraciones de la Base de Datos:**
+    ```bash
+    pnpm prisma migrate dev
+
+5. **Iniciar el Servidor de Desarrollo:**
+    ```bash
+    pnpm dev
+
+## Capturas de Pantalla
+
+![Imagen de la aplicación web](captura.png)
+
+
+## Licencia
+Este proyecto se encuentra bajo la licencia MIT.
