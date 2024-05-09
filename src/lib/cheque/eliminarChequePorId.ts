@@ -1,13 +1,12 @@
 import { ApiResponseData } from "../definitions"
 
-export default async function agregarEntidad(nombre: string, ruc:string): Promise<ApiResponseData|string|undefined> {
+export default async function eliminarChequePorId(id: string): Promise<ApiResponseData|string|undefined> {
   try{
-    const response = await fetch("/api/entidad", {
-      method: "POST",
+    const response = await fetch(`/api/cheque/${id}`, {
+      method: "DELETE",
       headers:{
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({nombre: nombre, ruc: ruc})
     })
 
     const data:ApiResponseData = await response.json()

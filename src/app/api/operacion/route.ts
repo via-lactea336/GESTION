@@ -5,13 +5,16 @@ import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
 import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiResponse";
 import reflejarOperacion from "@/lib/operacion/reflejarOperacion";
 
-
 export async function POST(req: NextRequest) {
   
   const body: Operacion = await req.json();
   const { tipoOperacionId, cuentaBancariaOrigenId, monto, concepto, numeroComprobante, cuentaInvolucrado, nombreInvolucrado, bancoInvolucrado, rucInvolucrado  } = body;
-  
+
   if(!tipoOperacionId || !monto || !numeroComprobante || !concepto || !cuentaBancariaOrigenId || !cuentaInvolucrado || !nombreInvolucrado || !bancoInvolucrado || !rucInvolucrado) return generateApiErrorResponse("Missing data to create the operation", 400) //Validate credentials
+
+  if(Number(monto) <= 0) return generateApiErrorResponse("Monto invalido", 400)
+  
+  if(cuentaBancariaOrigenId === cuentaInvolucrado) return generateApiErrorResponse("Las cuentas involucradas no pueden ser iguales", 400)
 
   try{
     const operacion = await prisma.operacion.create({

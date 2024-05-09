@@ -18,6 +18,8 @@ export async function POST(req: NextRequest) {
   
   if(!numeroCuenta || !bancoId || !entidadId || !esCuentaAhorro || !saldo || !saldoDisponible) return generateApiErrorResponse("Missing data to create the bank account", 400) //Validate credentials
 
+  if(Number(saldo) <= 0  || Number(saldoDisponible) <= 0) return generateApiErrorResponse("Saldo invalido", 400)
+
   //Create new bank account
   try{
     const bankAccount = await prisma.cuentaBancaria.create({

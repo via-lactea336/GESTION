@@ -1,6 +1,7 @@
+import { Decimal } from "@prisma/client/runtime/library"
 import prisma from "../prisma"
 
-const reflejarOperacion = async (idCuentaBancariaOrigen: string, monto: number, afectaSaldo: boolean, esDebito: boolean) => {
+const reflejarOperacion = async (idCuentaBancariaOrigen: string, monto: Decimal, afectaSaldo: boolean, esDebito: boolean) => {
   
   //Verificar si se da debito o credito a nuestra cuenta
   const saldoNuevo = {
