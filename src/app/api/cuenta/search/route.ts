@@ -12,10 +12,7 @@ export async function GET(request: NextRequest) {
   const deleted = searchParams.get('deleted')
 
   let values: CuentaBancaria[]|null = null;
-
-  //Si no hay informacion para la busqueda, devuelve un error
-  if(!bancoId && !esCuentaAhorro) return generateApiErrorResponse("No hay informacion necesaria para la busqueda de cuentas bancarias", 400) //Validate credentials
-
+  
   //Si hay informacion para la busqueda, agregarla al filtro
   const where = {
     bancoId: bancoId ?? undefined,
@@ -25,8 +22,12 @@ export async function GET(request: NextRequest) {
 
   //Asignar los elementos encontrados a los valores
   values = await prisma.cuentaBancaria.findMany({
-    where: where
-  })
+    where: where,
+    include:{
+      banco:true
+    }
+  }
+)
 
   return generateApiSuccessResponse(200, "Cuentas bancarias encontradas", values)
 }

@@ -28,3 +28,7 @@ export type OperacionDetails = Operacion & {
 export type OperacionAndTipoOperacion = Operacion & {
   tipoOperacion: TipoOperacion
 }
+
+export type CuentaBancariaAndBanco = CuentaBancaria & {
+  banco: Banco
+}

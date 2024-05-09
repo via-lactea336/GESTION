@@ -1,7 +1,7 @@
-import { CuentaBancaria } from "@prisma/client"
+import { CuentaBancariaAndBanco } from "../definitions"
 import { ApiResponseData } from "../definitions"
 
-export default async function obtenerOperacionesFiltros(
+export default async function obtenerCuentasFiltros(
   {
     bancoId,
     esCuentaAhorro,
@@ -13,20 +13,22 @@ export default async function obtenerOperacionesFiltros(
   }
 ){
   
-  let searchParams = "http://localhost:3000/api/cuenta/search?"
+  const searchParams = new URLSearchParams()
 
-  if(bancoId) searchParams += `bancoId=${bancoId}`
-  if(esCuentaAhorro) searchParams += `&esCuentaAhorro=${esCuentaAhorro}`
-  if(deleted !== null || deleted !== undefined) searchParams += `&deleted=${deleted}`
+  if (bancoId) searchParams.append('bancoId', bancoId)
+  if (esCuentaAhorro) searchParams.append('esCuentaAhorro', `${esCuentaAhorro}`)
+  if (deleted !== null || deleted !== undefined) searchParams.append('deleted', `${deleted}`)
+  
+  const queryString = searchParams.toString();
 
   try{
-    const response = await fetch(searchParams, {
+    const response = await fetch(`http://localhost:3000/api/cuenta/search?${queryString}`, {
       headers: {
         "Content-Type": "application/json",
       },
     }) 
 
-    const data:ApiResponseData<CuentaBancaria[]> = await response.json()
+    const data:ApiResponseData<CuentaBancariaAndBanco[]> = await response.json()
     return data
   }catch(error){
     if(error instanceof Error) return error.message

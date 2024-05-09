@@ -11,13 +11,15 @@ export default async function obtenerOperacionesFiltros(
   }
 ){
   
-  let searchParams = "http://localhost:3000/api/operacion/search?"
+  const searchParams = new URLSearchParams()
 
-  if(fechaDesde) searchParams += `fechaDesde=${fechaDesde}`
-  if(fechaHasta) searchParams += `&fechaHasta=${fechaHasta}`
+  if(fechaDesde) searchParams.append('fechaDesde', fechaDesde)
+  if(fechaHasta) searchParams.append('fechaHasta', fechaHasta)
+
+  const queryString = searchParams.toString();
 
   try{
-    const response = await fetch(searchParams, {
+    const response = await fetch(`http://localhost:3000/api/operacion/search?${queryString}`, {
       headers: {
         "Content-Type": "application/json",
       },
