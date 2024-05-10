@@ -1,35 +1,69 @@
+"use client"
+
 import React from "react";
+import { useEffect, useState } from "react";
+import obtenerBancos from "@/lib/banco/obtenerBancos";
+import { Banco } from "@prisma/client";
 
 type MenuItem = {
   label: string;
   options: string[];
 };
 
-const menu: MenuItem[] = [
-  {
-    label: "Bancos",
-    options: ["Todos", "Banco Familiar", "Banco Vision", "Banco ITAU"],
-  },
-  {
-    label: "Tipo de cta",
-    options: ["Todos", "Cuenta Corriente", "Cuenta de ahorro"],
-  },
-];
+const Header: React.FC<{ onBancoSeleccionado: (bancoId: string) => void }> = ({ onBancoSeleccionado }) => {
+  const estadoInicial= [{id: "0", nombre: "No hay bancos"}]
+  const handleBancoSeleccionado = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const bancoId = event.target.value;
+    onBancoSeleccionado(bancoId);
+  };
+  const obtenerYMostrarBanco = async () => {
+    try {
+      const cuentasData = await obtenerBancos();
+    
 
-const Header: React.FC = () => {
+      if(cuentasData === undefined || typeof(cuentasData) === "string") return 
+      
+      setBanco(cuentasData.data ?? estadoInicial)
+    } catch (error) {
+      console.error("Error al obtener las cuentas:", error);
+    }
+  };
+
+  
+  const [banco,setBanco]= useState<Banco[] >(estadoInicial)
+  useEffect(() => {
+    obtenerYMostrarBanco();
+  }, []);
+
+  const menu: MenuItem[] = [
+    
+    {
+      label: "Tipo de cta",
+      options: ["Todos", "Cuenta Corriente", "Cuenta de ahorro"],
+    },
+  ];
+
   return (
     <header className="flex gap-3 justify-between items-center flex-wrap px-8 py-4 w-full rounded-md bg-primary-800 text-white">
       <h1 className="text-2xl font-bold">Cuentas</h1>
-      <nav className="flex flex-wrap  items-center gap-6">
+      <nav className="flex flex-wrap  items-center gap-6">  
+        <div className="flex items-center gap-3">
+        <h3 className="mr-2">Bancos</h3>
+        <select className="bg-primary-400 text-white py-1 px-2 rounded-md" onChange={handleBancoSeleccionado}>
+      {banco.map((data,index) =>
+        <option key={index} value={data.id}>{data.nombre}</option>
+      )}
+    </select>
+      </div>
         {menu.map((data, index) => (
           <div key={index} className="flex items-center gap-3">
-            <h3 className="mr-2">{data.label}</h3>
-            <select className="bg-primary-400 text-white py-1 px-2 rounded-md">
-              {data.options.map((option, i) => (
-                <option key={i}>{option}</option>
-              ))}
-            </select>
-          </div>
+          <h3 className="mr-2">{data.label}</h3>
+          <select className="bg-primary-400 text-white py-1 px-2 rounded-md">
+            {data.options.map((option, i) => (
+              <option key={i}>{option}</option>
+            ))}
+          </select>
+        </div>
         ))}
         <div className="flex items-center gap-3">
           <h3>Ver saldos</h3>
