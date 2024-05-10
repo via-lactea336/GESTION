@@ -8,11 +8,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
- datasource db {
-   provider = "postgresql"
-   url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
- }
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
 
 model Banco {
   id                    String              @id @default(uuid())
@@ -63,7 +63,7 @@ model Operacion {
   tipoOperacionId     String                
   fechaOperacion      DateTime              @default(now())
   monto               Decimal               @db.Money
- 
+
   cuentaBancariaOrigen CuentaBancaria       @relation(fields: [cuentaBancariaOrigenId], references: [id], onDelete: NoAction)
   cuentaBancariaOrigenId String
 
