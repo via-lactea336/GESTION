@@ -2,10 +2,10 @@
 import obtenerCuentaBancariaPorId from "@/lib/cuentaBancaria/obtenerCuentaBancariaPorId";
 import obtenerOperaciones from "@/lib/operacion/obtenerOperaciones";
 import Image from "next/image";
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
-
+import { WalletIcon, BanknotesIcon } from "@heroicons/react/24/outline";
+import { Operacion } from "@prisma/client";
 export default function AccountDetailsTab() {
   const [accountData, setAccountData] = useState({
     id: "",
@@ -16,21 +16,7 @@ export default function AccountDetailsTab() {
     saldo: 0,
     saldoDisponible: 0,
   });
-  const [operaciones, setOperaciones] = useState([
-    {
-      id: "",
-      tipoOperacionId: "",
-      fechaOperacion: new Date(),
-      monto: 0,
-      cuentaBancariaOrigenId: "",
-      bancoInvolucrado: "",
-      nombreInvolucrado: "",
-      cuentaInvolucrado: "",
-      rucInvolucrado: "",
-      concepto: "",
-      numeroComprobante: "",
-    },
-  ]);
+  const [operaciones, setOperaciones] = useState<Operacion[]>();
   const { id } = useParams();
 
   useEffect(() => {
@@ -59,12 +45,7 @@ export default function AccountDetailsTab() {
         if (typeof operacionesReq === "string") {
           throw new Error(operacionesReq);
         }
-        setOperaciones(
-          operacionesReq.data.map((operacion) => ({
-            ...operacion,
-            monto: Number(operacion.monto),
-          }))
-        );
+        setOperaciones(operacionesReq.data);
       } catch (error) {
         console.error(error);
       }
@@ -88,26 +69,22 @@ export default function AccountDetailsTab() {
     <div className="flex flex-col h-full -mt-8">
       {/* Encabezado con título y botón de retroceso */}
       <div className="flex justify-between items-center bg-primary-600 p-4 border-2 border-black">
-        <h1 className="text-4xl font-bold mt-10 mb-10">Detalle cuentas</h1>
-        <Link
-          href={"/dashboard/account"}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 -mt-20 rounded"
-        >
+        <h1 className="text-4xl font-bold mt-2 mb-2">Detalle cuentas</h1>
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
           Atrás
-        </Link>
+        </button>
       </div>
 
       {/* Contenido principal */}
-      <div className="flex-grow bg-primary-200 shadow-md border-2 border-black pt-10 pb-10 pl-10 flex flex-row">
-        {/* Datos de la cuenta */}
-        <Image
-          src="https://img.freepik.com/vector-gratis/hucha_53876-25494.jpg?size=338&ext=jpg&ga=GA1.1.1687694167.1714694400&semt=ais"
-          alt="Account"
-          width={20}
-          height={20}
-          className="w-20 h-20 object-cover mr-12 mt-10"
-        />
-        <div className="flex-1 mr-8 mt-12">
+      <div className="flex-grow bg-primary-200 shadow-md border-2 border-black pt-5 pb-5 pl-10 flex flex-row">
+        <div className="w-20 h-20 mt-2 mr-20">
+          {accountData.esCuentaAhorro ? (
+            <BanknotesIcon className="text-primary-400" />
+          ) : (
+            <WalletIcon className="text-primary-400" />
+          )}
+        </div>
+        <div className="flex-1 mr-8 mt-5">
           <div className="mb-4 flex items-center">
             <label className="block text-gray-700 font-bold mr-2">
               Tipo de Cuenta:
@@ -120,13 +97,13 @@ export default function AccountDetailsTab() {
           </div>
           <div className="mb-4 flex items-center">
             <label className="block text-gray-700 font-bold mr-2">
-              Nombre de la Cuenta:
+              Numero de Cuenta:
             </label>
             <p className="text-gray-700">{accountData.numeroCuenta}</p>
           </div>
         </div>
 
-        <div className="flex-1 mt-12">
+        <div className="flex-1 mt-5">
           <div className="mb-4 flex items-center">
             <label className="block text-gray-700 font-bold mr-2">
               Saldo Disponible:
@@ -148,24 +125,30 @@ export default function AccountDetailsTab() {
         <table className="border-collapse w-full">
           <tbody>
             <tr>
-              <td className="w-1/4">
-                <h1 className="text-xl font-bold mt-1 text-black">Operacion</h1>
+              <td className="w-1/6">
+                <h1 className="text-md font-bold mt-1 text-black">Operacion</h1>
               </td>
-              <td className="w-1/4">
-                <h1 className="text-xl font-bold mt-1 text-black">Fecha</h1>
+              <td className="w-1/6">
+                <h1 className="text-md font-bold mt-1 text-black">Fecha</h1>
               </td>
-              <td className="w-1/4">
-                <h1 className="text-xl font-bold mt-1 text-black">
-                  Descripcion
+              <td className="w-1/6">
+                <h1 className="text-md font-bold mt-1 text-black">
+                  Banco Origen
                 </h1>
               </td>
-              <td className="w-1/4">
-                <h1 className="text-xl font-bold mt-1 text-black">
-                  Monto Transaccion
+              <td className="w-1/6">
+                <h1 className="text-md font-bold mt-1 text-black">
+                  Involucrado
                 </h1>
+              </td>
+              <td className="w-1/6">
+                <h1 className="text-md font-bold mt-1 text-black">Concepto</h1>
+              </td>
+              <td className="w-1/6">
+                <h1 className="text-md font-bold mt-1 text-black">Monto</h1>
               </td>
             </tr>
-            {operaciones.map((operacion, index) => (
+            {operaciones?.map((operacion, index) => (
               <tr key={index}>
                 <td>
                   <Image
@@ -176,33 +159,43 @@ export default function AccountDetailsTab() {
                         : "https://c1.klipartz.com/pngpicture/658/794/sticker-png-banking-arrow-money-bank-account-wire-transfer-electronic-funds-transfer-demand-deposit-mobile-banking-stanbic-ibtc-bank.png"
                     }
                     alt="Account"
-                    width={40}
-                    height={40}
+                    width={10}
+                    height={10}
                     className="w-10 h-10 object-cover rounded-full bg-violet-400 mt-5 mb-5 ml-5"
                   />
                 </td>
                 <td>
-                  <h1 className="text-base font-normal mt-1 text-black">
+                  <h1 className="text-sm font-normal mt-1 text-black">
                     {formatDate(operacion.fechaOperacion)}
                   </h1>
                 </td>
                 <td>
-                  <h1 className="text-base font-normal mt-1 text-black">
+                  <h1 className="text-sm font-normal mt-1 text-black">
+                    {operacion.bancoInvolucrado}
+                  </h1>
+                </td>
+                <td>
+                  <h1 className="text-sm font-normal mt-1 text-black">
+                    {operacion.nombreInvolucrado}
+                  </h1>
+                </td>
+                <td>
+                  <h1 className="text-sm font-normal mt-1 text-black">
                     {operacion.concepto}
                   </h1>
                 </td>
                 <td>
                   <h1
-                    className={`text-xl font-bold mt-1 ${
+                    className={`text-sm font-bold mt-1 ${
                       operacion.tipoOperacionId ===
                       "b30dde92-8757-4886-9388-be7dbc6cc275"
                         ? "text-green-500"
                         : "text-red-500"
                     }`}
                   >
-                    {operacion.monto >= 0
-                      ? `+${operacion.monto.toFixed(2)}$`
-                      : `${operacion.monto.toFixed(2)}$`}
+                    {Number(operacion.monto) >= 0
+                      ? `+${operacion.monto}Gs.`
+                      : `${operacion.monto}Gs.`}
                   </h1>
                 </td>
               </tr>

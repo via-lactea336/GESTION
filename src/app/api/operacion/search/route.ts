@@ -11,15 +11,14 @@ export async function GET(request: NextRequest) {
 
   const fechaDesde = searchParams.get("fechaDesde");
   const fechaHasta = searchParams.get("fechaHasta");
+  
+  const skip = searchParams.get("skip");
+  const upTo  = searchParams.get("upTo");
+
+  const verifiedSkip = (!skip || Number.isNaN(parseInt(skip))) ? 0 : parseInt(skip)
+  const verifiedUpTo = (!upTo || Number.isNaN(parseInt(upTo))) ? 4 : parseInt(upTo)
 
   let values: Operacion[] | null = null;
-
-  //Si no hay informacion para la busqueda, devuelve un error
-  if (!fechaDesde && !fechaHasta)
-    return generateApiErrorResponse(
-      "No hay informacion necesaria para la busqueda de operaciones",
-      400
-    ); //Validate credentials
 
   //Si hay informacion para la busqueda, agregarla al filtro
   const where = {
@@ -31,7 +30,12 @@ export async function GET(request: NextRequest) {
 
   //Asignar los elementos encontrados a los valores
   values = await prisma.operacion.findMany({
+    skip: verifiedSkip,
+    take: verifiedUpTo,
     where: where as any,
+    include:{
+      tipoOperacion: true
+    }
   });
 
   if (!values)

@@ -3,6 +3,8 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  // Crear usuario Admin
+
   // Crear bancos
   const bancoFamiliar = await prisma.banco.create({
     data: {
@@ -39,6 +41,61 @@ async function main() {
       esCuentaAhorro: false,
       saldo: 1000000,
       saldoDisponible: 1000000,
+    },
+  });
+
+  const cuentaBancariaBancoFamiliar3 = await prisma.cuentaBancaria.create({
+    data: {
+      numeroCuenta: "54-7891234",
+      bancoId: bancoFamiliar.id,
+      entidadId: entidad.id,
+      esCuentaAhorro: true,
+      saldo: 1500000,
+      saldoDisponible: 1500000,
+    },
+  });
+
+  const cuentaBancariaBancoAtlas = await prisma.cuentaBancaria.create({
+    data: {
+      numeroCuenta: "33-445566",
+      bancoId: atlas.id,
+      entidadId: entidad.id,
+      esCuentaAhorro: false,
+      saldo: 500000,
+      saldoDisponible: 500000,
+    },
+  });
+
+  const cuentaBancariaBancoAtlas2 = await prisma.cuentaBancaria.create({
+    data: {
+      numeroCuenta: "66-778899",
+      bancoId: atlas.id,
+      entidadId: entidad.id,
+      esCuentaAhorro: false,
+      saldo: 300000,
+      saldoDisponible: 300000,
+    },
+  });
+
+  const cuentaBancariaBancoItau = await prisma.cuentaBancaria.create({
+    data: {
+      numeroCuenta: "11-223344",
+      bancoId: itau.id,
+      entidadId: entidad.id,
+      esCuentaAhorro: false,
+      saldo: 2000000,
+      saldoDisponible: 2000000,
+    },
+  });
+
+  const cuentaBancariaBancoItau2 = await prisma.cuentaBancaria.create({
+    data: {
+      numeroCuenta: "44-556677",
+      bancoId: itau.id,
+      entidadId: entidad.id,
+      esCuentaAhorro: false,
+      saldo: 500000,
+      saldoDisponible: 500000,
     },
   });
 
