@@ -25,7 +25,7 @@ const BankAccount: React.FC<CuentaBancaria> = ({
 }) => {
   const tipoDeCuenta = esCuentaAhorro ? "Cuenta de ahorro" : "Cuenta Corriente";
   const saldoFormateado = saldo.toLocaleString();
-  const estadoInicial = { id: "", nombre: "" };
+  const estadoInicial = { id: "", nombre: "", deleted: null };
 
   const obtenerYMostrarBanco = async () => {
     try {
