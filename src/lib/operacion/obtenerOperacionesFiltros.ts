@@ -19,7 +19,7 @@ export default async function obtenerOperacionesFiltros(
   const queryString = searchParams.toString();
 
   try{
-    const response = await fetch(`http://localhost:3000/api/operacion/search?${queryString}`, {
+    const response = await fetch(`/api/operacion/search?${queryString}`, {
       headers: {
         "Content-Type": "application/json",
       },

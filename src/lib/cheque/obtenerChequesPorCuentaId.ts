@@ -5,7 +5,7 @@ import { ApiResponseData } from "../definitions"
 /**
  * Permite obtener todas las operaciones de una cuenta dada por su id
  * @param cuentaId El id de la cuenta de la cual queremos obtener sus operaciones
- * @returns La lista de operaciones, o en caso de error un string del error o undefined
+ * @returns La lista de operaciones, o en caso de error un string  error o undefined
  */
 export default async function obtenerChequesPorCuentaId(cuentaId:string): Promise<ApiResponseData<Operacion[]>|string|undefined> {
   try{

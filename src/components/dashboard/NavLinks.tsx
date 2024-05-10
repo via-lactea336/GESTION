@@ -1,5 +1,7 @@
 "use client";
 import {
+  UserIcon,
+  ArrowsRightLeftIcon,
   UserGroupIcon,
   HomeIcon,
   DocumentDuplicateIcon,
@@ -10,11 +12,11 @@ import { usePathname } from "next/navigation";
 // Map of links to display in the side navigation.
 // Depending on the size of the application, this would be stored in a database.
 const links = [
-  { name: "Cuenta", href: "/dashboard/account", icon: HomeIcon },
+  { name: "Cuenta", href: "/dashboard/account", icon: UserIcon },
   {
     name: "Transacciones",
     href: "/dashboard",
-    icon: DocumentDuplicateIcon,
+    icon: ArrowsRightLeftIcon,
   },
 ];
 
