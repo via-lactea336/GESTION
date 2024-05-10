@@ -10,12 +10,21 @@ export async function GET(req:NextRequest, { params }: { params: { id: string } 
   const operacion = await prisma.operacion.findFirst({
     where: {
       id
+    },
+    include: {
+      tipoOperacion: true,
+      cuentaBancariaOrigen: {
+        include: {
+          banco: true,
+          entidad: true,
+        }
+      }
     }
   })
 
   if(!operacion) return generateApiErrorResponse("Operation not found", 404)
-
-  return generateApiSuccessResponse<Operacion>(200, `Operation ${id}`, operacion)
+  // console.log('Este es el de la API \n', operacion)
+  return generateApiSuccessResponse(200, `Operation ${id}`, operacion)
 }
 
 

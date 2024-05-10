@@ -3,7 +3,7 @@ import { ApiResponseData } from "../definitions"
 
 export default async function obtenerCuentaBancariaPorId(id:string): Promise<ApiResponseData<CuentaBancaria>|string|undefined> {
   try{
-    const response = await fetch(`/api/cuenta/${id}`, {
+    const response = await fetch(`http://localhost:3000/api/cuenta/${id}`, {
       headers:{
         "Content-Type": "application/json",
       }

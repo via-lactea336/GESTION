@@ -35,7 +35,6 @@ export default function Page() {
   return (
     <div className="flex flex-col h-full -mt-8">
          <Header onBancoSeleccionado={setBancoSeleccionado} />
-
       <div className="bg-primary-200 container mx-auto mt-2 rounded-md">
         <h1 className="text-4xl font-bold text-center pt-3 text-primary-900">
           Cuentas

@@ -36,12 +36,15 @@ export async function DELETE(req:NextRequest, { params }: { params: { id: string
   const id = params.id;
   
   try {
-    const deletedBankAccount = await prisma.cuentaBancaria.delete({
+    const deletedBankAccount = await prisma.cuentaBancaria.update({
       where: {
         id
+      },
+      data: {
+        deleted: new Date()
       }
     });
-
+    
     // Devuelve éxito con la Cuenta Bancaria eliminada
     return generateApiSuccessResponse(200, `Bank Account ${id} deleted`, deletedBankAccount);
   } catch (error) {

@@ -23,9 +23,8 @@ export function Form({ title, children, handleSubmit }: Props) {
     } catch (error) {
       if (error instanceof Error) {
         setError({ message: error.message });
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
     }
   };
 

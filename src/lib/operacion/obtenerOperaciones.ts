@@ -3,7 +3,7 @@ import { ApiResponseData } from "../definitions"
 
 export default async function obtenerOperaciones(): Promise<ApiResponseData<Operacion[]>|string|undefined> {
   try{
-    const response = await fetch("/api/operacion", {
+    const response = await fetch("http://localhost:3000/api/operacion", {
       headers:{
         "Content-Type": "application/json",
       }

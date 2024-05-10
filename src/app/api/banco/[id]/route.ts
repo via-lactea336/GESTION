@@ -36,11 +36,26 @@ export async function DELETE(req:NextRequest, { params }: { params: { id: string
   const id = params.id;
   
   try {
-    const deletedBank = await prisma.banco.delete({
+    const deletedBank = await prisma.banco.update({
       where: {
         id
+      },
+      data: {
+        deleted: new Date()
       }
     });
+
+    //Eliminar todas las cuentas bancarias relacionadas con ese banco
+    await prisma.cuentaBancaria.updateMany({
+      where: {
+        bancoId: id
+      },
+      data: {
+        deleted: new Date()
+      }
+    })
+
+    if(!deletedBank) return generateApiErrorResponse("No se ha podido eliminar el banco", 500)
 
     // Devuelve éxito con el banco eliminado
     return generateApiSuccessResponse<Banco>(200, `Bank ${id} deleted`, deletedBank);
