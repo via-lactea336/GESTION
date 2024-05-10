@@ -80,9 +80,10 @@ export default function Page() {
               numeroCuenta={cuenta.numeroCuenta}
               esCuentaAhorro={cuenta.esCuentaAhorro}
               banco={cuenta.banco}
-              saldo={Number(cuenta.saldo)}
-              saldoDisponible={Number(cuenta.saldoDisponible)}
+              saldo={cuenta.saldo}
+              saldoDisponible={cuenta.saldoDisponible}
               verSaldo={verSaldo}
+              deleted={cuenta.deleted}
             />
           ))}
         </div>
