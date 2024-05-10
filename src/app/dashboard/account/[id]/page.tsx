@@ -111,14 +111,16 @@ export default function AccountDetailsTab() {
               <label className="block text-gray-700 font-bold mr-2">
                 Saldo Disponible:
               </label>
-              <p className="text-gray-700">${accountData.saldo.toFixed(2)}</p>
+              <p className="text-gray-700">
+                ${Number(accountData.saldo).toLocaleString()}
+              </p>
             </div>
             <div className="flex items-center">
               <label className="block text-gray-700 font-bold mr-2">
                 Saldo Retenido:
               </label>
               <p className="text-gray-700">
-                ${accountData.saldoDisponible.toFixed(2)}
+                ${Number(accountData.saldoDisponible).toLocaleString()}
               </p>
             </div>
           </div>
