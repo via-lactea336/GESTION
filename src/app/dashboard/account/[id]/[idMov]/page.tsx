@@ -14,6 +14,8 @@ export default function Page() {
   const [bancoDestino, setBancoDestino] = useState("undefined");
   const [nombreOrigen, setNombreOrigen] = useState("undefined");
   const [numCuentaOrigen, setNumCuentaOrigen] = useState("undefined");
+  const [bancoOrigen, setBancoOrigen] = useState("undefined");
+  const [tipoOperacion, setTipoOperacion] = useState("undefined");
 
   const { idMov } = useParams();
   const router = useRouter();
@@ -48,8 +50,10 @@ export default function Page() {
     setNombreDestino(data.data.nombreInvolucrado);
     setNumCuentaDestino(data.data.cuentaInvolucrado);
     setBancoDestino(data.data.bancoInvolucrado);
-    //setNombreOrigen(data.data.cuentaBancariaOrigen);
+    setNombreOrigen(data.data.cuentaBancariaOrigen.entidad.nombre);
     setNumCuentaOrigen(data.data.cuentaBancariaOrigenId);
+    setBancoOrigen(data.data.cuentaBancariaOrigen.banco.nombre);
+    setTipoOperacion(data.data.tipoOperacion.esDebito ? "Debito" : "Credito");
   };
 
   useEffect(() => {
@@ -64,8 +68,8 @@ export default function Page() {
     <div className="flex flex-col items-center justify-center h-full">
       <div className="w-1/2 py-4 border-b border-gray-300">
         <h1 className="text-2xl font-bold pb-4">
-          Comprobante de Transferencia
-        </h1>
+          Comprobante de Transferencia - {tipoOperacion}
+        </h1>          
         <div className="flex items-center ">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -74,9 +78,9 @@ export default function Page() {
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             className="lucide lucide-calendar-clock"
           >
             <path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5" />
@@ -113,9 +117,9 @@ export default function Page() {
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             className="lucide lucide-hand-coins"
           >
             <path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17" />
@@ -124,7 +128,7 @@ export default function Page() {
             <circle cx="16" cy="9" r="2.9" />
             <circle cx="6" cy="5" r="3" />
           </svg>
-          <p className="text-lg px-2">Destino</p>
+          <p className="text-lg px-2">{tipoOperacion == "Debito"?"Destino": "Origen"}</p>
         </div>
         <div className="flex justify-between w-full">
           <p className="w-1/3 text-base">Nombre:</p>
@@ -148,16 +152,16 @@ export default function Page() {
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             className="lucide lucide-banknote"
           >
             <rect width="20" height="12" x="2" y="6" rx="2" />
             <circle cx="12" cy="12" r="2" />
             <path d="M6 12h.01M18 12h.01" />
           </svg>
-          <p className="text-lg px-2">Origen</p>
+          <p className="text-lg px-2">{tipoOperacion == "Debito"?"Origen":"Destino"}</p>
         </div>
         <div className="flex justify-between w-full">
           <p className="w-1/3 text-base">Nombre:</p>
@@ -167,6 +171,10 @@ export default function Page() {
           <p className="w-1/3 text-base">Cuenta:</p>
           <p className="w-2/3 text-base text-right">{numCuentaOrigen}</p>
         </div>
+        <div className="flex justify-between w-full">
+          <p className="w-1/3 text-base">Banco:</p>
+          <p className="w-2/3 text-base text-right">{bancoOrigen}</p>
+        </div>        
       </div>
       <div className="w-1/2 py-4 border-gray-300">
         <div className="flex flex-row">
@@ -177,9 +185,9 @@ export default function Page() {
             viewBox="0 0 24 24"
             fill="none"
             stroke="blue"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             className="lucide lucide-badge-info"
           >
             <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
