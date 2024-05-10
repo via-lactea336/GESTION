@@ -159,7 +159,7 @@ export default function AccountDetailsTab() {
             {operaciones.map((operacion, index) => (
               <tr key={index}>
                 <td>
-                  <img
+                  <Image
                     src={
                       operacion.tipoOperacionId ===
                       "b30dde92-8757-4886-9388-be7dbc6cc275"

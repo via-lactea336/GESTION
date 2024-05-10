@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { Banco } from "@prisma/client";
 import { useEffect, useState } from "react";
