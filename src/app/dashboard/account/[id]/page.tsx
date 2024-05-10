@@ -40,7 +40,11 @@ export default function AccountDetailsTab() {
         if (!cuentaReq || typeof cuentaReq === "string") {
           throw new Error("Error obteniendo la cuenta");
         }
-        setAccountData(cuentaReq.data);
+        setAccountData({
+          ...cuentaReq.data,
+          saldo: Number(cuentaReq.data.saldo),
+          saldoDisponible: Number(cuentaReq.data.saldoDisponible),
+        });
       } catch (error) {
         console.error(error);
       }
@@ -55,7 +59,12 @@ export default function AccountDetailsTab() {
         if (typeof operacionesReq === "string") {
           throw new Error(operacionesReq);
         }
-        setOperaciones(operacionesReq.data);
+        setOperaciones(
+          operacionesReq.data.map((operacion) => ({
+            ...operacion,
+            monto: Number(operacion.monto),
+          }))
+        );
       } catch (error) {
         console.error(error);
       }
