@@ -195,8 +195,8 @@ export default function AccountDetailsTab() {
                       }`}
                     >
                       {Number(operacion.monto) >= 0
-                        ? `-${operacion.monto.toFixed(2)}Gs.`
-                        : `+${operacion.monto.toFixed(2)}Gs.`}
+                        ? `-${operacion.monto}Gs.`
+                        : `+${operacion.monto}Gs.`}
                     </h1>
                   </td>
                 </tr>
