@@ -42,6 +42,17 @@ async function main() {
     },
   });
 
+  const cuentaBancariaBancoFamiliar3 = await prisma.cuentaBancaria.create({
+    data: {
+      numeroCuenta: "54-7891234",
+      bancoId: bancoFamiliar.id,
+      entidadId: entidad.id,
+      esCuentaAhorro: true,
+      saldo: 1500000,
+      saldoDisponible: 1500000,
+    },
+  });
+
   const cuentaBancariaBancoAtlas = await prisma.cuentaBancaria.create({
     data: {
       numeroCuenta: "33-445566",
