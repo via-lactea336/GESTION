@@ -23,6 +23,10 @@ export async function POST(req: NextRequest) {
   if(Number(monto) <= 0) return generateApiErrorResponse("Monto invalido", 400)
   
   try{
+
+    //Refleja el incremento o decremento en el saldo de la cuenta bancaria siguien las propiedades del tipo de Operacion
+    reflejarOperacion(cuentaBancariaOrigenId, monto, tipoOperacionId)
+
     const operacion = await prisma.operacion.create({
       data: {
         tipoOperacionId, cuentaBancariaOrigenId, monto, concepto, numeroComprobante, cuentaInvolucrado, nombreInvolucrado, bancoInvolucrado, rucInvolucrado
@@ -33,9 +37,6 @@ export async function POST(req: NextRequest) {
     })
   
     if(!operacion) return generateApiErrorResponse("Error generating operation", 400)  
-
-    //Refleja el incremento o decremento en el saldo de la cuenta bancaria siguien las propiedades del tipo de Operacion
-    reflejarOperacion(cuentaBancariaOrigenId, monto, operacion.tipoOperacion.afectaSaldo, operacion.tipoOperacion.esDebito)
 
     return generateApiSuccessResponse(200, "operation added successfully")
   
