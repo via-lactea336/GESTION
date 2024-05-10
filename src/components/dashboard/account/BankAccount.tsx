@@ -14,7 +14,8 @@ const BankAccount: React.FC<Props> = ({
   verSaldo,
 }) => {
   const tipoDeCuenta = esCuentaAhorro ? "Cuenta de ahorro" : "Cuenta Corriente";
-  const saldoFormateado = saldo.toLocaleString();
+  const saldoFormateado = saldo;
+  console.log("saldo", saldo);
 
   return (
     <div className="bg-gray-800 py-6 px-4 rounded-md shadow-md [min-width:300px]">
@@ -25,8 +26,8 @@ const BankAccount: React.FC<Props> = ({
         <p className="text-xl">
           {" "}
           {verSaldo
-            ? saldoFormateado
-            : `${"*".repeat(saldoFormateado.length)}`}{" "}
+            ? Number(saldoFormateado).toLocaleString()
+            : `${"*".repeat(saldoFormateado.toLocaleString().length)}`}{" "}
           GS
         </p>
         <a
