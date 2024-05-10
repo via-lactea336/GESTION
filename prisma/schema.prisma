@@ -8,80 +8,105 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// datasource db {
-//   provider = "postgresql"
-//   url      = env("DATABASE_URL")
-// }
-
-datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
-}
+ datasource db {
+   provider = "postgresql"
+   url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+ }
 
 model Banco {
   id                    String              @id @default(uuid())
-  nombre                String              @unique
+  nombre                String              @unique @db.VarChar(128)
   deleted               DateTime?
   cuentas               CuentaBancaria[]
+  cheques               Cheque[]
 }
 
 
 model CuentaBancaria {
-  id                    String              @id @default(uuid())
-  numeroCuenta          String              @unique
-  banco                 Banco               @relation(fields: [bancoId], references: [id], onDelete: NoAction)
+  id                    String             @id @default(uuid())
+  numeroCuenta          String             @unique @db.VarChar(128)
+  banco                 Banco              @relation(fields: [bancoId], references: [id], onDelete: NoAction)
   bancoId               String
-  entidad               Entidad             @relation(fields: [entidadId], references: [id], onDelete: NoAction)
+  entidad               Entidad            @relation(fields: [entidadId], references: [id], onDelete: NoAction)
   entidadId             String 
   esCuentaAhorro        Boolean
-  saldo                 Int
-  saldoDisponible       Int
+  saldo                 Decimal            @db.Money
+  saldoDisponible       Decimal            @db.Money
   deleted               DateTime?
   operaciones           Operacion[]
+  cheques               Cheque[]
 }
 
 
 model Entidad {
   id                    String              @id @default(uuid())
-  nombre                String              @unique
-  ruc                   String              @unique
-  CuentaBancaria        CuentaBancaria[]
+  nombre                String              @unique @db.VarChar(128)
+  ruc                   String              @unique @db.VarChar(128)
+  cuentaBancarias       CuentaBancaria[]
 }
 
 
 model TipoOperacion {
   id                    String              @id @default(uuid())
   nombre                String              @unique
-  esDebito              Boolean
+  esDebito              Boolean             
   afectaSaldo           Boolean
-  Operacion             Operacion[]
+  operaciones           Operacion[]
+  cheques               Cheque[]
 }
 
 
 model Operacion {
   id                  String                @id @default(uuid())
   tipoOperacion       TipoOperacion         @relation(fields: [tipoOperacionId], references: [id], onDelete: NoAction)
-  tipoOperacionId     String
+  tipoOperacionId     String                
   fechaOperacion      DateTime              @default(now())
-  monto               Int
+  monto               Decimal               @db.Money
  
   cuentaBancariaOrigen CuentaBancaria       @relation(fields: [cuentaBancariaOrigenId], references: [id], onDelete: NoAction)
   cuentaBancariaOrigenId String
 
-  bancoInvolucrado    String           
-  nombreInvolucrado   String
-  cuentaInvolucrado   String
-  rucInvolucrado      String
+  bancoInvolucrado    String               @db.VarChar(128)
+  nombreInvolucrado   String               @db.VarChar(128)
+  cuentaInvolucrado   String               @db.VarChar(128)
+  rucInvolucrado      String               @db.VarChar(128)
 
-  concepto            String
+  concepto            String               @db.VarChar(255)
 
-  numeroComprobante   String
+  numeroComprobante   String               @db.VarChar(128)
 }
 
+enum estadoCheque {
+  EMITIDO
+  PAGADO
+}
+
+model Cheque {
+  id                        String           @id @default(uuid())
+  numeroCheque              String           @unique
+  esRecibido                Boolean               
+  monto                     Decimal          @db.Money        
+  fechaEmision              DateTime
+  fechaPago                 DateTime
+
+  emitidoPor                String           @db.VarChar(128)
+  acreedor                  String           @db.VarChar(128)
+
+  estado                    estadoCheque     @default(EMITIDO)
+  
+  bancoCheque               Banco            @relation(references: [id], fields: [bancoChequeId], onDelete: NoAction)
+  bancoChequeId             String
+
+  tipoOperacion             TipoOperacion    @relation(fields: [tipoOperacionId], references: [id], onDelete: NoAction)
+  tipoOperacionId           String
+  
+  cuentaAfectada            CuentaBancaria   @relation(fields: [cuentaBancariaAfectadaId], references: [id], onDelete: NoAction)
+  cuentaBancariaAfectadaId  String      
+}
 
 model User {
   id String @id @default(uuid())
   username String @unique
-  password String
+  password String
 }
