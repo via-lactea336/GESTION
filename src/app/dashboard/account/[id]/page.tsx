@@ -40,11 +40,7 @@ export default function AccountDetailsTab() {
         if (!cuentaReq || typeof cuentaReq === "string") {
           throw new Error("Error obteniendo la cuenta");
         }
-        setAccountData({
-          ...cuentaReq.data,
-          saldo: Number(cuentaReq.data.saldo),
-          saldoDisponible: Number(cuentaReq.data.saldoDisponible),
-        });
+        setAccountData(cuentaReq.data);
       } catch (error) {
         console.error(error);
       }
@@ -59,12 +55,7 @@ export default function AccountDetailsTab() {
         if (typeof operacionesReq === "string") {
           throw new Error(operacionesReq);
         }
-        setOperaciones(
-          operacionesReq.data.map((operacion) => ({
-            ...operacion,
-            monto: Number(operacion.monto),
-          }))
-        );
+        setOperaciones(operacionesReq.data);
       } catch (error) {
         console.error(error);
       }
@@ -89,12 +80,9 @@ export default function AccountDetailsTab() {
       {/* Encabezado con título y botón de retroceso */}
       <div className="flex justify-between items-center bg-primary-600 p-4 border-2 border-black">
         <h1 className="text-4xl font-bold mt-10 mb-10">Detalle cuentas</h1>
-        <Link
-          href={"/dashboard/account"}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 -mt-20 rounded"
-        >
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 -mt-20 rounded">
           Atrás
-        </Link>
+        </button>
       </div>
 
       {/* Contenido principal */}

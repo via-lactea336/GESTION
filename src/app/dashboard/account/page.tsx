@@ -69,11 +69,8 @@ export default function Page() {
         onTipoCuentaSeleccionado={setTipoCuentaSeleccionado}
         onVerSaldo={setVerSaldo}
       />
-      <div className="bg-gray-700 container mx-auto mt-2 rounded-md">
-        <h1 className="text-4xl font-bold text-center pt-3 text-white">
-          Cuentas
-        </h1>
-        <div className="flex items-center justify-center py-6 flex-wrap gap-4 md:gap-8">
+      <div className="bg-gray-700 mt-2 rounded-md">
+        <div className="grid flex-wrap p-6 gap-4 grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
           {cuentasFiltradas.map((cuenta: CuentaBancaria) => (
             <BankAccount
               key={cuenta.id}
