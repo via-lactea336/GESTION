@@ -11,6 +11,12 @@ export async function GET(request: NextRequest) {
 
   const fechaDesde = searchParams.get("fechaDesde");
   const fechaHasta = searchParams.get("fechaHasta");
+  
+  const skip = searchParams.get("skip");
+  const upTo  = searchParams.get("upTo");
+
+  const verifiedSkip = (!skip || Number.isNaN(parseInt(skip))) ? 0 : parseInt(skip)
+  const verifiedUpTo = (!upTo || Number.isNaN(parseInt(upTo))) ? 4 : parseInt(upTo)
 
   let values: Operacion[] | null = null;
 
@@ -24,7 +30,12 @@ export async function GET(request: NextRequest) {
 
   //Asignar los elementos encontrados a los valores
   values = await prisma.operacion.findMany({
+    skip: verifiedSkip,
+    take: verifiedUpTo,
     where: where as any,
+    include:{
+      tipoOperacion: true
+    }
   });
 
   if (!values)
