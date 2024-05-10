@@ -5,18 +5,14 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { WalletIcon, BanknotesIcon } from "@heroicons/react/24/outline";
-import { Operacion } from "@prisma/client";
+import { CuentaBancaria, Operacion } from "@prisma/client";
+import { OperacionAndTipoOperacion } from "@/lib/definitions";
+import obtenerOperacionesPorCuentaId from "@/lib/operacion/obtenerOperacionesPorCuentaId";
 export default function AccountDetailsTab() {
-  const [accountData, setAccountData] = useState({
-    id: "",
-    numeroCuenta: "",
-    bancoId: "",
-    entidadId: "",
-    esCuentaAhorro: false,
-    saldo: 0,
-    saldoDisponible: 0,
-  });
-  const [operaciones, setOperaciones] = useState<Operacion[]>();
+  const [accountData, setAccountData] = useState<CuentaBancaria | null>(null);
+  const [operaciones, setOperaciones] = useState<OperacionAndTipoOperacion[]>(
+    []
+  );
   const { id } = useParams();
 
   useEffect(() => {
@@ -26,11 +22,7 @@ export default function AccountDetailsTab() {
         if (!cuentaReq || typeof cuentaReq === "string") {
           throw new Error("Error obteniendo la cuenta");
         }
-        setAccountData({
-          ...cuentaReq.data,
-          saldo: Number(cuentaReq.data.saldo),
-          saldoDisponible: Number(cuentaReq.data.saldoDisponible),
-        });
+        setAccountData(cuentaReq.data);
       } catch (error) {
         console.error(error);
       }
@@ -38,7 +30,9 @@ export default function AccountDetailsTab() {
 
     const fetchOperaciones = async () => {
       try {
-        const operacionesReq = await obtenerOperaciones();
+        const operacionesReq = await obtenerOperacionesPorCuentaId(
+          id as string
+        );
         if (operacionesReq === undefined) {
           throw new Error("Error obteniendo las operaciones");
         }
@@ -78,7 +72,7 @@ export default function AccountDetailsTab() {
       {/* Contenido principal */}
       <div className="flex-grow bg-primary-200 shadow-md border-2 border-black pt-5 pb-5 pl-10 flex flex-row">
         <div className="w-20 h-20 mt-2 mr-20">
-          {accountData.esCuentaAhorro ? (
+          {accountData && accountData.esCuentaAhorro ? (
             <BanknotesIcon className="text-primary-400" />
           ) : (
             <WalletIcon className="text-primary-400" />
@@ -90,7 +84,7 @@ export default function AccountDetailsTab() {
               Tipo de Cuenta:
             </label>
             <p className="text-gray-700">
-              {accountData.esCuentaAhorro
+              {accountData && accountData.esCuentaAhorro
                 ? "Cuenta de ahorros"
                 : "Cuenta Corriente"}
             </p>
@@ -99,7 +93,7 @@ export default function AccountDetailsTab() {
             <label className="block text-gray-700 font-bold mr-2">
               Numero de Cuenta:
             </label>
-            <p className="text-gray-700">{accountData.numeroCuenta}</p>
+            <p className="text-gray-700">{accountData?.numeroCuenta}</p>
           </div>
         </div>
 
@@ -108,14 +102,14 @@ export default function AccountDetailsTab() {
             <label className="block text-gray-700 font-bold mr-2">
               Saldo Disponible:
             </label>
-            <p className="text-gray-700">${accountData.saldo.toFixed(2)}</p>
+            <p className="text-gray-700">${accountData?.saldo.toFixed(2)}</p>
           </div>
           <div className="flex items-center">
             <label className="block text-gray-700 font-bold mr-2">
               Saldo Retenido:
             </label>
             <p className="text-gray-700">
-              ${accountData.saldoDisponible.toFixed(2)}
+              ${accountData?.saldoDisponible.toFixed(2)}
             </p>
           </div>
         </div>
