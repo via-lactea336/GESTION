@@ -55,7 +55,11 @@ export async function POST(req: NextRequest) {
 export async function GET() {
 
   //Get all banks
-  const bankAccounts = await prisma.cuentaBancaria.findMany()
+  const bankAccounts = await prisma.cuentaBancaria.findMany({
+    include:{
+      banco:true
+    }
+  })
 
   //Return success
   return generateApiSuccessResponse(200, "Bank account list", bankAccounts)

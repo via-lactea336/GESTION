@@ -14,13 +14,6 @@ export async function GET(request: NextRequest) {
 
   let values: Operacion[] | null = null;
 
-  //Si no hay informacion para la busqueda, devuelve un error
-  if (!fechaDesde && !fechaHasta)
-    return generateApiErrorResponse(
-      "No hay informacion necesaria para la busqueda de operaciones",
-      400
-    ); //Validate credentials
-
   //Si hay informacion para la busqueda, agregarla al filtro
   const where = {
     createdAt: {
