@@ -3,6 +3,8 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  // Crear usuario Admin
+
   // Crear bancos
   const bancoFamiliar = await prisma.banco.create({
     data: {
