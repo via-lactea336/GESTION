@@ -22,7 +22,7 @@ export default async function obtenerCuentasFiltros(
   const queryString = searchParams.toString();
 
   try{
-    const response = await fetch(`http://localhost:3000/api/cuenta/search?${queryString}`, {
+    const response = await fetch(`/api/cuenta/search?${queryString}`, {
       headers: {
         "Content-Type": "application/json",
       },

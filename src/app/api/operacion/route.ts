@@ -10,12 +10,18 @@ export async function POST(req: NextRequest) {
   const body: Operacion = await req.json();
   const { tipoOperacionId, cuentaBancariaOrigenId, monto, concepto, numeroComprobante, cuentaInvolucrado, nombreInvolucrado, bancoInvolucrado, rucInvolucrado  } = body;
 
+  const currentCuentaBancarioOrigen = await prisma.cuentaBancaria.findFirst({
+    where:{
+      id: cuentaBancariaOrigenId
+    }
+  })
+
+  if(currentCuentaBancarioOrigen?.numeroCuenta === cuentaInvolucrado) return generateApiErrorResponse("Las cuentas involucradas no pueden ser iguales", 400)
+
   if(!tipoOperacionId || !monto || !numeroComprobante || !concepto || !cuentaBancariaOrigenId || !cuentaInvolucrado || !nombreInvolucrado || !bancoInvolucrado || !rucInvolucrado) return generateApiErrorResponse("Missing data to create the operation", 400) //Validate credentials
 
   if(Number(monto) <= 0) return generateApiErrorResponse("Monto invalido", 400)
   
-  if(cuentaBancariaOrigenId === cuentaInvolucrado) return generateApiErrorResponse("Las cuentas involucradas no pueden ser iguales", 400)
-
   try{
     const operacion = await prisma.operacion.create({
       data: {
@@ -35,6 +41,7 @@ export async function POST(req: NextRequest) {
   
   }catch(err){
     if(err instanceof PrismaClientKnownRequestError && err.code === "P2002") return generateApiErrorResponse("operation already exists", 400)
+    if(err instanceof Error) return generateApiErrorResponse(err.message, 400)
     else return generateApiErrorResponse("Something went wrong", 500)
   }  
   

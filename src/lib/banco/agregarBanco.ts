@@ -2,7 +2,7 @@ import { ApiResponseData } from "../definitions"
 
 export default async function agregarBanco(nombre: string): Promise<ApiResponseData|string|undefined> {
   try{
-    const response = await fetch("http://localhost:3000/api/banco", {
+    const response = await fetch("/api/banco", {
       method: "POST",
       headers:{
         "Content-Type": "application/json",

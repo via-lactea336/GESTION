@@ -17,9 +17,8 @@ export default async function obtenerOperacionesFiltros(
   if(fechaHasta) searchParams.append('fechaHasta', fechaHasta)
 
   const queryString = searchParams.toString();
-
   try{
-    const response = await fetch(`http://localhost:3000/api/operacion/search?${queryString}`, {
+    const response = await fetch(`/api/operacion/search?${queryString.trim()}`, {
       headers: {
         "Content-Type": "application/json",
       },
