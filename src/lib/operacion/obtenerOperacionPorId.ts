@@ -8,7 +8,7 @@ type OperacionDetails = Operacion & {
 
 export default async function obtenerOperacionPorId(id:string): Promise<ApiResponseData<OperacionDetails>|string|undefined> {
   try{
-    const response = await fetch(`http://localhost:3000/api/operacion/${id}`, {
+    const response = await fetch(`/api/operacion/${id}`, {
       headers:{
         "Content-Type": "application/json",
       }
