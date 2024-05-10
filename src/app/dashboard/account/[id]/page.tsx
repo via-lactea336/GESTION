@@ -194,7 +194,7 @@ export default function AccountDetailsTab() {
                           : "text-green-500"
                       }`}
                     >
-                      {operacion.monto >= 0
+                      {Number(operacion.monto) >= 0
                         ? `-${operacion.monto.toFixed(2)}Gs.`
                         : `+${operacion.monto.toFixed(2)}Gs.`}
                     </h1>
