@@ -15,17 +15,14 @@ export async function GET(request: NextRequest) {
   //Si no hay informacion para la busqueda, devuelve un error
   if(!fechaDesde && !fechaHasta) return generateApiErrorResponse("No hay informacion necesaria para la busqueda de operaciones", 400) //Validate credentials
 
-  //Si hay informacion para la busqueda, agregarla al filtro
-  const where = {
-    createdAt: {
-      gte: fechaDesde ? new Date(fechaDesde) : undefined,
-      lte: fechaHasta ? new Date(fechaHasta) : undefined
-    }
-  }
-
   //Asignar los elementos encontrados a los valores
   values = await prisma.operacion.findMany({
-    where: where
+    where:{
+      createdAt:{
+        lte: fechaHasta ? new Date(fechaHasta) : undefined,
+        gte: fechaDesde ? new Date(fechaDesde) : undefined,
+      }
+    }
   })
 
   if(!values) return generateApiErrorResponse("Error intentando buscar Operaciones", 500)
