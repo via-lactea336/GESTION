@@ -1,33 +1,79 @@
+"use client";
 import obtenerCuentaBancariaPorId from "@/lib/cuentaBancaria/obtenerCuentaBancariaPorId";
 import obtenerOperaciones from "@/lib/operacion/obtenerOperaciones";
 import Image from "next/image";
+import { useParams } from "next/navigation";
+import { useState, useEffect } from 'react';
 
 
-type Props = {
-    params : {id: string}
-}
+export default function AccountDetailsTab(){
+    const [accountData, setAccountData] = useState({
+        id: '',
+        numeroCuenta: '',
+        bancoId: '',
+        entidadId: '',
+        esCuentaAhorro: false,
+        saldo: 0,
+        saldoDisponible: 0,
 
-const  AccountDetailsTab = async ( {params}: Props) => {
-    const cuentaReq = await obtenerCuentaBancariaPorId(params.id);
-    const operacionesReq = await obtenerOperaciones();
+    });
+    const [operaciones, setOperaciones] = useState([{
+        id: '',
+        tipoOperacionId: '',
+        fechaOperacion: new Date(),
+        monto: 0,
+        cuentaBancariaOrigenId: '',
+        bancoInvolucrado: '',
+        nombreInvolucrado: '',
+        cuentaInvolucrado: '',
+        rucInvolucrado: '',
+        concepto: '',
+        numeroComprobante: '',
+    }]);
+    const {id} = useParams();
 
-    if(cuentaReq === undefined) return <div>Error obteniendo la cuenta</div>;
-    if (typeof(cuentaReq) === "string") return <div>{cuentaReq}</div>;
-    const accountData = cuentaReq.data;
+    useEffect(() => {
+        const fetchAccount = async () => {
+            try {
+                const cuentaReq = await obtenerCuentaBancariaPorId(id as string);
+                if (!cuentaReq || typeof cuentaReq === 'string') {
+                    throw new Error('Error obteniendo la cuenta');
 
-    if(operacionesReq === undefined) return <div>Error obteniendo la cuenta</div>;
-    if (typeof(operacionesReq) === "string") return <div>{operacionesReq}</div>;
-    const operaciones = operacionesReq.data;
+                }
+                setAccountData(cuentaReq.data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
 
-    function formatDate(dateString: Date): string {
+        const fetchOperaciones = async () => {
+            try {
+                const operacionesReq = await obtenerOperaciones();
+                if (operacionesReq === undefined) {
+                    throw new Error('Error obteniendo las operaciones');
+                }
+                if (typeof operacionesReq === 'string') {
+                    throw new Error(operacionesReq);
+                }
+                setOperaciones(operacionesReq.data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchAccount();
+        fetchOperaciones();
+    }, [id]); 
+
+
+    const formatDate = (dateString: Date)  => {
         const date = new Date(dateString);
-        const day = date.getDate(); 
+        const day = date.getDate();
         const month = date.getMonth() + 1;
-        const year = date.getFullYear(); 
-        const formattedDate = `${day < 10 ? '0' + day : day}-${month < 10 ? '0' + month : month}-${year}`;
-    
+        const year = date.getFullYear();
+        const formattedDate = `${day < 10 ? "0" + day : day}-${month < 10 ? "0" + month : month}-${year}`;
         return formattedDate;
-    }
+    };
+
     return (
         <div className="flex flex-col h-full -mt-8">
         {/* Encabezado con título y botón de retroceso */}
@@ -142,4 +188,3 @@ const  AccountDetailsTab = async ( {params}: Props) => {
         </div>
     );
 };
-export default AccountDetailsTab;
