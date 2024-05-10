@@ -22,7 +22,7 @@ const Header = ({
   onTipoCuentaSeleccionado,
   onVerSaldo,
 }: HeaderProps) => {
-  const estadoInicial = [{ id: "0", nombre: "No hay bancos" }];
+  const estadoInicial = [{ id: "0", nombre: "No hay bancos", deleted: null }];
   const handleBancoSeleccionado = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
