@@ -3,15 +3,15 @@ import React, { useState, useEffect, useCallback } from "react";
 import Header from "@/components/dashboard/account/Header";
 import BankAccount from "@/components/dashboard/account/BankAccount";
 import obtenerCuentaBancaria from "@/lib/cuentaBancaria/obtenerCuentaBancaria";
-import { CuentaBancaria } from "@prisma/client";
+import { CuentaBancariaAndBanco } from "@/lib/definitions";
 
 export default function Page() {
-  const [cuentasOriginales, setCuentasOriginales] = useState<CuentaBancaria[]>(
-    []
-  );
-  const [cuentasFiltradas, setCuentasFiltradas] = useState<CuentaBancaria[]>(
-    []
-  );
+  const [cuentasOriginales, setCuentasOriginales] = useState<
+    CuentaBancariaAndBanco[]
+  >([]);
+  const [cuentasFiltradas, setCuentasFiltradas] = useState<
+    CuentaBancariaAndBanco[]
+  >([]);
   const [bancoSeleccionado, setBancoSeleccionado] = useState<string | null>(
     null
   );
@@ -71,13 +71,15 @@ export default function Page() {
       />
       <div className="bg-gray-700 mt-2 rounded-md">
         <div className="grid flex-wrap p-6 gap-4 grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
-          {cuentasFiltradas.map((cuenta: CuentaBancaria) => (
+          {cuentasFiltradas.map((cuenta) => (
             <BankAccount
+              bancoId={cuenta.bancoId}
+              entidadId={cuenta.entidadId}
               key={cuenta.id}
               id={cuenta.id}
               numeroCuenta={cuenta.numeroCuenta}
               esCuentaAhorro={cuenta.esCuentaAhorro}
-              bancoId={cuenta.bancoId}
+              banco={cuenta.banco}
               saldo={Number(cuenta.saldo)}
               saldoDisponible={Number(cuenta.saldoDisponible)}
               verSaldo={verSaldo}

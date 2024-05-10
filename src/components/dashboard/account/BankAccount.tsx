@@ -1,48 +1,20 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-"use client";
-import { Banco } from "@prisma/client";
-import { useEffect, useState } from "react";
-import obtenerBancoPorId from "@/lib/banco/obtenerBancoPorId";
+import { CuentaBancariaAndBanco } from "@/lib/definitions";
 
-interface CuentaBancaria {
-  id: string;
-  numeroCuenta: string;
-  esCuentaAhorro: boolean;
-  bancoId: string;
-  saldo: number;
-  saldoDisponible: number;
+interface Props extends CuentaBancariaAndBanco {
   verSaldo: boolean;
 }
 
-const BankAccount: React.FC<CuentaBancaria> = ({
+const BankAccount: React.FC<Props> = ({
   id,
   numeroCuenta,
   esCuentaAhorro,
-  bancoId,
+  banco,
   saldo,
   saldoDisponible,
   verSaldo,
 }) => {
   const tipoDeCuenta = esCuentaAhorro ? "Cuenta de ahorro" : "Cuenta Corriente";
   const saldoFormateado = saldo.toLocaleString();
-  const estadoInicial = { id: "", nombre: "", deleted: null };
-
-  const obtenerYMostrarBanco = async () => {
-    try {
-      const cuentasData = await obtenerBancoPorId(bancoId);
-
-      if (cuentasData === undefined || typeof cuentasData === "string") return;
-
-      setBanco(cuentasData.data ?? estadoInicial);
-    } catch (error) {
-      console.error("Error al obtener las cuentas:", error);
-    }
-  };
-
-  const [banco, setBanco] = useState<Banco>(estadoInicial);
-  useEffect(() => {
-    obtenerYMostrarBanco();
-  }, []);
 
   return (
     <div className="bg-gray-800 py-6 px-4 rounded-md shadow-md [min-width:300px]">
