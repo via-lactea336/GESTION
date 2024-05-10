@@ -8,11 +8,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
-}
+ datasource db {
+   provider = "postgresql"
+   url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+ }
 
 model Banco {
   id                    String              @id @default(uuid())
@@ -20,8 +20,6 @@ model Banco {
   deleted               DateTime?
   cuentas               CuentaBancaria[]
   cheques               Cheque[]
-  createdAt             DateTime            @default(now())
-  updatedAt             DateTime            @updatedAt @default(now())
 }
 
 
@@ -38,8 +36,6 @@ model CuentaBancaria {
   deleted               DateTime?
   operaciones           Operacion[]
   cheques               Cheque[]
-  createdAt             DateTime           @default(now())
-  updatedAt             DateTime           @updatedAt @default(now())
 }
 
 
@@ -48,8 +44,6 @@ model Entidad {
   nombre                String              @unique @db.VarChar(128)
   ruc                   String              @unique @db.VarChar(128)
   cuentaBancarias       CuentaBancaria[]
-  createdAt             DateTime            @default(now())
-  updatedAt             DateTime            @updatedAt @default(now())
 }
 
 
@@ -60,8 +54,6 @@ model TipoOperacion {
   afectaSaldo           Boolean
   operaciones           Operacion[]
   cheques               Cheque[]
-  createdAt             DateTime            @default(now())
-  updatedAt             DateTime            @updatedAt @default(now())
 }
 
 
@@ -83,8 +75,6 @@ model Operacion {
   concepto            String               @db.VarChar(255)
 
   numeroComprobante   String               @db.VarChar(128)
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt @default(now())
 }
 
 enum estadoCheque {
@@ -113,14 +103,10 @@ model Cheque {
   
   cuentaAfectada            CuentaBancaria   @relation(fields: [cuentaBancariaAfectadaId], references: [id], onDelete: NoAction)
   cuentaBancariaAfectadaId  String      
-  createdAt                 DateTime         @default(now())
-  updatedAt                 DateTime         @updatedAt @default(now())
 }
 
 model User {
   id String @id @default(uuid())
   username String @unique
-  password String
-  createdAt             DateTime            @default(now())
-  updatedAt             DateTime            @updatedAt @default(now())
+  password String
 }
