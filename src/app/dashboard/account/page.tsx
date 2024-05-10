@@ -81,8 +81,8 @@ export default function Page() {
               numeroCuenta={cuenta.numeroCuenta}
               esCuentaAhorro={cuenta.esCuentaAhorro}
               bancoId={cuenta.bancoId}
-              saldo={cuenta.saldo}
-              saldoDisponible={cuenta.saldoDisponible}
+              saldo={Number(cuenta.saldo)}
+              saldoDisponible={Number(cuenta.saldoDisponible)}
               verSaldo={verSaldo}
             />
           ))}
