@@ -101,6 +101,7 @@ const Header = ({
           <h3>Ver saldos</h3>
           <input
             onChange={handleVerSaldo}
+            defaultChecked={false}
             type="checkbox"
             className="h-4 w-4 accent-primary-500 cursor-pointer"
           />
