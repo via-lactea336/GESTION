@@ -22,7 +22,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
   const { esRecibido, monto, fechaEmision, involucrado, estado, bancoChequeId, cuentaBancariaAfectadaId, cuentaAfectada, bancoCheque } = chequeVerifBefore
 
-  if(!esRecibido && (cuentaAfectada.saldo < monto || cuentaAfectada.saldoDisponible < monto)) return generateApiErrorResponse("Saldo insuficiente", 400)
+  if(!esRecibido && (Number(cuentaAfectada.saldo) < Number(monto) || Number(cuentaAfectada.saldoDisponible) < Number(monto))) return generateApiErrorResponse("Saldo insuficiente", 400)
   
   const saldoUpdate = {
     increment: esRecibido === true ? monto : undefined, //Si es recibido entonces incrementa el saldo con el monto 
