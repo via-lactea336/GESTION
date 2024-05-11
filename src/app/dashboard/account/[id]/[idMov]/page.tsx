@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import obtenerOperacionPorId from "../../../../../lib/operacion/obtenerOperacionPorId";
+import TransferReceipt from '../../../../../components/PDF/TransferenciaDetails';
+import { PDFDownloadLink } from "@react-pdf/renderer";
 
-export default function Page() {
+export default function PageComponent() {
   const [dateTime, setDateTime] = useState("undefined");
   const [monto, setMonto] = useState("0");
   const [numComprobante, setNumComprobante] = useState("undefined");
@@ -51,7 +52,7 @@ export default function Page() {
     setNumCuentaDestino(data.data.cuentaInvolucrado);
     setBancoDestino(data.data.bancoInvolucrado);
     setNombreOrigen(data.data.cuentaBancariaOrigen.entidad.nombre);
-    setNumCuentaOrigen(data.data.cuentaBancariaOrigenId);
+    setNumCuentaOrigen(data.data.cuentaBancariaOrigen.numeroCuenta);
     setBancoOrigen(data.data.cuentaBancariaOrigen.banco.nombre);
     setTipoOperacion(data.data.tipoOperacion.esDebito ? "Debito" : "Credito");
   };
@@ -199,9 +200,38 @@ export default function Page() {
         <div className="flex justify-center">
           <button
             onClick={handleCloseButtonClick}
-            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            className=" mr-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
           >
             Cerrar
+          </button>
+          <button
+            className="mr-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+          >
+            <PDFDownloadLink
+              document={<TransferReceipt
+                numComprobante={numComprobante}
+                concepto={concepto}
+                nombreDestino={nombreDestino}
+                numCuentaDestino={numCuentaDestino}
+                bancoDestino={bancoDestino}
+                nombreOrigen={nombreOrigen}
+                numCuentaOrigen={numCuentaOrigen}
+                tipoOperacion={tipoOperacion}
+                monto={monto}
+                dateTime={dateTime}
+                bancoOrigen={bancoOrigen}
+              />}
+              fileName="transferencia.pdf"
+            >
+              {
+                ({loading, url, error, blob}) => 
+                  loading? (
+                    <button> Cargando documento... </button> 
+                    ):(
+                    <button>Descargar</button>
+                    )
+              }
+            </PDFDownloadLink> 
           </button>
         </div>
       </div>
