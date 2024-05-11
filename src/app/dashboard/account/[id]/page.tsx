@@ -175,7 +175,7 @@ export default function AccountDetailsTab() {
                 >
                   <td className="py-2">
                     <div className="w-7 h-7 ml-5">
-                      {operacion.tipoOperacion ? (
+                      {operacion.tipoOperacion.esDebito ? (
                         <ArrowUpRightIcon className="text-red-500" />
                       ) : (
                         <ArrowDownLeftIcon className="text-green-500" />
@@ -205,12 +205,12 @@ export default function AccountDetailsTab() {
                   <td>
                     <span
                       className={`text-sm mt-1 ${
-                        operacion.tipoOperacionId
+                        operacion.tipoOperacion.esDebito
                           ? "text-red-500"
                           : "text-green-500"
                       }`}
                     >
-                      {Number(operacion.monto) >= 0
+                      {operacion.tipoOperacion.esDebito
                         ? `- ${Number(operacion.monto).toLocaleString()} Gs.`
                         : `+ ${Number(operacion.monto).toLocaleString()} Gs.`}
                     </span>
