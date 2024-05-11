@@ -4,6 +4,7 @@ import obtenerOperaciones from "@/lib/operacion/obtenerOperaciones";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   WalletIcon,
   BanknotesIcon,
@@ -13,12 +14,19 @@ import {
 import obtenerOperacionesPorCuentaId from "@/lib/operacion/obtenerOperacionesPorCuentaId";
 import { OperacionAndTipoOperacion } from "@/lib/definitions";
 import { CuentaBancaria } from "@prisma/client";
+import Link from "next/link";
 export default function AccountDetailsTab() {
   const [accountData, setAccountData] = useState<CuentaBancaria | null>(null);
   const [operaciones, setOperaciones] = useState<OperacionAndTipoOperacion[]>(
     []
   );
   const { id } = useParams();
+  const router = useRouter();
+  const handleNavigation = (path: string) => {
+    return () => {
+      router.push(path);
+    };
+  };
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -71,135 +79,141 @@ export default function AccountDetailsTab() {
     return (
       <div className="flex flex-col h-full -mt-8">
         {/* Encabezado con título y botón de retroceso */}
-        <div className="flex justify-between items-center bg-primary-600 p-4 border-2 border-black">
-          <h1 className="text-4xl font-bold mt-2 mb-2">Detalle cuentas</h1>
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <div className="flex justify-between items-center bg-primary-800 p-4 rounded-md">
+          <h1 className="text-2xl font-bold mt-2 mb-2">Detalle cuentas</h1>
+          <Link
+            href="/dashboard/account"
+            className="bg-gray-800 hover:bg-gray-900 text-white  py-2 px-4 rounded"
+          >
             Atrás
-          </button>
+          </Link>
         </div>
 
         {/* Contenido principal */}
-        <div className="flex-grow bg-primary-200 shadow-md border-2 border-black pt-5 pb-5 pl-10 flex flex-row">
-          <div className="w-20 h-20 mt-2 mr-20">
+        <div className="bg-gray-800 rounded-md  py-5 mt-2 flex gap-2 justify-around flex-wrap">
+          <div className="w-20 h-20 mt-2">
             {accountData.esCuentaAhorro ? (
               <BanknotesIcon className="text-primary-400" />
             ) : (
               <WalletIcon className="text-primary-400" />
             )}
           </div>
-          <div className="flex-1 mr-8 mt-5">
+          <div className="mt-5">
             <div className="mb-4 flex items-center">
-              <label className="block text-gray-700 font-bold mr-2">
+              <label className="block  font-semibold mr-2">
                 Tipo de Cuenta:
               </label>
-              <p className="text-gray-700">
+              <p>
                 {accountData.esCuentaAhorro
                   ? "Cuenta de ahorros"
                   : "Cuenta Corriente"}
               </p>
             </div>
             <div className="mb-4 flex items-center">
-              <label className="block text-gray-700 font-bold mr-2">
+              <label className="block font-semibold mr-2">
                 Numero de Cuenta:
               </label>
-              <p className="text-gray-700">{accountData.numeroCuenta}</p>
+              <p>{accountData.numeroCuenta}</p>
             </div>
           </div>
 
-          <div className="flex-1 mt-5">
+          <div className="mt-5">
             <div className="mb-4 flex items-center">
-              <label className="block text-gray-700 font-bold mr-2">
+              <label className="block font-semibold mr-2">
                 Saldo Disponible:
               </label>
-              <p className="text-gray-700">
-                ${Number(accountData.saldo).toLocaleString()}
-              </p>
+              <p>${Number(accountData.saldo).toLocaleString()}</p>
             </div>
             <div className="flex items-center">
-              <label className="block text-gray-700 font-bold mr-2">
+              <label className="block font-semibold mr-2">
                 Saldo Retenido:
               </label>
-              <p className="text-gray-700">
-                ${Number(accountData.saldoDisponible).toLocaleString()}
-              </p>
+              <p>${Number(accountData.saldoDisponible).toLocaleString()}</p>
             </div>
           </div>
         </div>
-        <h1 className="text-3xl font-bold mt-10">Movimientos</h1>
-        <div className="flex-grow bg-primary-200 shadow-md border-2 border-black p-10 flex flex-row">
+        <h1 className="text-xl font-bold my-4">Movimientos</h1>
+        <div className="flex-grow bg-gray-800 rounded-md p-5 flex flex-row">
           <table className="border-collapse w-full">
             <tbody>
               <tr>
                 <td className="w-1/6">
-                  <h1 className="text-md font-bold mt-1 text-black">
+                  <span className="text-md mt-1 text-primary-400">
                     Operacion
-                  </h1>
+                  </span>
                 </td>
                 <td className="w-1/6">
-                  <h1 className="text-md font-bold mt-1 text-black">Fecha</h1>
+                  <span className="text-md mt-1 text-primary-400">Fecha</span>
                 </td>
                 <td className="w-1/6">
-                  <h1 className="text-md font-bold mt-1 text-black">
+                  <span className="text-md mt-1 text-primary-400">
                     Banco Origen
-                  </h1>
+                  </span>
                 </td>
                 <td className="w-1/6">
-                  <h1 className="text-md font-bold mt-1 text-black">
+                  <span className="text-md mt-1 text-primary-400">
                     Involucrado
-                  </h1>
+                  </span>
                 </td>
                 <td className="w-1/6">
-                  <h1 className="text-md font-bold mt-1 text-black">
+                  <span className="text-md mt-1 text-primary-400">
                     Concepto
-                  </h1>
+                  </span>
                 </td>
                 <td className="w-1/6">
-                  <h1 className="text-md font-bold mt-1 text-black">Monto</h1>
+                  <span className="text-md mt-1 text-primary-400">Monto</span>
                 </td>
               </tr>
               {operaciones.map((operacion, index) => (
-                <tr key={index}>
-                  <td>
-                    <div className="w-8 h-8 ml-5">
+                <tr
+                  key={index}
+                  onClick={handleNavigation(
+                    `/dashboard/account/${id}/${operacion.id}`
+                  )}
+                  className="border-b-2 border-b-gray-700 w-full hover:bg-gray-700 hover:cursor-pointer"
+                  title="Ver detalles de la operación"
+                >
+                  <td className="py-2">
+                    <div className="w-7 h-7 ml-5">
                       {operacion.tipoOperacion ? (
-                        <ArrowUpRightIcon className="text-red-600" />
+                        <ArrowUpRightIcon className="text-red-500" />
                       ) : (
-                        <ArrowDownLeftIcon className="text-green-600" />
+                        <ArrowDownLeftIcon className="text-green-500" />
                       )}
                     </div>
                   </td>
                   <td>
-                    <h1 className="text-sm font-normal mt-1 text-black">
+                    <h1 className="text-sm font-normal mt-1">
                       {formatDate(operacion.fechaOperacion)}
                     </h1>
                   </td>
                   <td>
-                    <h1 className="text-sm font-normal mt-1 text-black">
+                    <h1 className="text-sm font-normal mt-1">
                       {operacion.bancoInvolucrado}
                     </h1>
                   </td>
                   <td>
-                    <h1 className="text-sm font-normal mt-1 text-black">
+                    <h1 className="text-sm font-normal mt-1 ">
                       {operacion.nombreInvolucrado}
                     </h1>
                   </td>
                   <td>
-                    <h1 className="text-sm font-normal mt-1 text-black">
+                    <h1 className="text-sm font-normal mt-1 ">
                       {operacion.concepto}
                     </h1>
                   </td>
                   <td>
-                    <h1
-                      className={`text-sm font-bold mt-1 ${
+                    <span
+                      className={`text-sm mt-1 ${
                         operacion.tipoOperacionId
                           ? "text-red-500"
                           : "text-green-500"
                       }`}
                     >
                       {Number(operacion.monto) >= 0
-                        ? `-${operacion.monto}Gs.`
-                        : `+${operacion.monto}Gs.`}
-                    </h1>
+                        ? `- ${Number(operacion.monto).toLocaleString()} Gs.`
+                        : `+ ${Number(operacion.monto).toLocaleString()} Gs.`}
+                    </span>
                   </td>
                 </tr>
               ))}
