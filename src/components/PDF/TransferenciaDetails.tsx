@@ -1,11 +1,11 @@
-import React from 'react';
-import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
+import React from "react";
+import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
 
 // Definición de los tipos de los props
 type TransferReceiptProps = {
   tipoOperacion: string;
   dateTime: string;
-  monto: number;
+  monto: string;
   numComprobante: string;
   concepto: string;
   nombreDestino: string;
@@ -28,53 +28,55 @@ function TransferReceipt({
   nombreOrigen,
   numCuentaOrigen,
   bancoOrigen,
-}: TransferReceiptProps){
+}: TransferReceiptProps) {
   // Create styles
   const styles = StyleSheet.create({
     page: {
-      flexDirection: 'column',
-      backgroundColor: '#ffffff',
-      padding: 20
+      flexDirection: "column",
+      backgroundColor: "#ffffff",
+      padding: 20,
     },
     section: {
-      width: '90%', 
-      flexDirection: 'column' ,
-      marginBottom: 10
+      width: "90%",
+      flexDirection: "column",
+      marginBottom: 10,
     },
     view: {
-      flexDirection: 'row',
-      justifyContent: 'space-between', 
-      alignItems: 'center', 
-      marginBottom: 5 
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 5,
     },
     title: {
       fontSize: 20,
-      fontWeight: 'bold',
+      fontWeight: "bold",
     },
     subtitle: {
       fontSize: 16,
-      fontWeight: 'bold',
+      fontWeight: "bold",
     },
     text: {
       fontSize: 12,
     },
     container: {
-      width: '70%', 
-      margin: '0 auto', 
+      width: "70%",
+      margin: "0 auto",
     },
     categoria: {
       fontSize: 18,
-      fontWeight: 'bold',
+      fontWeight: "bold",
       marginBottom: 5,
-      textDecoration: 'underline',
-    }
-  })
+      textDecoration: "underline",
+    },
+  });
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={[styles.container, styles.section]}>
-          <Text style={styles.title}>Comprobante de Transferencia - {tipoOperacion}</Text>
+          <Text style={styles.title}>
+            Comprobante de Transferencia - {tipoOperacion}
+          </Text>
           <View style={styles.section}>
             <Text style={styles.subtitle}>Fecha:</Text>
             <Text style={styles.text}>{dateTime}</Text>
@@ -95,7 +97,9 @@ function TransferReceipt({
           </View>
         </View>
         <View style={[styles.container, styles.section]}>
-          <Text style={[styles.subtitle, styles.categoria]}>{tipoOperacion === "Debito" ? "Destino" : "Origen"}</Text>
+          <Text style={[styles.subtitle, styles.categoria]}>
+            {tipoOperacion === "Debito" ? "Destino" : "Origen"}
+          </Text>
           <View style={styles.view}>
             <Text style={styles.subtitle}>Nombre:</Text>
             <Text style={styles.text}>{nombreDestino}</Text>
@@ -110,7 +114,9 @@ function TransferReceipt({
           </View>
         </View>
         <View style={[styles.container, styles.section]}>
-          <Text style={[styles.subtitle, styles.categoria]}>{tipoOperacion === "Debito" ? "Origen" : "Destino"}</Text>
+          <Text style={[styles.subtitle, styles.categoria]}>
+            {tipoOperacion === "Debito" ? "Origen" : "Destino"}
+          </Text>
           <View style={styles.view}>
             <Text style={styles.subtitle}>Nombre:</Text>
             <Text style={styles.text}>{nombreOrigen}</Text>
@@ -130,7 +136,7 @@ function TransferReceipt({
         </View>
       </Page>
     </Document>
-  )
+  );
 }
 
 export default TransferReceipt;
