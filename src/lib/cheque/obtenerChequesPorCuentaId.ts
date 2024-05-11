@@ -1,21 +1,16 @@
 
-import { Operacion } from "@prisma/client"
+import { Cheque } from "@prisma/client"
 import { ApiResponseData } from "../definitions"
 
-/**
- * Permite obtener todas las operaciones de una cuenta dada por su id
- * @param cuentaId El id de la cuenta de la cual queremos obtener sus operaciones
- * @returns La lista de operaciones, o en caso de error un string  error o undefined
- */
-export default async function obtenerChequesPorCuentaId(cuentaId:string): Promise<ApiResponseData<Operacion[]>|string|undefined> {
+export default async function obtenerChequesPorCuentaId(cuentaId:string): Promise<ApiResponseData<Cheque[]>|string|undefined> {
   try{
-    const response = await fetch(`/api/operacion/cheque/${cuentaId}`, {
+    const response = await fetch(`/api//cheque/${cuentaId}`, {
       headers:{
         "Content-Type": "application/json",
       }
     })
 
-    const data:ApiResponseData<Operacion[]> = await response.json()
+    const data:ApiResponseData<Cheque[]> = await response.json()
 
     return data
   

@@ -22,8 +22,7 @@ export default async function agregarCheque(
   fechaEmision: Date,
   fechaPago: Date,
   emitidoPor: string,
-  acreedor: string,
-  estado: string,
+  involucrado: string,
   bancoChequeId: string,
   tipoOperacionId: string,
   cuentaBancariaAfectadaId: string
@@ -41,8 +40,7 @@ export default async function agregarCheque(
         fechaEmision: fechaEmision,
         fechaPago: fechaPago,
         emitidoPor: emitidoPor,
-        acreedor: acreedor,
-        estado: estado,
+        involucradr:involucrado,
         bancoChequeId: bancoChequeId,
         tipoOperacionId: tipoOperacionId,
         cuentaBancariaAfectadaId: cuentaBancariaAfectadaId

@@ -1,7 +1,7 @@
-import { Operacion } from "@prisma/client"
+import { Cheque } from "@prisma/client"
 import { ApiResponseData } from "../definitions"
 
-export default async function obtenerCheques(): Promise<ApiResponseData<Operacion[]>|string|undefined> {
+export default async function obtenerCheques(): Promise<ApiResponseData<Cheque[]>|string|undefined> {
   try{
     const response = await fetch("/api/cheque", {
       headers:{
@@ -9,7 +9,7 @@ export default async function obtenerCheques(): Promise<ApiResponseData<Operacio
       }
     })
 
-    const data:ApiResponseData<Operacion[]> = await response.json()
+    const data:ApiResponseData<Cheque[]> = await response.json()
 
     return data
   

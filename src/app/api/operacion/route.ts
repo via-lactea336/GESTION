@@ -15,10 +15,11 @@ export async function POST(req: NextRequest) {
       id: cuentaBancariaOrigenId
     }
   })
-
-  if(currentCuentaBancarioOrigen?.numeroCuenta === cuentaInvolucrado) return generateApiErrorResponse("Las cuentas involucradas no pueden ser iguales", 400)
+  if(!currentCuentaBancarioOrigen) return generateApiErrorResponse("Cuenta bancaria no encontrada", 400)
 
   if(!tipoOperacionId || !monto || !numeroComprobante || !concepto || !cuentaBancariaOrigenId || !cuentaInvolucrado || !nombreInvolucrado || !bancoInvolucrado || !rucInvolucrado) return generateApiErrorResponse("Missing data to create the operation", 400) //Validate credentials
+
+  if(currentCuentaBancarioOrigen.numeroCuenta === cuentaInvolucrado) return generateApiErrorResponse("Las cuentas involucradas no pueden ser iguales", 400)
 
   if(Number(monto) <= 0) return generateApiErrorResponse("Monto invalido", 400)
   
