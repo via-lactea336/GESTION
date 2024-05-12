@@ -4,6 +4,7 @@ import {
   generateApiErrorResponse,
   generateApiSuccessResponse,
 } from "@/lib/apiResponse";
+import { estadoCheque } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -14,6 +15,10 @@ export async function GET(request: NextRequest) {
   const skip = searchParams.get("skip");
   const upTo  = searchParams.get("upTo");
 
+  const bancoChequeId  = searchParams.get("bancoChequeId");
+
+  const estado = searchParams.get("estado");
+
   const cuenta = searchParams.get("cuenta");
 
   const verifiedSkip = (!skip || Number.isNaN(parseInt(skip))) ? 0 : parseInt(skip)
@@ -21,25 +26,28 @@ export async function GET(request: NextRequest) {
 
   //Si hay informacion para la busqueda, agregarla al filtro
   const where = {
-    createdAt: {
+    fechaEmision: {
       gte: fechaDesde ? new Date(fechaDesde) : undefined,
       lte: fechaHasta ? new Date(fechaHasta) : undefined,
     },
-    cuentaBancariaOrigenId: cuenta? cuenta : undefined
+    bancoChequeId: bancoChequeId ? bancoChequeId : undefined,
+    cuentaBancariaAfectadaId: cuenta? cuenta : undefined,
+    estado: estado ? estado : undefined
   };
 
   //Asignar los elementos encontrados a los valores
-  const values = await prisma.operacion.findMany({
+  const values = await prisma.cheque.findMany({
     skip: verifiedSkip,
     take: verifiedUpTo,
     where: where as any,
     include:{
-      tipoOperacion: true
+      cuentaAfectada: true,
+      bancoCheque: true
     }
   });
 
   if (!values)
-    return generateApiErrorResponse("Error intentando buscar Operaciones", 500);
+    return generateApiErrorResponse("Error intentando buscar los Cheques", 500);
 
-  return generateApiSuccessResponse(200, "Operaciones encontradas", values);
+  return generateApiSuccessResponse(200, "Lista de cheques encontrados", values);
 }

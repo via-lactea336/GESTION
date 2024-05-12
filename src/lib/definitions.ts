@@ -1,4 +1,4 @@
-import { Banco, CuentaBancaria, Entidad, Operacion, TipoOperacion } from "@prisma/client";
+import { Banco, Cheque, CuentaBancaria, Entidad, Operacion, TipoOperacion } from "@prisma/client";
 
 export type LoadingProps = {
   loading: boolean;
@@ -31,4 +31,8 @@ export type OperacionAndTipoOperacion = Operacion & {
 
 export type CuentaBancariaAndBanco = CuentaBancaria & {
   banco: Banco
+}
+
+export type ChequeDetails = Cheque & {
+  cuentaAfectada: CuentaBancaria & {bancoCheque: Banco}
 }

@@ -10,10 +10,14 @@ export async function GET(req:NextRequest, { params }: { params: { id: string } 
   const cheques = await prisma.cheque.findMany({
     where: {
       cuentaBancariaAfectadaId: id
+    },
+    include:{
+      bancoCheque: true,
+      cuentaAfectada:true, 
     }
   })
 
   if(!cheques) return generateApiErrorResponse("Cheques no encontradas", 404)
 
-  return generateApiSuccessResponse<Cheque[]>(200, 'Se obtuvieron las siguientes cheques', cheques)
+  return generateApiSuccessResponse(200, 'Se obtuvieron las siguientes cheques', cheques)
 }

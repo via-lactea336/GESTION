@@ -36,6 +36,9 @@ model CuentaBancaria {
   deleted               DateTime?
   operaciones           Operacion[]
   cheques               Cheque[]
+
+  createdAt                  DateTime         @default(now())
+  updatedAt                  DateTime         @updatedAt @default(now())
 }
 
 
@@ -74,6 +77,9 @@ model Operacion {
   concepto            String               @db.VarChar(255)
 
   numeroComprobante   String               @db.VarChar(128)
+
+  createdAt                  DateTime         @default(now())
+  updatedAt                  DateTime         @updatedAt @default(now())
 }
 
 enum estadoCheque {
@@ -98,7 +104,10 @@ model Cheque {
   bancoChequeId             String
   
   cuentaAfectada            CuentaBancaria   @relation(fields: [cuentaBancariaAfectadaId], references: [id], onDelete: NoAction)
-  cuentaBancariaAfectadaId  String      
+  cuentaBancariaAfectadaId  String
+
+  createdAt                  DateTime         @default(now())
+  updatedAt                  DateTime         @updatedAt @default(now())
 }
 
 model User {
