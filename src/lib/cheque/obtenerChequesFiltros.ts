@@ -1,5 +1,5 @@
 import { estadoCheque } from "@prisma/client"
-import { ChequeDetails, ApiResponseData} from "../definitions"
+import { ChequeDetails, ApiResponseData, DatosFiltrados} from "../definitions"
 
 export default async function obtenerChequesFiltros(
   {
@@ -36,7 +36,7 @@ export default async function obtenerChequesFiltros(
       },
     }) 
 
-    const data:ApiResponseData<ChequeDetails[]> = await response.json()
+    const data:ApiResponseData<DatosFiltrados<ChequeDetails>> = await response.json()
     return data
   }catch(error){
     if(error instanceof Error) return error.message
