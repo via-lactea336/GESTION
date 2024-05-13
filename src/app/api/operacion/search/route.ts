@@ -38,8 +38,10 @@ export async function GET(request: NextRequest) {
     }
   });
 
+  const count = await prisma.operacion.count({ where: where as any });
+
   if (!values)
     return generateApiErrorResponse("Error intentando buscar Operaciones", 500);
 
-  return generateApiSuccessResponse(200, "Operaciones encontradas", values);
+  return generateApiSuccessResponse(200, "Operaciones encontradas", {values:values, totalQuantity: count});
 }

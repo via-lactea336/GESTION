@@ -46,8 +46,10 @@ export async function GET(request: NextRequest) {
     }
   });
 
+  const count = await prisma.cheque.count({ where: where as any });
+
   if (!values)
     return generateApiErrorResponse("Error intentando buscar los Cheques", 500);
 
-  return generateApiSuccessResponse(200, "Lista de cheques encontrados", values);
+  return generateApiSuccessResponse(200, "Lista de cheques encontrados", {values:values, totalQuantity: count});
 }

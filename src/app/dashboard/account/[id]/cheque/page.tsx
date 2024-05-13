@@ -3,7 +3,7 @@
 import obtenerBancos from '@/lib/banco/obtenerBancos'
 import obtenerChequesFiltros from '@/lib/cheque/obtenerChequesFiltros'
 import { ChequeDetails } from '@/lib/definitions'
-import { ArrowDownLeftIcon, ArrowUpRightIcon } from '@heroicons/react/24/solid'
+import { ArrowDownLeftIcon, ArrowUpRightIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
 import { type Cheque, estadoCheque, Banco } from '@prisma/client'
 import Link from 'next/link'
 import React, { useEffect } from 'react'
@@ -12,10 +12,14 @@ export default function Cheque({ params }: { params: { id: string } }) {
 
   const { id } = params
 
+  const quantityPerPage = parseInt(process.env.QUANTITY_PER_PAGE || "4")
+
   const [cheques, setCheques] = React.useState<ChequeDetails[]>([])
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
   const [bancos, setBancos] = React.useState<Banco[]>([])
+  const [indicesPagina, setindicesPagina] = React.useState(0)
+  const [indiceActual, setIndiceActual] = React.useState(0)
 
   const [filtro, setFiltro] = React.useState<{
     upTo: number,
@@ -26,7 +30,7 @@ export default function Cheque({ params }: { params: { id: string } }) {
     bancoChequeId?: string
     estado?: estadoCheque
   }>({
-    upTo: 4,
+    upTo: quantityPerPage,
     skip: 0,
     cuentaId: id,
   }
@@ -49,7 +53,9 @@ export default function Cheque({ params }: { params: { id: string } }) {
       return
     }
 
-    setCheques(response.data)
+    console.log(response.data.totalQuantity)
+    setCheques(response.data.values)
+    setindicesPagina(response.data.totalQuantity % quantityPerPage === 0 ? response.data.totalQuantity / quantityPerPage : Math.floor(response.data.totalQuantity / quantityPerPage) + 1)
     setBancos(bancosRes.data)
     setLoading(false)
   }
@@ -68,9 +74,19 @@ export default function Cheque({ params }: { params: { id: string } }) {
     })
   }
 
+  const changeIndicePagina = (indice: number) => {
+    setIndiceActual(indice)
+    setFiltro({
+      ...filtro,
+      skip: indice * quantityPerPage
+    })
+  }
+
   if (loading) return <h1>Loading...</h1>
 
   if (error) return <h1>{error}</h1>
+
+  console.log("indicesPagina", indicesPagina)
 
   return (
     <div className="flex flex-col h-full -mt-8">
@@ -113,9 +129,10 @@ export default function Cheque({ params }: { params: { id: string } }) {
 
       <h2 className="text-xl font-bold my-4">Lista de Cheques</h2>
 
-      <div className="flex-grow bg-gray-800 rounded-md p-5 flex flex-row">
+      <div className="flex-grow bg-gray-800 rounded-md p-5 flex flex-col">
         {
           cheques.length != 0 ? (
+          <>
             <table className="border-collapse w-full">
               <thead>
                 <tr>
@@ -148,7 +165,7 @@ export default function Cheque({ params }: { params: { id: string } }) {
                         minute: "2-digit",
                         hour12: false,
                       })}</td>
-                      <td>{cheque.bancoChequeId}</td>
+                      <td>{cheque.bancoCheque.nombre}</td>
                       <td>{cheque.estado === estadoCheque.PAGADO ? <span className='bg-green-500 p-1 rounded'>{estadoCheque.PAGADO}</span> : <span className='bg-red-500 p-1 rounded'>{estadoCheque.EMITIDO}</span>}</td>
                       <td>{Number(cheque.monto).toLocaleString()}</td>
                       <td>acciones</td>
@@ -156,6 +173,33 @@ export default function Cheque({ params }: { params: { id: string } }) {
                   ))}
               </tbody>
             </table>
+            <div className="flex justify-between items-center mt-2 ">
+              <button 
+                onClick={() => changeIndicePagina(indiceActual-1)}
+                disabled={indiceActual-1 === -1} 
+                className='w-8 bg-gray-700 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded' >
+                <ChevronLeftIcon />
+              </button>
+              <div className='gap-2 flex'>
+                {
+                  [...Array(indicesPagina)].map((_, index) => (
+                    <button 
+                      key={index} 
+                      onClick={() => changeIndicePagina(index)}
+                      className={(index === indiceActual ? "opacity-50 cursor-not-allowed " : "hover:bg-gray-900 ") +"px-6 py-2 bg-gray-700 rounded"}>
+                      <span className={"cursor-pointer m-auto"}>{index + 1}</span>
+                    </button>
+                  ))
+                }
+              </div>
+              <button 
+                disabled={indiceActual+1 === indicesPagina} 
+                onClick={() => changeIndicePagina(indiceActual+1)}
+                className={'w-8 bg-gray-700 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded'}>
+                <ChevronRightIcon />
+              </button>
+            </div>
+          </>
           ) :
             <h1 className='text-red-500 text-2xl'>No hay cheques en la cuenta</h1>
         }
