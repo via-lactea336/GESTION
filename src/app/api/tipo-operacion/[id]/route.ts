@@ -23,12 +23,15 @@ export async function DELETE(req:NextRequest, { params }: { params: { id: string
   const id = params.id;
   
   try {
-    const tipoOperacion = await prisma.operacion.delete({
+    const tipoOperacion = await prisma.tipoOperacion.update({
       where: {
         id
+      },
+      data:{
+        deleted: new Date()
       }
     });
-    return generateApiSuccessResponse(200, `La operacion con id:${id} fue eliminada`, tipoOperacion);
+    return generateApiSuccessResponse(200, `El tipo de Operacion con id:${id} fue eliminada`, tipoOperacion);
   } catch (error) {
     return generateApiErrorResponse("Error eliminando el tipo de Operacion", 500);
   }

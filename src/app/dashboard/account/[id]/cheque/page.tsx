@@ -1,6 +1,7 @@
 "use client"
 
 import obtenerBancos from '@/lib/banco/obtenerBancos'
+import concicliarCheque from '@/lib/cheque/conciliarCheque'
 import obtenerChequesFiltros from '@/lib/cheque/obtenerChequesFiltros'
 import { ChequeDetails } from '@/lib/definitions'
 import { ArrowDownLeftIcon, ArrowUpRightIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
@@ -82,6 +83,24 @@ export default function Cheque({ params }: { params: { id: string } }) {
     })
   }
 
+  const handleConciliar = async (id:string)=>{
+
+    const response = await concicliarCheque(id)
+
+    if (typeof (response) === 'string' || response === undefined) {
+      setError(response || "Error al conciliar el cheque")
+      setLoading(false)
+      return
+    }
+
+    const prevCheques = [...cheques]
+    setCheques(prevCheques.map(cheque => cheque.id === id ? {...cheque, estado: estadoCheque.PAGADO} : cheque))
+  }
+
+  const handleAnular = async (id: string) => {
+    console.log("anulado")
+  }
+
   if (loading) return <h1>Loading...</h1>
 
   if (error) return <h1>{error}</h1>
@@ -157,18 +176,25 @@ export default function Cheque({ params }: { params: { id: string } }) {
                           )}
                         </div>
                       </td>
-                      <td>{cheque.fechaEmision.toLocaleString("es-ES", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: false,
-                      })}</td>
+                      <td>{cheque.fechaEmision.toString().split("T")[0]}</td>
                       <td>{cheque.bancoCheque.nombre}</td>
                       <td>{cheque.estado === estadoCheque.PAGADO ? <span className='bg-green-500 p-1 rounded'>{estadoCheque.PAGADO}</span> : <span className='bg-red-500 p-1 rounded'>{estadoCheque.EMITIDO}</span>}</td>
                       <td>{Number(cheque.monto).toLocaleString()}</td>
-                      <td>acciones</td>
+                      <td>
+                        <div className='flex gap-2'>
+                          <button 
+                            disabled={cheque.estado === estadoCheque.PAGADO}
+                            onClick={async () => await handleConciliar(cheque.id)} 
+                            className='disabled:opacity-50 disabled:cursor-not-allowed border-gray-700 border-2 hover:bg-green-900 p-1 rounded'>
+                            Conciliar
+                          </button>
+                          <button 
+                            onClick={async () => await handleAnular(cheque.id)} 
+                            className='border-gray-700 border-2 hover:bg-red-900 p-1 rounded'>
+                              Anular
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
               </tbody>

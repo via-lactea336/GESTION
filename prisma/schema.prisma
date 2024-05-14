@@ -56,6 +56,8 @@ model TipoOperacion {
   esDebito              Boolean             
   afectaSaldo           Boolean
   operaciones           Operacion[]
+
+  deleted               DateTime?
 }
 
 
@@ -85,6 +87,7 @@ model Operacion {
 enum estadoCheque {
   EMITIDO
   PAGADO
+  ANULADO
 }
 
 model Cheque {
@@ -93,12 +96,13 @@ model Cheque {
   esRecibido                Boolean               
   monto                     Decimal          @db.Money        
   
-  fechaEmision              DateTime
-  fechaPago                 DateTime?
+  fechaEmision                    DateTime
+  fechaPago                       DateTime?
 
-  involucrado               String           @db.VarChar(128)
+  involucradoNombre               String           @db.VarChar(128)
+  involucradoDocumentoIdentidad   String           @db.VarChar(128)
 
-  estado                    estadoCheque     @default(EMITIDO)
+  estado                          estadoCheque     @default(EMITIDO)
   
   bancoCheque               Banco            @relation(references: [id], fields: [bancoChequeId], onDelete: NoAction)
   bancoChequeId             String
@@ -106,12 +110,18 @@ model Cheque {
   cuentaAfectada            CuentaBancaria   @relation(fields: [cuentaBancariaAfectadaId], references: [id], onDelete: NoAction)
   cuentaBancariaAfectadaId  String
 
-  createdAt                  DateTime         @default(now())
-  updatedAt                  DateTime         @updatedAt @default(now())
+  createdAt                 DateTime         @default(now())
+  updatedAt                 DateTime         @updatedAt @default(now())
+}
+
+enum Roles { 
+  ADMIN
+  EMPLOYEES
 }
 
 model User {
-  id String @id @default(uuid())
-  username String @unique
-  password String
+  id        String @id @default(uuid())
+  username  String @unique
+  password  String
+  rol       Roles @default(EMPLOYEES)
 }

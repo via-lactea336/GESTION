@@ -11,6 +11,11 @@ export async function GET(request: NextRequest) {
   const fechaDesde = searchParams.get("fechaDesde");
   const fechaHasta = searchParams.get("fechaHasta");
   
+  const montoDesde = searchParams.get("montoDesde")
+  const montoHasta = searchParams.get("montoHasta")
+
+  const esDebito = searchParams.get("esDebito");
+
   const skip = searchParams.get("skip");
   const upTo  = searchParams.get("upTo");
 
@@ -19,13 +24,23 @@ export async function GET(request: NextRequest) {
   const verifiedSkip = (!skip || Number.isNaN(parseInt(skip))) ? 0 : parseInt(skip)
   const verifiedUpTo = (!upTo || Number.isNaN(parseInt(upTo))) ? 4 : parseInt(upTo)
 
+  const amounts = [ 
+    (!montoDesde || Number.isNaN(parseFloat(montoDesde)))? undefined : parseFloat(montoDesde), 
+    (!montoHasta || Number.isNaN(parseFloat(montoHasta)))? undefined : parseFloat(montoHasta)
+  ] 
+
   //Si hay informacion para la busqueda, agregarla al filtro
   const where = {
     createdAt: {
       gte: fechaDesde ? new Date(fechaDesde) : undefined,
       lte: fechaHasta ? new Date(fechaHasta) : undefined,
     },
-    cuentaBancariaOrigenId: cuenta? cuenta : undefined
+    cuentaBancariaOrigenId: cuenta? cuenta : undefined,
+    monto:{
+      gte:amounts[0],
+      lte:amounts[1]
+    },
+    esDebito: esDebito ? esDebito === "true"? true : esDebito === "false"? false : undefined : undefined,
   };
 
   //Asignar los elementos encontrados a los valores
