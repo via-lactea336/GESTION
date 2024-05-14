@@ -8,14 +8,18 @@ export default async function obtenerChequesFiltros(
     fechaDesde,
     fechaHasta,
     cuentaId,
-    estado
+    estado,
+    montoDesde,
+    montoHasta,
   }:{
     skip?:number,
     upTo?:number,
     fechaDesde?:string,
-    fechaHasta?:string
-    cuentaId?:string
-    estado?:estadoCheque
+    fechaHasta?:string,
+    cuentaId?:string,
+    estado?:estadoCheque,
+    montoDesde?:number,
+    montoHasta?:number
   }
 ){
   
@@ -27,6 +31,8 @@ export default async function obtenerChequesFiltros(
   if(upTo) searchParams.append("upTo", upTo.toString())
   if(cuentaId) searchParams.append("cuentaId", cuentaId)
   if(estado) searchParams.append("estado", estado)
+  if(montoDesde) searchParams.append("montoDesde", montoDesde.toString())
+  if(montoHasta) searchParams.append("montoHasta", montoHasta.toString())
 
   const queryString = searchParams.toString();
   try{

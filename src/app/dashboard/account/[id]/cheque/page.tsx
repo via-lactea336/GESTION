@@ -28,8 +28,10 @@ export default function Cheque({ params }: { params: { id: string } }) {
     cuentaId: string,
     fechaDesde?: string,
     fechaHasta?: string,
-    bancoChequeId?: string
-    estado?: estadoCheque
+    bancoChequeId?: string,
+    estado?: estadoCheque,
+    montoDesde?: number,
+    montoHasta?: number
   }>({
     upTo: quantityPerPage,
     skip: 0,
@@ -73,6 +75,23 @@ export default function Cheque({ params }: { params: { id: string } }) {
       ...filtro,
       [name]: value === "" ? undefined : value
     })
+  }
+
+  const handleOnChangeInputNumber = (e: React.ChangeEvent<HTMLInputElement>) =>{
+    const { name, value } = e.target
+
+    if (value.includes("-") || value.includes("e")) {
+      e.preventDefault()
+      return
+    }
+    
+    setFiltro(
+      {
+        ...filtro,
+        [name]: parseFloat(value)
+      }
+    )
+
   }
 
   const changeIndicePagina = (indice: number) => {
@@ -142,6 +161,17 @@ export default function Cheque({ params }: { params: { id: string } }) {
             </select>
           </div>
 
+          <div className='flex flex-col items-center gap-3'>
+              <input 
+                onChange={handleOnChangeInputNumber}
+                className='bg-gray-800 text-white py-1 px-2 rounded' placeholder='Monto Desde' type="number" 
+                name="montoDesde" id="montoDesde" />
+              <input 
+                onChange={handleOnChangeInputNumber}
+                className='bg-gray-800 text-white py-1 px-2 rounded' placeholder='Monto Hasta' type="number" 
+                name="montoHasta" id="montoHasta" />
+          </div>  
+          
         </nav>
         <Link className='bg-gray-800 hover:bg-gray-900 text-white  py-2 px-4 rounded' href="/dashboard/account">Atras</Link>
       </header>
