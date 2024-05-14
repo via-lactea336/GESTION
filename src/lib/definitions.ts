@@ -33,6 +33,9 @@ export type CuentaBancariaAndBanco = CuentaBancaria & {
   banco: Banco
 }
 
-export type ChequeDetails = Cheque & {
-  cuentaAfectada: CuentaBancaria & {bancoCheque: Banco}
+export type ChequeDetails = Cheque & {cuentaAfectada: CuentaBancaria} & {bancoCheque: Banco}
+
+export type DatosFiltrados<T> = {
+  values: T[],
+  totalQuantity: number
 }

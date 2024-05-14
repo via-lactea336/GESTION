@@ -1,4 +1,4 @@
-import { OperacionAndTipoOperacion } from "../definitions"
+import { DatosFiltrados, OperacionAndTipoOperacion } from "../definitions"
 import { ApiResponseData } from "../definitions"
 
 export default async function obtenerOperacionesFiltros(
@@ -33,7 +33,7 @@ export default async function obtenerOperacionesFiltros(
       },
     }) 
 
-    const data:ApiResponseData<OperacionAndTipoOperacion[]> = await response.json()
+    const data:ApiResponseData<DatosFiltrados<OperacionAndTipoOperacion>> = await response.json()
     return data
   }catch(error){
     if(error instanceof Error) return error.message
