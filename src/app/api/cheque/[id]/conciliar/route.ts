@@ -33,12 +33,8 @@ export async function POST(
   const {
     esRecibido,
     monto,
-    fechaEmision,
-    estado,
-    bancoChequeId,
     cuentaBancariaAfectadaId,
     cuentaAfectada,
-    bancoCheque,
   } = chequeVerifBefore;
 
   if (
