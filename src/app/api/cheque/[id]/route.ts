@@ -28,6 +28,9 @@ export async function DELETE(req:NextRequest, { params }: { params: { id: string
         id
       }
     });
+
+    if(!cheque) return generateApiErrorResponse("Cheque no encontrado", 404)
+
     return generateApiSuccessResponse(200, `Cheque con id: ${id} fue eliminado`, cheque);
   } catch (error) {
     return generateApiErrorResponse("Error eliminando el cheque", 500);

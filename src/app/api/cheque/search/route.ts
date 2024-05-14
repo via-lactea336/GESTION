@@ -11,6 +11,9 @@ export async function GET(request: NextRequest) {
 
   const fechaDesde = searchParams.get("fechaDesde");
   const fechaHasta = searchParams.get("fechaHasta");
+
+  const montoDesde = searchParams.get("montoDesde")
+  const montoHasta = searchParams.get("montoHasta")
   
   const skip = searchParams.get("skip");
   const upTo  = searchParams.get("upTo");
@@ -24,6 +27,11 @@ export async function GET(request: NextRequest) {
   const verifiedSkip = (!skip || Number.isNaN(parseInt(skip))) ? 0 : parseInt(skip)
   const verifiedUpTo = (!upTo || Number.isNaN(parseInt(upTo))) ? 4 : parseInt(upTo)
 
+  const amounts = [ 
+    (!montoDesde || Number.isNaN(parseFloat(montoDesde)))? undefined : parseFloat(montoDesde), 
+    (!montoHasta || Number.isNaN(parseFloat(montoHasta)))? undefined : parseFloat(montoHasta)
+  ] 
+
   //Si hay informacion para la busqueda, agregarla al filtro
   const where = {
     fechaEmision: {
@@ -32,7 +40,11 @@ export async function GET(request: NextRequest) {
     },
     bancoChequeId: bancoChequeId ? bancoChequeId : undefined,
     cuentaBancariaAfectadaId: cuenta? cuenta : undefined,
-    estado: estado ? estado : undefined
+    estado: estado ? estado : undefined,
+    monto:{
+      gte:amounts[0],
+      lte:amounts[1]
+    }
   };
 
   //Asignar los elementos encontrados a los valores
