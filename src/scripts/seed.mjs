@@ -210,6 +210,35 @@ async function main() {
     skipDuplicates: true,
   });
   
+  const cheques = await prisma.cheque.createMany({
+    data: [
+      {
+        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Pago de Servicios").id,
+        fechaOperacion: new Date(),
+        monto: 10000,
+        cuentaBancariaAfectadaId: cuentaBancariaBancoFamiliar.id,
+        bancoInvolucrado: "Banco Familiar",
+        nombreInvolucrado: "Maria Ojeda",
+        cuentaInvolucrado: "22-3331549",
+        rucInvolucrado: "1234567890",
+        concepto: "Pago de Servicios",
+        numeroComprobante: "000009",
+      },
+      {
+        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Pago de Salario").id,
+        fechaOperacion: new Date(),
+        monto: 15000,
+        cuentaBancariaAfectadaId: cuentaBancariaBancoItau.id,
+        bancoInvolucrado: "Banco Itaú",
+        nombreInvolucrado: "Mirian Gonzalez",
+        cuentaInvolucrado: "17-203344",
+        rucInvolucrado: "222333-0",
+        concepto: "Pago de Salario",
+        numeroComprobante: "000010",
+      },
+    ]
+  })
+
   console.log("Se han creado los registros correctamente.");
 }
 
