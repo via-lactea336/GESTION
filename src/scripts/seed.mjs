@@ -223,6 +223,8 @@ async function main() {
         rucInvolucrado: "1234567890",
         concepto: "Pago de Servicios",
         numeroComprobante: "000009",
+        numeroCheque: "000001",
+        esRecibido: false,
       },
       {
         tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Pago de Salario").id,
@@ -235,6 +237,8 @@ async function main() {
         rucInvolucrado: "222333-0",
         concepto: "Pago de Salario",
         numeroComprobante: "000010",
+        numeroCheque: "000002",
+        esRecibido: false,
       },
     ]
   })
