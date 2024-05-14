@@ -9,6 +9,9 @@ async function main() {
   // Delete tipoOperacion
   await prisma.tipoOperacion.deleteMany({});
 
+  // Delete Cheque
+  await prisma.cheque.deleteMany({});
+
   // Delete cuentaBancaria
   await prisma.cuentaBancaria.deleteMany({});
 
