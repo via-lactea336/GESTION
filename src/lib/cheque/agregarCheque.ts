@@ -20,11 +20,9 @@ export default async function agregarCheque(
   esRecibido: boolean,
   monto: number,
   fechaEmision: Date,
-  fechaPago: Date,
-  emitidoPor: string,
-  involucrado: string,
+  involucradoNombre: string,
+  involucradoDocumentoIdentidad: string,
   bancoChequeId: string,
-  tipoOperacionId: string,
   cuentaBancariaAfectadaId: string
 ): Promise<ApiResponseData|string|undefined> {
   try{
@@ -38,11 +36,9 @@ export default async function agregarCheque(
         esRecibido: esRecibido,
         monto: monto,
         fechaEmision: fechaEmision,
-        fechaPago: fechaPago,
-        emitidoPor: emitidoPor,
-        involucradr:involucrado,
+        involucradoNombre: involucradoNombre,
+        involucradoDocumentoIdentidad: involucradoDocumentoIdentidad,
         bancoChequeId: bancoChequeId,
-        tipoOperacionId: tipoOperacionId,
         cuentaBancariaAfectadaId: cuentaBancariaAfectadaId
       })
     })
