@@ -6,7 +6,6 @@ import obtenerChequesFiltros from '@/lib/cheque/obtenerChequesFiltros'
 import { ChequeDetails } from '@/lib/definitions'
 import { ArrowDownLeftIcon, ArrowUpRightIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
 import { type Cheque, estadoCheque, Banco } from '@prisma/client'
-import Link from 'next/link'
 import React, { useEffect } from 'react'
 
 export default function Cheque({ params }: { params: { id: string } }) {
@@ -16,7 +15,8 @@ export default function Cheque({ params }: { params: { id: string } }) {
   const quantityPerPage = parseInt(process.env.QUANTITY_PER_PAGE || "4")
 
   const [cheques, setCheques] = React.useState<ChequeDetails[]>([])
-  const [loading, setLoading] = React.useState(true)
+  const [loadingContentPage, setLoadingContentPage] = React.useState(true)
+  const [loadingTable, setLoadingTable] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
   const [bancos, setBancos] = React.useState<Banco[]>([])
   const [indicesPagina, setindicesPagina] = React.useState(0)
@@ -39,37 +39,45 @@ export default function Cheque({ params }: { params: { id: string } }) {
   }
   )
 
-  const obtenerChequesEffect = async () => {
-    const response = await obtenerChequesFiltros(filtro)
-
+  const obtenerBancosHandler = async () => {
+    
     const bancosRes = await obtenerBancos()
-
-    if (typeof (response) === 'string' || response === undefined) {
-      setError(response || "Error al obtener los cheques")
-      setLoading(false)
-      return
-    }
 
     if (typeof (bancosRes) === 'string' || bancosRes === undefined) {
       setError(bancosRes || "Error al obtener los bancos para el filtro")
-      setLoading(false)
+      setLoadingContentPage(false)
       return
     }
+   
+    setBancos(bancosRes.data)
+    setLoadingContentPage(false)
+  }
 
-    console.log(response.data.totalQuantity)
+  const obtenerChequesFiltroHandler = async () => {
+    setLoadingTable(true)
+    const response = await obtenerChequesFiltros(filtro)
+    
+    if (typeof (response) === 'string' || response === undefined) {
+      setError(response || "Error al obtener los cheques")
+      setLoadingContentPage(false)
+      return
+    }
+    
     setCheques(response.data.values)
     setindicesPagina(response.data.totalQuantity % quantityPerPage === 0 ? response.data.totalQuantity / quantityPerPage : Math.floor(response.data.totalQuantity / quantityPerPage) + 1)
-    setBancos(bancosRes.data)
-    setLoading(false)
+
+    setLoadingTable(false)
   }
 
   useEffect(() => {
+    obtenerBancosHandler()
+  }, [])
 
-    obtenerChequesEffect()
+  useEffect(() => {
+    obtenerChequesFiltroHandler()
+  }, [indiceActual])
 
-  }, [filtro])
-
-  const handleOnChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleOnChange = (e: React.ChangeEvent< HTMLSelectElement | HTMLInputElement>) => {
     const { name, value } = e.target
     setFiltro({
       ...filtro,
@@ -77,24 +85,13 @@ export default function Cheque({ params }: { params: { id: string } }) {
     })
   }
 
-  const handleOnChangeInputNumber = (e: React.ChangeEvent<HTMLInputElement>) =>{
-    const { name, value } = e.target
-
-    if (value.includes("-") || value.includes("e")) {
+  const onKeyDownHandleForNumberInputs = (e:React.KeyboardEvent) =>{
+    if (e.key === "e" || e.key === "-") {
       e.preventDefault()
-      return
     }
-    
-    setFiltro(
-      {
-        ...filtro,
-        [name]: parseFloat(value)
-      }
-    )
-
   }
 
-  const changeIndicePagina = (indice: number) => {
+  const changeIndicePagina = async (indice: number) => {
     setIndiceActual(indice)
     setFiltro({
       ...filtro,
@@ -102,13 +99,14 @@ export default function Cheque({ params }: { params: { id: string } }) {
     })
   }
 
+
   const handleConciliar = async (id:string)=>{
 
     const response = await concicliarCheque(id)
 
     if (typeof (response) === 'string' || response === undefined) {
       setError(response || "Error al conciliar el cheque")
-      setLoading(false)
+      setLoadingContentPage(false)
       return
     }
 
@@ -120,11 +118,9 @@ export default function Cheque({ params }: { params: { id: string } }) {
     console.log("anulado")
   }
 
-  if (loading) return <h1>Loading...</h1>
+  if (loadingContentPage) return <h1>Loading...</h1>
 
   if (error) return <h1>{error}</h1>
-
-  console.log("indicesPagina", indicesPagina)
 
   return (
     <div className="flex flex-col h-full -mt-8">
@@ -163,24 +159,31 @@ export default function Cheque({ params }: { params: { id: string } }) {
 
           <div className='flex flex-col items-center gap-3'>
               <input 
-                onChange={handleOnChangeInputNumber}
+                onChange={handleOnChange}
+                onKeyDown={onKeyDownHandleForNumberInputs}
                 className='bg-gray-800 text-white py-1 px-2 rounded' placeholder='Monto Desde' type="number" 
                 name="montoDesde" id="montoDesde" />
               <input 
-                onChange={handleOnChangeInputNumber}
+                onChange={handleOnChange}
+                onKeyDown={onKeyDownHandleForNumberInputs}
                 className='bg-gray-800 text-white py-1 px-2 rounded' placeholder='Monto Hasta' type="number" 
                 name="montoHasta" id="montoHasta" />
           </div>  
           
         </nav>
-        <Link className='bg-gray-800 hover:bg-gray-900 text-white  py-2 px-4 rounded' href="/dashboard/account">Atras</Link>
+        <button 
+          onClick={async () => {await obtenerChequesFiltroHandler()}}
+          className='bg-gray-800 hover:bg-gray-900 text-white  py-2 px-4 rounded' 
+        >
+            Filtrar
+        </button>
       </header>
 
       <h2 className="text-xl font-bold my-4">Lista de Cheques</h2>
 
       <div className="flex-grow bg-gray-800 rounded-md p-5 flex flex-col">
         {
-          cheques.length != 0 ? (
+          !loadingTable  ? (
           <>
             <table className="border-collapse w-full">
               <thead>
@@ -231,7 +234,7 @@ export default function Cheque({ params }: { params: { id: string } }) {
             </table>
             <div className="flex justify-between items-center mt-2 ">
               <button 
-                onClick={() => changeIndicePagina(indiceActual-1)}
+                onClick={async () => await changeIndicePagina(indiceActual-1)}
                 disabled={indiceActual-1 === -1} 
                 className='w-8 bg-gray-700 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded' >
                 <ChevronLeftIcon />
@@ -241,7 +244,7 @@ export default function Cheque({ params }: { params: { id: string } }) {
                   [...Array(indicesPagina)].map((_, index) => (
                     <button 
                       key={index} 
-                      onClick={() => changeIndicePagina(index)}
+                      onClick={async () => await changeIndicePagina(index)}
                       className={(index === indiceActual ? "opacity-50 cursor-not-allowed " : "hover:bg-gray-900 ") +"px-6 py-2 bg-gray-700 rounded"}>
                       <span className={"cursor-pointer m-auto"}>{index + 1}</span>
                     </button>
@@ -250,13 +253,16 @@ export default function Cheque({ params }: { params: { id: string } }) {
               </div>
               <button 
                 disabled={indiceActual+1 === indicesPagina} 
-                onClick={() => changeIndicePagina(indiceActual+1)}
+                onClick={async () => await changeIndicePagina(indiceActual+1)}
                 className={'w-8 bg-gray-700 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded'}>
                 <ChevronRightIcon />
               </button>
             </div>
           </>
           ) :
+          cheques.length != 0 ?
+            <h1 className='text-red-500 text-2xl'>No hay cheques en la cuenta</h1>
+          :
             <h1 className='text-red-500 text-2xl'>No hay cheques en la cuenta</h1>
         }
       </div>

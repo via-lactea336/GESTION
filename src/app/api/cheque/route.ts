@@ -24,16 +24,6 @@ export async function POST(req: NextRequest) {
     cuentaBancariaAfectadaId,
   } = body;
 
-  console.log(
-    esRecibido,
-    numeroCheque,
-    monto,
-    fechaEmision,
-    involucrado,
-    bancoChequeId,
-    cuentaBancariaAfectadaId
-  );
-
   if (
     !numeroCheque ||
     !monto ||
