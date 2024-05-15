@@ -2,9 +2,7 @@
 import {
   UserIcon,
   ArrowsRightLeftIcon,
-  UserGroupIcon,
-  HomeIcon,
-  DocumentDuplicateIcon,
+  BanknotesIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -14,9 +12,14 @@ import { usePathname } from "next/navigation";
 const links = [
   { name: "Cuenta", href: "/dashboard/account", icon: UserIcon },
   {
-    name: "Transacciones",
-    href: "/dashboard",
+    name: "Transferencias",
+    href: "/dashboard/transferencias",
     icon: ArrowsRightLeftIcon,
+  },
+  {
+    name: "Cheques",
+    href: "/dashboard/cheques",
+    icon: BanknotesIcon,
   },
 ];
 
