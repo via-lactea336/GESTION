@@ -82,6 +82,7 @@ const CrearCheques = () => {
           new Date(fechaEmision),
           involucradoNombre,
           involucradoDocumentoIdentidad,
+          "",
           bancoChequeId,
           cuentaBancariaAfectadaId
         
