@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
     fechaEmision,
     bancoChequeId,
     cuentaBancariaAfectadaId,
+    involucradoCuentaBancaria,
   } = body;
 
   if (
@@ -80,6 +81,7 @@ export async function POST(req: NextRequest) {
     const cheque = await prisma.cheque.create({
       data: {
         numeroCheque,
+        involucradoCuentaBancaria,
         monto,
         esRecibido,
         fechaEmision,
