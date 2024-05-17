@@ -5,24 +5,22 @@ import { OperacionAndTipoOperacion } from "@/lib/definitions";
 
 // Definición de los tipos de los props
 type TransferReceiptProps = {
-  operaciones: OperacionAndTipoOperacion[],
-  cuenta: CuentaBancaria
-}
+  operaciones: OperacionAndTipoOperacion[];
+  cuenta: CuentaBancaria;
+};
 
 const formatDate = (dateString: Date) => {
   const date = new Date(dateString);
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
-  const formattedDate = `${day < 10 ? "0" + day : day}-${month < 10 ? "0" + month : month
-    }-${year}`;
+  const formattedDate = `${day < 10 ? "0" + day : day}-${
+    month < 10 ? "0" + month : month
+  }-${year}`;
   return formattedDate;
 };
 
-function detalleCuentaReceipt({
-  operaciones,
-  cuenta
-}: TransferReceiptProps) {
+function detalleCuentaReceipt({ operaciones, cuenta }: TransferReceiptProps) {
   // Create styles
   const styles = StyleSheet.create({
     page: {
@@ -93,21 +91,23 @@ function detalleCuentaReceipt({
     },
     debit: {
       color: "red",
-    }
+    },
   });
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={[styles.container, styles.section]}>
-          <Text style={styles.title}>
-            Movimientos Detalle Cuenta
-          </Text>
+          <Text style={styles.title}>Movimientos Detalle Cuenta</Text>
           <View style={styles.view}>
             <View>
               <View style={styles.section}>
                 <Text style={styles.subtitle}>Tipo de Cuenta:</Text>
-                <Text style={styles.text}>{cuenta.esCuentaAhorro ? "Cuenta de ahorros" : "Cuenta Corriente"}</Text>
+                <Text style={styles.text}>
+                  {cuenta.esCuentaAhorro
+                    ? "Cuenta de ahorros"
+                    : "Cuenta Corriente"}
+                </Text>
               </View>
               <View style={styles.section}>
                 <Text style={styles.subtitle}>Número de Cuenta:</Text>
@@ -117,11 +117,13 @@ function detalleCuentaReceipt({
             <View>
               <View style={styles.section}>
                 <Text style={styles.subtitle}>Saldo Disponible:</Text>
-                <Text style={styles.text}>{cuenta.saldo}</Text>
+                <Text style={styles.text}>{Number(cuenta.saldo)}</Text>
               </View>
               <View style={styles.section}>
                 <Text style={styles.subtitle}>Saldo Retenido:</Text>
-                <Text style={styles.text}>{cuenta.saldoDisponible}</Text>
+                <Text style={styles.text}>
+                  {Number(cuenta.saldoDisponible)}
+                </Text>
               </View>
             </View>
           </View>
@@ -131,23 +133,74 @@ function detalleCuentaReceipt({
           <Text style={styles.categoria}>Operaciones</Text>
           <View style={styles.table}>
             <View style={styles.tableRow}>
-              <View style={styles.tableCol}><Text style={[styles.tableCell, styles.tableHeader]}>Operación</Text></View>
-              <View style={styles.tableCol}><Text style={[styles.tableCell, styles.tableHeader]}>Fecha</Text></View>
-              <View style={styles.tableCol}><Text style={[styles.tableCell, styles.tableHeader]}>Banco Origen</Text></View>
-              <View style={styles.tableCol}><Text style={[styles.tableCell, styles.tableHeader]}>Involucrado</Text></View>
-              <View style={styles.tableCol}><Text style={[styles.tableCell, styles.tableHeader]}>Concepto</Text></View>
-              <View style={styles.tableCol}><Text style={[styles.tableCell, styles.tableHeader]}>Monto</Text></View>
+              <View style={styles.tableCol}>
+                <Text style={[styles.tableCell, styles.tableHeader]}>
+                  Operación
+                </Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={[styles.tableCell, styles.tableHeader]}>
+                  Fecha
+                </Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={[styles.tableCell, styles.tableHeader]}>
+                  Banco Origen
+                </Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={[styles.tableCell, styles.tableHeader]}>
+                  Involucrado
+                </Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={[styles.tableCell, styles.tableHeader]}>
+                  Concepto
+                </Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={[styles.tableCell, styles.tableHeader]}>
+                  Monto
+                </Text>
+              </View>
             </View>
             {operaciones.map((operacion, index) => (
               <View style={styles.tableRow} key={index}>
-                <View style={styles.tableCol}><Text style={styles.tableCell}>{operacion.tipoOperacion.esDebito ? "Debito" : "Credito"}</Text></View>
-                <View style={styles.tableCol}><Text style={styles.tableCell}>{formatDate(operacion.fechaOperacion)}</Text></View>
-                <View style={styles.tableCol}><Text style={styles.tableCell}>{operacion.bancoInvolucrado}</Text></View>
-                <View style={styles.tableCol}><Text style={styles.tableCell}>{operacion.nombreInvolucrado}</Text></View>
-                <View style={styles.tableCol}><Text style={styles.tableCell}>{operacion.concepto}</Text></View>
                 <View style={styles.tableCol}>
-                  <Text style={[styles.tableCell, operacion.tipoOperacion.esDebito ? styles.debit : styles.credit]}>
-                    {operacion.tipoOperacion.esDebito ? `- ${Number(operacion.monto).toLocaleString()} Gs.` : `+ ${Number(operacion.monto).toLocaleString()} Gs.`}
+                  <Text style={styles.tableCell}>
+                    {operacion.tipoOperacion.esDebito ? "Debito" : "Credito"}
+                  </Text>
+                </View>
+                <View style={styles.tableCol}>
+                  <Text style={styles.tableCell}>
+                    {formatDate(operacion.fechaOperacion)}
+                  </Text>
+                </View>
+                <View style={styles.tableCol}>
+                  <Text style={styles.tableCell}>
+                    {operacion.bancoInvolucrado}
+                  </Text>
+                </View>
+                <View style={styles.tableCol}>
+                  <Text style={styles.tableCell}>
+                    {operacion.nombreInvolucrado}
+                  </Text>
+                </View>
+                <View style={styles.tableCol}>
+                  <Text style={styles.tableCell}>{operacion.concepto}</Text>
+                </View>
+                <View style={styles.tableCol}>
+                  <Text
+                    style={[
+                      styles.tableCell,
+                      operacion.tipoOperacion.esDebito
+                        ? styles.debit
+                        : styles.credit,
+                    ]}
+                  >
+                    {operacion.tipoOperacion.esDebito
+                      ? `- ${Number(operacion.monto).toLocaleString()} Gs.`
+                      : `+ ${Number(operacion.monto).toLocaleString()} Gs.`}
                   </Text>
                 </View>
               </View>
