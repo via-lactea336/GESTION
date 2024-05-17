@@ -17,10 +17,6 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon
 } from "@heroicons/react/24/outline";
-import obtenerOperacionesPorCuentaId from "@/lib/operacion/obtenerOperacionesPorCuentaId";
-import { OperacionAndTipoOperacion } from "@/lib/definitions";
-import { CuentaBancaria } from "@prisma/client";
-import Link from "next/link";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 export default function AccountDetailsTab() {
   const quantityPerPage = parseInt(process.env.QUANTITY_PER_PAGE || "4")
