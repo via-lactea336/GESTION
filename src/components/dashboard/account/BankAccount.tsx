@@ -19,9 +19,9 @@ const BankAccount: React.FC<Props> = ({
 
   return (
     <div className="bg-gray-800 py-6 px-4 rounded-md shadow-md [min-width:300px]">
-      <h2 className="text-lg font-bold">{tipoDeCuenta}</h2>
+      <h2 className="text-lg font-bold">{banco.nombre}</h2>
       <p className="text-sm"> N° de cuenta {numeroCuenta}</p>
-      <p className="text-sm"> {banco.nombre}</p>
+      <p className="text-sm"> {tipoDeCuenta}</p>
       <div className="flex flex-row-reverse justify-between items-center pt-4 w-full">
         <p className="text-xl">
           {" "}
