@@ -145,7 +145,6 @@ const CrearCheques = () => {
             type="checkbox"
             id="esRecibido"
             checked={esRecibido}
-            required
             onChange={(e) => setEsRecibido(e.target.checked)}
             className="text-blue-500 border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
