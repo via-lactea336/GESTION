@@ -86,9 +86,11 @@ const CrearCheques = () => {
         cuentaBancariaAfectadaId
       );
       if (r !== undefined && typeof r !== "string") {
-        if (r.data) {
+        if (r.success) {
           toast.success("Cheque registrado exitosamente");
-        } else if (r.error) {
+          // Limpiar los campos después de registrar el cheque
+          event.currentTarget.reset();
+        } else {
           toast.error("Error al registrar el cheque");
         }
       }
@@ -106,6 +108,7 @@ const CrearCheques = () => {
       setCuentaBancariaAfectadaId("");
       setInvolucradoNombre("");
       setInvolucradoDocumentoIdentidad("");
+      setInvolucradoCuentaBancaria("");
     }
   };
 
@@ -119,6 +122,7 @@ const CrearCheques = () => {
           <input
             type="text"
             id="numeroCheque"
+            required
             value={numeroCheque}
             onChange={(e) => setNumeroCheque(e.target.value)}
             className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
@@ -130,6 +134,7 @@ const CrearCheques = () => {
           </label>
           <input
             type="number"
+            required
             id="monto"
             onChange={(e) => setMonto(Number(e.target.value))}
             className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
@@ -140,6 +145,7 @@ const CrearCheques = () => {
             type="checkbox"
             id="esRecibido"
             checked={esRecibido}
+            required
             onChange={(e) => setEsRecibido(e.target.checked)}
             className="text-blue-500 border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
@@ -154,6 +160,7 @@ const CrearCheques = () => {
           <input
             type="date"
             id="fechaEmision"
+            required
             value={fechaEmision}
             onChange={(e) => setFechaEmision(e.target.value)}
             className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
@@ -166,11 +173,12 @@ const CrearCheques = () => {
           <input
             type="text"
             id="involucradoNombre"
+            required={!esRecibido}
             value={involucradoNombre}
             onChange={(e) => setInvolucradoNombre(e.target.value)}
             disabled={esRecibido} // Deshabilita el campo si esRecibido está marcado
-            className={`text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
-              esRecibido ? "bg-gray-200" : ""
+            className={`text-white py-1 px-4 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+              esRecibido ? "bg-gray-700 cursor-not-allowed" : "bg-gray-900"
             }`}
           />
         </div>
@@ -184,10 +192,12 @@ const CrearCheques = () => {
           <input
             type="text"
             id="involucradoCuentaBancaria"
+            required={!esRecibido}
+            disabled={esRecibido}
             value={involucradoCuentaBancaria}
             onChange={(e) => setInvolucradoCuentaBancaria(e.target.value)}
-            className={`text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
-              esRecibido ? "bg-gray-200" : ""
+            className={`text-white py-1 px-4 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+              esRecibido ? "bg-gray-700 cursor-not-allowed" : "bg-gray-900"
             }`}
           />
         </div>
@@ -201,11 +211,12 @@ const CrearCheques = () => {
           <input
             type="text"
             id="involucradoDocumentoIdentidad"
+            required={!esRecibido}
             value={involucradoDocumentoIdentidad}
             onChange={(e) => setInvolucradoDocumentoIdentidad(e.target.value)}
             disabled={esRecibido} // Deshabilita el campo si esRecibido está marcado
-            className={`text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
-              esRecibido ? "bg-gray-200" : ""
+            className={`text-white py-1 px-4  mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+              esRecibido ? "bg-gray-700 cursor-not-allowed" : "bg-gray-900"
             }`}
           />
         </div>
