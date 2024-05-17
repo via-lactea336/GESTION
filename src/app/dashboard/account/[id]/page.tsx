@@ -3,7 +3,7 @@ import obtenerCuentaBancariaPorId from "@/lib/cuentaBancaria/obtenerCuentaBancar
 import { useParams } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import DetalleCuentasReceipt from '../../../../components/PDF/DetalleCuentas';
+import DetalleCuentasReceipt from "../../../../components/PDF/DetalleCuentas";
 import obtenerOperacionesFiltros from "@/lib/operacion/obtenerOperacionesFiltros";
 import { ApiResponseData, OperacionAndTipoOperacion } from "@/lib/definitions";
 import obtenerTiposOperacion from "@/lib/tipoOperacion/obtenerTiposOperacion";
@@ -123,8 +123,9 @@ export default function AccountDetailsTab() {
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
-    const formattedDate = `${day < 10 ? "0" + day : day}-${month < 10 ? "0" + month : month
-      }-${year}`;
+    const formattedDate = `${day < 10 ? "0" + day : day}-${
+      month < 10 ? "0" + month : month
+    }-${year}`;
     return formattedDate;
   };
 
@@ -162,24 +163,29 @@ export default function AccountDetailsTab() {
         <div className="flex justify-between items-center bg-primary-800 p-4 rounded-md">
           <h1 className="text-2xl font-bold mt-2 mb-2">Detalle cuentas</h1>
           <div>
-            <button
-              className="mr-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            <Link
+              className="px-4 py-2 bg-gray-800 rounded-md hover:bg-gray-900 mr-4"
+              href={`/dashboard/account/${id}/cheque`}
             >
+              Ver Cheques
+            </Link>
+            <button className="mr-4 bg-gray-800 hover:bg-gray-900 text-white py-2 px-4 rounded-md">
               <PDFDownloadLink
-                document={<DetalleCuentasReceipt
-                  operaciones={operaciones}
-                  cuenta={accountData}
-                //concepto={concepto}
-                />}
+                document={
+                  <DetalleCuentasReceipt
+                    operaciones={operaciones}
+                    cuenta={accountData}
+                    //concepto={concepto}
+                  />
+                }
                 fileName="detalle-cuentas.pdf"
               >
-                {
-                  ({ loading, url, error, blob }) =>
-                    loading ? (
-                      <button> Cargando documento... </button>
-                    ) : (
-                      <button>Descargar</button>
-                    )
+                {({ loading, url, error, blob }) =>
+                  loading ? (
+                    <button> Cargando documento... </button>
+                  ) : (
+                    <button>Descargar</button>
+                  )
                 }
               </PDFDownloadLink>
             </button>
@@ -342,10 +348,11 @@ export default function AccountDetailsTab() {
                   </td>
                   <td>
                     <span
-                      className={`text-sm mt-1 ${operacion.tipoOperacion.esDebito
+                      className={`text-sm mt-1 ${
+                        operacion.tipoOperacion.esDebito
                           ? "text-red-500"
                           : "text-green-500"
-                        }`}
+                      }`}
                     >
                       {operacion.tipoOperacion.esDebito
                         ? `- ${Number(operacion.monto).toLocaleString()} Gs.`
