@@ -11,6 +11,7 @@ import obtenerCuentaBancaria from "@/lib/cuentaBancaria/obtenerCuentaBancaria";
 import { CuentaBancaria } from "@prisma/client";
 import obtenerCuentasFiltros from "@/lib/cuentaBancaria/obtenerCuentasFiltros";
 import { CuentaBancariaAndBanco } from "@/lib/definitions";
+import { Toaster, toast } from "sonner";
 
 const CrearCheques = () => {
   const estadoInicial = [{ id: "0", nombre: "No hay bancos", deleted: null }];
@@ -27,6 +28,8 @@ const CrearCheques = () => {
   console.log(bancoChequeId);
   const [tipoOperacionId, setTipoOperacionId] = useState("");
   const [cuentaBancariaAfectadaId, setCuentaBancariaAfectadaId] = useState("");
+  const [involucradoCuentaBancaria, setInvolucradoCuentaBancaria] =
+    useState("");
   const [bancos, setBancos] = useState<Banco[]>([]);
   const [cuentasBancarias, setCuentasBancarias] = useState<
     CuentaBancariaAndBanco[]
@@ -71,19 +74,28 @@ const CrearCheques = () => {
     event.preventDefault();
 
     try {
-      await agregarCheque(
+      const r = await agregarCheque(
         numeroCheque,
         esRecibido,
         monto,
         new Date(fechaEmision),
         involucradoNombre,
         involucradoDocumentoIdentidad,
+        involucradoCuentaBancaria,
         bancoChequeId,
         cuentaBancariaAfectadaId
-
-        //  cuentaBancariaAfectadaId
       );
-
+      if (r !== undefined && typeof r !== "string") {
+        if (r.data) {
+          toast.success("Cheque registrado exitosamente");
+        } else if (r.error) {
+          toast.error("Error al registrar el cheque");
+        }
+      }
+    } catch (error) {
+      // Manejar el error si la función agregarCheque falla
+      console.error("Error al registrar el cheque:", error);
+    } finally {
       setNumeroCheque("");
       setEsRecibido(false);
       setMonto(0);
@@ -94,12 +106,6 @@ const CrearCheques = () => {
       setCuentaBancariaAfectadaId("");
       setInvolucradoNombre("");
       setInvolucradoDocumentoIdentidad("");
-
-      // Puedes mostrar algún mensaje de éxito si es necesario
-      console.log("Cheque registrado exitosamente");
-    } catch (error) {
-      // Manejar el error si la función agregarCheque falla
-      console.error("Error al registrar el cheque:", error);
     }
   };
 
@@ -108,14 +114,14 @@ const CrearCheques = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="numeroCheque" className="block font-medium">
-            Número de Cheque xd:
+            Número de Cheque:
           </label>
           <input
             type="text"
             id="numeroCheque"
             value={numeroCheque}
             onChange={(e) => setNumeroCheque(e.target.value)}
-            className="text-black mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
         <div>
@@ -125,9 +131,8 @@ const CrearCheques = () => {
           <input
             type="number"
             id="monto"
-            defaultValue={monto}
             onChange={(e) => setMonto(Number(e.target.value))}
-            className="text-black mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
         <div>
@@ -151,7 +156,7 @@ const CrearCheques = () => {
             id="fechaEmision"
             value={fechaEmision}
             onChange={(e) => setFechaEmision(e.target.value)}
-            className="text-black mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
         <div>
@@ -164,12 +169,28 @@ const CrearCheques = () => {
             value={involucradoNombre}
             onChange={(e) => setInvolucradoNombre(e.target.value)}
             disabled={esRecibido} // Deshabilita el campo si esRecibido está marcado
-            className={`text-black mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+            className={`text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
               esRecibido ? "bg-gray-200" : ""
             }`}
           />
         </div>
-
+        <div>
+          <label
+            htmlFor="involucradoCuentaBancaria"
+            className="block font-medium"
+          >
+            Cuenta Bancaria involucrado:
+          </label>
+          <input
+            type="text"
+            id="involucradoCuentaBancaria"
+            value={involucradoCuentaBancaria}
+            onChange={(e) => setInvolucradoCuentaBancaria(e.target.value)}
+            className={`text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+              esRecibido ? "bg-gray-200" : ""
+            }`}
+          />
+        </div>
         <div>
           <label
             htmlFor="involucradoDocumentoIdentidad"
@@ -183,7 +204,7 @@ const CrearCheques = () => {
             value={involucradoDocumentoIdentidad}
             onChange={(e) => setInvolucradoDocumentoIdentidad(e.target.value)}
             disabled={esRecibido} // Deshabilita el campo si esRecibido está marcado
-            className={`text-black mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+            className={`text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
               esRecibido ? "bg-gray-200" : ""
             }`}
           />
@@ -197,7 +218,7 @@ const CrearCheques = () => {
             id="bancoChequeId"
             value={bancoChequeId}
             onChange={(e) => setBancoChequeId(e.target.value)}
-            className="text-black mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Selecciona un banco</option>
             {bancos.map((banco) => (
@@ -215,7 +236,7 @@ const CrearCheques = () => {
             id="cuentaBancariaId"
             value={cuentaBancariaAfectadaId}
             onChange={(e) => setCuentaBancariaAfectadaId(e.target.value)}
-            className="text-black mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Selecciona una cuenta</option>
             {cuentasBancarias.map((cuentasBancarias) => (
@@ -228,11 +249,12 @@ const CrearCheques = () => {
 
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600"
+          className="w-full bg-primary-800 text-white font-bold py-2 px-4 rounded-md hover:bg-primary-700"
         >
           Registrar Cheque
         </button>
       </form>
+      <Toaster richColors />
     </div>
   );
 };
