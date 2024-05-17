@@ -99,9 +99,7 @@ model Cheque {
   fechaEmision                    DateTime
   fechaPago                       DateTime?
 
-  involucradoNombre               String           @db.VarChar(128)
-  involucradoCuentaBancaria       String           @db.VarChar(128)
-  involucradoDocumentoIdentidad   String           @db.VarChar(128)
+  involucrado                     String @db.VarChar(128)
 
   estado                          estadoCheque     @default(EMITIDO)
   

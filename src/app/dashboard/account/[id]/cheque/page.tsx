@@ -118,9 +118,9 @@ export default function Cheque({ params }: { params: { id: string } }) {
     console.log("anulado")
   }
 
-  if (loadingContentPage) return <h1>Loading...</h1>
+  if (loadingContentPage) return <h1>Cargando...</h1>
 
-  if (error) return <h1>{error}</h1>
+  if (error) return <h1 className="text-red-500">{error}</h1>
 
   return (
     <div className="flex flex-col h-full -mt-8">
@@ -183,7 +183,13 @@ export default function Cheque({ params }: { params: { id: string } }) {
 
       <div className="flex-grow bg-gray-800 rounded-md p-5 flex flex-col">
         {
-          !loadingTable  ? (
+          loadingTable? 
+          <h2>Cargando...</h2>
+          :
+          cheques.length === 0?
+          <h2>No hay cheques para mostrar</h2>
+          :
+          (
           <>
             <table className="border-collapse w-full">
               <thead>
@@ -214,19 +220,23 @@ export default function Cheque({ params }: { params: { id: string } }) {
                       <td>{cheque.estado === estadoCheque.PAGADO ? <span className='bg-green-500 p-1 rounded'>{estadoCheque.PAGADO}</span> : <span className='bg-red-500 p-1 rounded'>{estadoCheque.EMITIDO}</span>}</td>
                       <td>{Number(cheque.monto).toLocaleString()}</td>
                       <td>
-                        <div className='flex gap-2'>
-                          <button 
-                            disabled={cheque.estado === estadoCheque.PAGADO}
-                            onClick={async () => await handleConciliar(cheque.id)} 
-                            className='disabled:opacity-50 disabled:cursor-not-allowed border-gray-700 border-2 hover:bg-green-900 p-1 rounded'>
-                            Conciliar
-                          </button>
-                          <button 
-                            onClick={async () => await handleAnular(cheque.id)} 
-                            className='border-gray-700 border-2 hover:bg-red-900 p-1 rounded'>
-                              Anular
-                          </button>
-                        </div>
+                        {cheque.esRecibido && cheque.bancoChequeId != cheque.cuentaAfectada.bancoId ?
+                          <div className='flex gap-2'>
+                            <button 
+                              disabled={cheque.estado === estadoCheque.PAGADO}
+                              onClick={async () => await handleConciliar(cheque.id)} 
+                              className='disabled:opacity-50 disabled:cursor-not-allowed border-gray-700 border-2 hover:bg-green-900 p-1 rounded'>
+                              Conciliar
+                            </button>
+                            <button 
+                              onClick={async () => await handleAnular(cheque.id)} 
+                              className='border-gray-700 border-2 hover:bg-red-900 p-1 rounded'>
+                                Anular
+                            </button>
+                          </div>
+                          :
+                          <span>-</span>
+                        }
                       </td>
                     </tr>
                   ))}
@@ -259,11 +269,7 @@ export default function Cheque({ params }: { params: { id: string } }) {
               </button>
             </div>
           </>
-          ) :
-          cheques.length != 0 ?
-            <h1 className='text-red-500 text-2xl'>No hay cheques en la cuenta</h1>
-          :
-            <h1 className='text-red-500 text-2xl'>No hay cheques en la cuenta</h1>
+          )
         }
       </div>
 

@@ -55,6 +55,9 @@ export async function GET(request: NextRequest) {
     include:{
       cuentaAfectada: true,
       bancoCheque: true
+    },
+    orderBy:{
+      fechaEmision: "desc"
     }
   });
 
