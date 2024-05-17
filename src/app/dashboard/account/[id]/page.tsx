@@ -1,11 +1,11 @@
 "use client";
 import obtenerCuentaBancariaPorId from "@/lib/cuentaBancaria/obtenerCuentaBancariaPorId";
 import { useParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import obtenerOperacionesFiltros from "@/lib/operacion/obtenerOperacionesFiltros";
 import { ApiResponseData, OperacionAndTipoOperacion } from "@/lib/definitions";
-import   obtenerTiposOperacion from "@/lib/tipoOperacion/obtenerTiposOperacion";
+import obtenerTiposOperacion from "@/lib/tipoOperacion/obtenerTiposOperacion";
 import { CuentaBancaria } from "@prisma/client";
 import Link from "next/link";
 import {
@@ -14,33 +14,37 @@ import {
   ArrowDownLeftIcon,
   ArrowUpRightIcon,
   ChevronLeftIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 export default function AccountDetailsTab() {
-  const quantityPerPage = parseInt(process.env.QUANTITY_PER_PAGE || "4")
-  const [indicesPagina, setindicesPagina] = useState(0)
-  const [indiceActual, setIndiceActual] = useState(0)
+  const quantityPerPage = parseInt(process.env.QUANTITY_PER_PAGE || "4");
+  const [indicesPagina, setindicesPagina] = useState(0);
+  const [indiceActual, setIndiceActual] = useState(0);
   const [accountData, setAccountData] = useState<CuentaBancaria | null>(null);
   const [operaciones, setOperaciones] = useState<OperacionAndTipoOperacion[]>(
     []
   );
-  const [operacionesFiltradas, setOperacionesFiltradas] = useState<OperacionAndTipoOperacion[]>(
-    []
-  );
-  const [tipoOperaciones, setTipoOperaciones] = useState<ApiResponseData<{
-    id: string;
-    nombre: string;
-    esDebito: boolean;
-    afectaSaldo: boolean;
-    deleted: Date | null;
-  }[]>>();
+  const [operacionesFiltradas, setOperacionesFiltradas] = useState<
+    OperacionAndTipoOperacion[]
+  >([]);
+  const [tipoOperaciones, setTipoOperaciones] = useState<
+    ApiResponseData<
+      {
+        id: string;
+        nombre: string;
+        esDebito: boolean;
+        afectaSaldo: boolean;
+        deleted: Date | null;
+      }[]
+    >
+  >();
 
   const [filtros, setFiltros] = useState({
-    tipoOperacion: 'Todas',
-    fechaMin: '',
-    fechaMax: '',
-    pagina: 0
-  })
+    tipoOperacion: "Todas",
+    fechaMin: "",
+    fechaMax: "",
+    pagina: 0,
+  });
 
   const { id } = useParams();
   const router = useRouter();
@@ -58,8 +62,6 @@ export default function AccountDetailsTab() {
           throw new Error("Error obteniendo la cuenta");
         }
         setAccountData(cuentaReq.data);
-
-
       } catch (error) {
         console.error(error);
       }
@@ -78,59 +80,41 @@ export default function AccountDetailsTab() {
       } catch (error) {
         console.error(error);
       }
-    }
+    };
     fetchAccount();
     fetchTiposOperaciones();
   }, [id]);
 
-  const updateCuentas = () =>{
-    let operacionesFiltradasTmp = operaciones;
-
-    if (filtros.tipoOperacion != "Todas") {
-      operacionesFiltradasTmp = operacionesFiltradasTmp.filter(
-        (operacion) => operacion.tipoOperacion.nombre === (filtros.tipoOperacion))
-    }
-    setOperacionesFiltradas(operacionesFiltradasTmp);
-
-    if (filtros.fechaMin != '' && filtros.fechaMax != ''){
-      setOperacionesFiltradas(operacionesFiltradasTmp.filter(operation => {
-        const startDate = new Date(filtros.fechaMin)
-        const endDate = new Date(filtros.fechaMax)
-        const operationDate = new Date(operation.fechaOperacion);
-        console.log(operationDate)
-        console.log(operationDate >= startDate && operationDate <= endDate)
-        return operationDate >= startDate && operationDate <= endDate;
-      }));
-    }
-  }
-
-  
-
-  const fetchOperaciones = async () => {
+  const fetchOperaciones = useCallback(async () => {
     try {
+      console.log("fetching operaciones");
       const operacionesReq = await obtenerOperacionesFiltros({
         cuentaId: id as string,
-        fechaDesde: filtros.fechaMin, 
-        fechaHasta: filtros.fechaMax, 
-        skip: filtros.pagina, 
-        upTo: quantityPerPage, 
+        fechaDesde: filtros.fechaMin,
+        fechaHasta: filtros.fechaMax,
+        skip: filtros.pagina,
+        upTo: quantityPerPage,
       });
-  
-      if (typeof operacionesReq === 'string') {
+
+      if (typeof operacionesReq === "string") {
         throw new Error(operacionesReq);
       }
-  
+
       if (!operacionesReq || !operacionesReq.data) {
-        throw new Error('Error obteniendo las operaciones');
+        throw new Error("Error obteniendo las operaciones");
       }
-  
+
       setOperaciones(operacionesReq.data.values);
       setOperacionesFiltradas(operacionesReq.data.values);
-      setindicesPagina(operacionesReq.data.totalQuantity % quantityPerPage === 0 ? operacionesReq.data.totalQuantity / quantityPerPage : Math.floor(operacionesReq.data.totalQuantity / quantityPerPage) + 1)
+      setindicesPagina(
+        operacionesReq.data.totalQuantity % quantityPerPage === 0
+          ? operacionesReq.data.totalQuantity / quantityPerPage
+          : Math.floor(operacionesReq.data.totalQuantity / quantityPerPage) + 1
+      );
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [id, filtros, quantityPerPage]);
 
   const formatDate = (dateString: Date) => {
     const date = new Date(dateString);
@@ -143,28 +127,30 @@ export default function AccountDetailsTab() {
     return formattedDate;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     const { name, value } = e.target;
 
     setFiltros({
       ...filtros,
-      [name]: value
+      [name]: value,
     });
   };
 
   const changeIndicePagina = async (indice: number) => {
-    setIndiceActual(indice)
+    setIndiceActual(indice);
     setFiltros({
       ...filtros,
-      pagina: indice * quantityPerPage
-    })
-  }
-
+      pagina: indice * quantityPerPage,
+    });
+  };
 
   useEffect(() => {
-    updateCuentas();
     fetchOperaciones();
-  }, [filtros, operaciones]); 
+  }, [fetchOperaciones]);
 
   if (accountData === null || operaciones === null) {
     return <h1>cargando....</h1>;
@@ -212,9 +198,7 @@ export default function AccountDetailsTab() {
 
           <div className="mt-5">
             <div className="mb-4 flex items-center">
-              <label className="block font-semibold mr-2">
-                Saldo Total:
-              </label>
+              <label className="block font-semibold mr-2">Saldo Total:</label>
               <p>${Number(accountData.saldo).toLocaleString()}</p>
             </div>
             <div className="flex items-center">
@@ -230,37 +214,38 @@ export default function AccountDetailsTab() {
         <div className="flex justify-around gap-3 mb-1 bg-primary-800 p-4 rounded-md">
           <div>
             <label>Tipo Operacion</label>
-            <select className="bg-gray-800 text-white py-1 px-2 rounded-md ml-3 mr-3"
-            name="tipoOperacion"
-            onChange={handleChange}>
-                <option value="Todas">Todas</option>
-                {tipoOperaciones?.data.map((option, i) => (
+            <select
+              className="bg-gray-800 text-white py-1 px-2 rounded-md ml-3 mr-3"
+              name="tipoOperacion"
+              onChange={handleChange}
+            >
+              <option value="Todas">Todas</option>
+              {tipoOperaciones?.data.map((option, i) => (
                 <option key={i}>{option.nombre}</option>
-                ))}
+              ))}
             </select>
           </div>
           <div>
             <label>Fecha minima</label>
-              <input
-                  type="date"
-                  name="fechaMin"
-                  value={filtros.fechaMin}
-                  onChange={handleChange}
-                  className="bg-gray-800 text-white py-1 px-2 rounded-md ml-3 mr-3"
-              />
+            <input
+              type="date"
+              name="fechaMin"
+              value={filtros.fechaMin}
+              onChange={handleChange}
+              className="bg-gray-800 text-white py-1 px-2 rounded-md ml-3 mr-3"
+            />
           </div>
           <div>
             <label>Fecha Maxima</label>
             <input
-                  type="date"
-                  name="fechaMax"
-                  value={filtros.fechaMax}
-                  onChange={handleChange}
-                  className="bg-gray-800 text-white py-1 px-2 rounded-md ml-3 mr-3"
-              />
+              type="date"
+              name="fechaMax"
+              value={filtros.fechaMax}
+              onChange={handleChange}
+              className="bg-gray-800 text-white py-1 px-2 rounded-md ml-3 mr-3"
+            />
           </div>
         </div>
-        
 
         <div className="flex-grow bg-gray-800 rounded-md p-5 flex flex-row">
           <table className="border-collapse w-full">
@@ -350,31 +335,38 @@ export default function AccountDetailsTab() {
           </table>
         </div>
         <div className="flex justify-around items-center mt-2 ">
-            <button 
-              onClick={async () => await changeIndicePagina(indiceActual-1)}
-              disabled={indiceActual-1 === -1} 
-              className='w-8 bg-gray-700 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded' >
-              <ChevronLeftIcon />
-            </button>
-            <div className='gap-2 flex'>
-                {
-                  [...Array(indicesPagina)].map((_, index) => (
-                    <button 
-                      key={index} 
-                      onClick={async () => await changeIndicePagina(index)}
-                      className={(index === indiceActual ? "opacity-50 cursor-not-allowed " : "hover:bg-gray-900 ") +"px-6 py-2 bg-gray-700 rounded"}>
-                      <span className={"cursor-pointer m-auto"}>{index + 1}</span>
-                    </button>
-                  ))
+          <button
+            onClick={async () => await changeIndicePagina(indiceActual - 1)}
+            disabled={indiceActual - 1 === -1}
+            className="w-8 bg-gray-700 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded"
+          >
+            <ChevronLeftIcon />
+          </button>
+          <div className="gap-2 flex">
+            {[...Array(indicesPagina)].map((_, index) => (
+              <button
+                key={index}
+                onClick={async () => await changeIndicePagina(index)}
+                className={
+                  (index === indiceActual
+                    ? "opacity-50 cursor-not-allowed "
+                    : "hover:bg-gray-900 ") + "px-6 py-2 bg-gray-700 rounded"
                 }
-              </div>
-            <button 
-              onClick={async () => await changeIndicePagina(indiceActual+1)}
-              disabled={indiceActual+1 === indicesPagina} 
-              className={'w-8 bg-gray-700 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded'}>
-              <ChevronRightIcon />
-            </button>
+              >
+                <span className={"cursor-pointer m-auto"}>{index + 1}</span>
+              </button>
+            ))}
           </div>
+          <button
+            onClick={async () => await changeIndicePagina(indiceActual + 1)}
+            disabled={indiceActual + 1 === indicesPagina}
+            className={
+              "w-8 bg-gray-700 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded"
+            }
+          >
+            <ChevronRightIcon />
+          </button>
+        </div>
       </div>
     );
   }
