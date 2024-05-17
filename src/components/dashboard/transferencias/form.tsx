@@ -91,6 +91,14 @@ export default function FormTransferencias() {
     fetchDatos();
   }, []);
 
+  const [maxDate, setMaxDate] = useState("");
+
+  // Set max date to today
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+    setMaxDate(today);
+  }, []);
+
   return (
     <form className="w-full" onSubmit={handleSubmit}>
       <div className="flex flex-wrap -mx-3 mb-6">
@@ -100,6 +108,7 @@ export default function FormTransferencias() {
             <select
               className="block appearance-none w-full bg-gray-800 py-3 px-4 pr-8 rounded leading-tight focus:outline-none"
               id="operacion"
+              required
               onChange={(e) => {
                 setEsDebito(
                   operaciones.find((op) => op.id === e.target.value)
@@ -136,6 +145,7 @@ export default function FormTransferencias() {
             <select
               className="block appearance-none w-full bg-gray-800 py-3 px-4 pr-8 rounded leading-tight focus:outline-none"
               id="cuentaBancariaOrigenId"
+              required
             >
               {loading ? (
                 <option>Cargando...</option>
@@ -167,6 +177,7 @@ export default function FormTransferencias() {
             <select
               className="block appearance-none w-full bg-gray-800 py-3 px-4 pr-8 rounded leading-tight focus:outline-none"
               id="bancoInvolucrado"
+              required
             >
               {loading ? (
                 <option>Cargando...</option>
@@ -194,6 +205,7 @@ export default function FormTransferencias() {
           <input
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             id="cuentaInvolucrado"
+            required
             type="text"
             placeholder="22-187805"
           />
@@ -209,6 +221,7 @@ export default function FormTransferencias() {
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             id="nombreInvolucrado"
             type="text"
+            required
             placeholder="Pedro Meza"
           />
         </div>
@@ -218,6 +231,7 @@ export default function FormTransferencias() {
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             id="rucInvolucrado"
             type="text"
+            required
             placeholder="123456-1"
           />
         </div>
@@ -227,6 +241,7 @@ export default function FormTransferencias() {
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             id="monto"
             type="number"
+            required
             placeholder="150000"
             min={1}
           />
@@ -237,6 +252,7 @@ export default function FormTransferencias() {
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             id="comprobante"
             type="text"
+            required
             placeholder="012345"
           />
         </div>
@@ -248,7 +264,9 @@ export default function FormTransferencias() {
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="fechaOperacion"
             type="date"
+            required
             placeholder="012345"
+            max={maxDate}
           />
         </div>
         <div className="w-full md:w-2/3 px-3 mb-6 md:mb-0">
@@ -257,6 +275,7 @@ export default function FormTransferencias() {
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             id="concepto"
             type="text"
+            required
             placeholder="Pago de servicios básicos"
           />
         </div>
