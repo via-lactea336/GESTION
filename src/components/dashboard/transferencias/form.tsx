@@ -2,6 +2,7 @@
 import obtenerBancos from "@/lib/banco/obtenerBancos";
 import obtenerCuentaBancaria from "@/lib/cuentaBancaria/obtenerCuentaBancaria";
 import { CuentaBancariaAndBanco } from "@/lib/definitions";
+import { useCalendar } from "@/lib/hooks/useCalendar";
 import agregarOperacion from "@/lib/operacion/agregarOperacion";
 import obtenerTiposOperacion from "@/lib/tipoOperacion/obtenerTiposOperacion";
 import { Banco, TipoOperacion } from "@prisma/client";
@@ -91,13 +92,7 @@ export default function FormTransferencias() {
     fetchDatos();
   }, []);
 
-  const [maxDate, setMaxDate] = useState("");
-
-  // Set max date to today
-  useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
-    setMaxDate(today);
-  }, []);
+  const { maxDate } = useCalendar();
 
   return (
     <form className="w-full" onSubmit={handleSubmit}>

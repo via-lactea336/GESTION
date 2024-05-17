@@ -12,6 +12,7 @@ import { CuentaBancaria } from "@prisma/client";
 import obtenerCuentasFiltros from "@/lib/cuentaBancaria/obtenerCuentasFiltros";
 import { CuentaBancariaAndBanco } from "@/lib/definitions";
 import { Toaster, toast } from "sonner";
+import { useCalendar } from "@/lib/hooks/useCalendar";
 
 const CrearCheques = () => {
   const estadoInicial = [{ id: "0", nombre: "No hay bancos", deleted: null }];
@@ -38,7 +39,7 @@ const CrearCheques = () => {
   const [involucradoDocumentoIdentidad, setInvolucradoDocumentoIdentidad] =
     useState("");
 
-  console.log(tipoOperacionId);
+  const { maxDate } = useCalendar();
 
   const obtenerYMostrarBanco = async () => {
     try {
@@ -160,6 +161,7 @@ const CrearCheques = () => {
             type="date"
             id="fechaEmision"
             required
+            max={maxDate}
             value={fechaEmision}
             onChange={(e) => setFechaEmision(e.target.value)}
             className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
