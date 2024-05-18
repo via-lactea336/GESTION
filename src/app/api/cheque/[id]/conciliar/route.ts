@@ -5,72 +5,59 @@ import {
   generateApiErrorResponse,
   generateApiSuccessResponse,
 } from "@/lib/apiResponse";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+
+  const {bancoAfectadoId} : {bancoAfectadoId: string} = await req.json();
   const id = params.id;
 
-  const chequeVerifBefore = await prisma.cheque.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      cuentaAfectada: true,
-      bancoCheque: true,
-    },
-  });
+  if(!bancoAfectadoId) return generateApiErrorResponse("No hay informacion suficiente para conciliar el cheque", 500);
 
-  if (!chequeVerifBefore)
-    return generateApiErrorResponse("Cheque no encontrado", 404);
-  if (
-    chequeVerifBefore.estado === estadoCheque.PAGADO ||
-    chequeVerifBefore.fechaPago != null
-  )
-    return generateApiErrorResponse("Cheque ya fue pagado", 400);
+    try{
+      //Conciliar el cheque
+      const cheque = await prisma.cheque.update({
+        where: {
+          id,
+          estado: estadoCheque.EMITIDO,
+          esRecibido:true,
+          bancoChequeId:{
+            not:bancoAfectadoId
+          },
+        },
+        data: {
+          fechaPago: new Date(),
+          estado: estadoCheque.PAGADO,
+        },
+      });
 
-  const {
-    esRecibido,
-    monto,
-    cuentaBancariaAfectadaId,
-    cuentaAfectada,
-  } = chequeVerifBefore;
+      const saldoUpdate = {
+        increment: cheque.esRecibido === true ? cheque.monto : undefined, //Si es recibido entonces incrementa el saldo con el monto
+        decrement: cheque.esRecibido === false ? cheque.monto : undefined, //Si no es recibido (emitido) entonces decrementa el saldo con el monto
+      };
 
-  if (
-    !esRecibido &&
-    (Number(cuentaAfectada.saldo) < Number(monto) ||
-      Number(cuentaAfectada.saldoDisponible) < Number(monto))
-  )
-    return generateApiErrorResponse("Saldo insuficiente", 400);
+      //Actualizar el saldo de la cuenta
+      await prisma.cuentaBancaria.update({
+        where: {
+          id: cheque.cuentaBancariaAfectadaId,
+        },
+        data: {
+          saldoDisponible: saldoUpdate,
+        },
+      });
 
-  const saldoUpdate = {
-    increment: esRecibido === true ? monto : undefined, //Si es recibido entonces incrementa el saldo con el monto
-    decrement: esRecibido === false ? monto : undefined, //Si no es recibido (emitido) entonces decrementa el saldo con el monto
-  };
 
-  await prisma.cuentaBancaria.update({
-    where: {
-      id: cuentaBancariaAfectadaId,
-    },
-    data: {
-      saldoDisponible: saldoUpdate,
-    },
-  });
-
-  const cheque = await prisma.cheque.update({
-    where: {
-      id,
-    },
-    data: {
-      fechaPago: new Date(),
-      estado: estadoCheque.PAGADO,
-    },
-  });
-
-  return generateApiSuccessResponse(
-    200,
-    `Cheque n° ${cheque.numeroCheque} fue pagado`,
-    cheque
-  );
+      return generateApiSuccessResponse(
+        200,
+        `Cheque n° ${cheque.numeroCheque} fue pagado`,
+        cheque
+      );
+  }catch(err){
+    if(err instanceof PrismaClientKnownRequestError) return generateApiErrorResponse(err.message, 500);
+    if(err instanceof Error) return generateApiErrorResponse(err.message, 500);
+    return generateApiErrorResponse("Error al conciliar el cheque", 500);
+  }
 }
