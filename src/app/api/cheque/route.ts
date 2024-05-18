@@ -11,10 +11,6 @@ import { estadoCheque } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   const body: Cheque = await req.json();
-  const involucrado = {
-    nombre: body.involucradoNombre,
-    cedula: body.involucradoDocumentoIdentidad,
-  };
   const {
     esRecibido,
     numeroCheque,
@@ -22,15 +18,15 @@ export async function POST(req: NextRequest) {
     fechaEmision,
     bancoChequeId,
     cuentaBancariaAfectadaId,
-    involucradoCuentaBancaria,
+    involucrado,
   } = body;
 
   if (
     !numeroCheque ||
     !monto ||
+    !involucrado ||
     esRecibido === null ||
     !fechaEmision ||
-    !involucrado ||
     !bancoChequeId ||
     !cuentaBancariaAfectadaId
   )
@@ -54,7 +50,7 @@ export async function POST(req: NextRequest) {
     );
 
   if (
-    involucrado.nombre.trim() === cuentaBancariaAfectada.entidad.nombre.trim()
+    involucrado.trim() === cuentaBancariaAfectada.entidad.nombre.trim()
   )
     return generateApiErrorResponse(
       "El emisor del cheque y el acreedor no pueden ser iguales",
@@ -81,7 +77,7 @@ export async function POST(req: NextRequest) {
     const cheque = await prisma.cheque.create({
       data: {
         numeroCheque,
-        involucradoCuentaBancaria,
+        involucrado,
         monto,
         esRecibido,
         fechaEmision,
@@ -91,8 +87,6 @@ export async function POST(req: NextRequest) {
           esRecibido && bancoChequeId === bancoCuentaAfectada
             ? fechaEmision
             : null,
-        involucradoNombre: involucrado.nombre,
-        involucradoDocumentoIdentidad: involucrado.cedula,
         estado:
           esRecibido && bancoChequeId === bancoCuentaAfectada
             ? estadoCheque.PAGADO

@@ -95,15 +95,10 @@ async function main() {
         afectaSaldo: true,
       },
       {
-        nombre: "ANULACION DE CHEQUE RECIBIDO",
+        nombre: "ANULACION DE CHEQUE",
         esDebito: true,
         afectaSaldo: false,
       },
-      {
-        nombre: "ANULACION DE CHEQUE EMITIDO",
-        esDebito: false,
-        afectaSaldo: false,
-      }
     ],
     skipDuplicates: true,
   });
