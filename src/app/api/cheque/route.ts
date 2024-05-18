@@ -21,6 +21,8 @@ export async function POST(req: NextRequest) {
     involucrado,
   } = body;
 
+  console.log("body", body);
+
   if (
     !numeroCheque ||
     !monto ||
