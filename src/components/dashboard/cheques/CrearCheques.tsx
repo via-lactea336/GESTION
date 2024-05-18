@@ -1,15 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import agregarCheque from "@/lib/cheque/agregarCheque";
-import obtenerBancoPorId from "@/lib/banco/obtenerBancoPorId";
-import obtenerCuentaBancariaPorId from "@/lib/entidad/obtenerEntidadPorId";
 import obtenerBancos from "@/lib/banco/obtenerBancos";
 import { Banco } from "@prisma/client";
-import obtenerTiposOperacion from "@/lib/tipoOperacion/obtenerTiposOperacion";
-import { TipoOperacion } from "@prisma/client";
 import obtenerCuentaBancaria from "@/lib/cuentaBancaria/obtenerCuentaBancaria";
-import { CuentaBancaria } from "@prisma/client";
-import obtenerCuentasFiltros from "@/lib/cuentaBancaria/obtenerCuentasFiltros";
 import { CuentaBancariaAndBanco } from "@/lib/definitions";
 import { Toaster, toast } from "sonner";
 import { useCalendar } from "@/lib/hooks/useCalendar";
@@ -24,20 +18,13 @@ const CrearCheques = () => {
   const [fechaEmision, setFechaEmision] = useState("");
 
   const [involucrado, setInvolucrado] = useState("");
-  const [estado, setEstado] = useState("");
   const [bancoChequeId, setBancoChequeId] = useState("");
   console.log(bancoChequeId);
-  const [tipoOperacionId, setTipoOperacionId] = useState("");
   const [cuentaBancariaAfectadaId, setCuentaBancariaAfectadaId] = useState("");
-  const [involucradoCuentaBancaria, setInvolucradoCuentaBancaria] =
-    useState("");
   const [bancos, setBancos] = useState<Banco[]>([]);
   const [cuentasBancarias, setCuentasBancarias] = useState<
     CuentaBancariaAndBanco[]
   >([]);
-  const [involucradoNombre, setInvolucradoNombre] = useState("");
-  const [involucradoDocumentoIdentidad, setInvolucradoDocumentoIdentidad] =
-    useState("");
 
   const { maxDate } = useCalendar();
 
@@ -73,16 +60,13 @@ const CrearCheques = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     try {
       const r = await agregarCheque(
         numeroCheque,
         esRecibido,
         monto,
         new Date(fechaEmision),
-        involucradoNombre,
-        involucradoDocumentoIdentidad,
-        involucradoCuentaBancaria,
+        involucrado,
         bancoChequeId,
         cuentaBancariaAfectadaId
       );
@@ -90,26 +74,43 @@ const CrearCheques = () => {
         if (r.success) {
           toast.success("Cheque registrado exitosamente");
           // Limpiar los campos después de registrar el cheque
-          event.currentTarget.reset();
+          resetInputs();
         } else {
-          toast.error("Error al registrar el cheque");
+          toast.error(r.error || "Error al registrar el cheque");
         }
       }
     } catch (error) {
       // Manejar el error si la función agregarCheque falla
       console.error("Error al registrar el cheque:", error);
-    } finally {
-      setNumeroCheque("");
-      setEsRecibido(false);
-      setMonto(0);
-      setFechaEmision("");
-      setInvolucrado("");
-      setBancoChequeId("");
-      setTipoOperacionId("");
-      setCuentaBancariaAfectadaId("");
-      setInvolucradoNombre("");
-      setInvolucradoDocumentoIdentidad("");
-      setInvolucradoCuentaBancaria("");
+    }
+  };
+
+  const resetInputs = () => {
+    setNumeroCheque("");
+    setEsRecibido(false);
+    setMonto(0);
+    setFechaEmision("");
+    setInvolucrado("");
+    setBancoChequeId("");
+    setCuentaBancariaAfectadaId("");
+  };
+
+  const handleSetCuentaBancariaAfectadaId = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    if(!esRecibido){
+      setBancoChequeId(cuentasBancarias.filter((c) => c.id === event.target.value)[0].bancoId);
+    }
+    setCuentaBancariaAfectadaId(event.target.value);
+  };
+
+  const handleSetEsRecibido = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.checked
+    setEsRecibido(value);
+    if(!value){
+      if(cuentaBancariaAfectadaId !== ""){
+        setBancoChequeId(cuentasBancarias.filter((c) => c.id === cuentaBancariaAfectadaId)[0].bancoId);
+      }
     }
   };
 
@@ -146,7 +147,7 @@ const CrearCheques = () => {
             type="checkbox"
             id="esRecibido"
             checked={esRecibido}
-            onChange={(e) => setEsRecibido(e.target.checked)}
+            onChange={handleSetEsRecibido}
             className="text-blue-500 border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
           <label htmlFor="esRecibido" className="ml-2">
@@ -169,68 +170,29 @@ const CrearCheques = () => {
         </div>
         <div>
           <label htmlFor="involucradoNombre" className="block font-medium">
-            Nombre del involucrado:
+            {esRecibido ? "Librador" : "Acreedor"}
           </label>
           <input
             type="text"
             id="involucradoNombre"
-            required={!esRecibido}
-            value={involucradoNombre}
-            onChange={(e) => setInvolucradoNombre(e.target.value)}
-            disabled={esRecibido} // Deshabilita el campo si esRecibido está marcado
-            className={`text-white py-1 px-4 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
-              esRecibido ? "bg-gray-700 cursor-not-allowed" : "bg-gray-900"
-            }`}
+            required
+            value={involucrado}
+            onChange={(e) => setInvolucrado(e.target.value)}
+            className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
-        <div>
-          <label
-            htmlFor="involucradoCuentaBancaria"
-            className="block font-medium"
-          >
-            Cuenta Bancaria involucrado:
-          </label>
-          <input
-            type="text"
-            id="involucradoCuentaBancaria"
-            required={!esRecibido}
-            disabled={esRecibido}
-            value={involucradoCuentaBancaria}
-            onChange={(e) => setInvolucradoCuentaBancaria(e.target.value)}
-            className={`text-white py-1 px-4 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
-              esRecibido ? "bg-gray-700 cursor-not-allowed" : "bg-gray-900"
-            }`}
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="involucradoDocumentoIdentidad"
-            className="block font-medium"
-          >
-            Doc. de identidad:
-          </label>
-          <input
-            type="text"
-            id="involucradoDocumentoIdentidad"
-            required={!esRecibido}
-            value={involucradoDocumentoIdentidad}
-            onChange={(e) => setInvolucradoDocumentoIdentidad(e.target.value)}
-            disabled={esRecibido} // Deshabilita el campo si esRecibido está marcado
-            className={`text-white py-1 px-4  mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
-              esRecibido ? "bg-gray-700 cursor-not-allowed" : "bg-gray-900"
-            }`}
-          />
-        </div>
-
+        
         <div>
           <label htmlFor="bancoChequeId" className="block font-medium">
-            Banco:
+            Banco del cheque:
           </label>
           <select
             id="bancoChequeId"
             value={bancoChequeId}
+            required
+            disabled={!esRecibido}
             onChange={(e) => setBancoChequeId(e.target.value)}
-            className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-700 disabled:opacity-50" 
           >
             <option value="">Selecciona un banco</option>
             {bancos.map((banco) => (
@@ -242,12 +204,12 @@ const CrearCheques = () => {
         </div>
         <div>
           <label htmlFor="cuentaBancariaId" className="block font-medium">
-            Cuenta bancaria:
+            Cuenta bancaria Afectada:
           </label>
           <select
             id="cuentaBancariaId"
             value={cuentaBancariaAfectadaId}
-            onChange={(e) => setCuentaBancariaAfectadaId(e.target.value)}
+            onChange={handleSetCuentaBancariaAfectadaId}
             className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Selecciona una cuenta</option>
