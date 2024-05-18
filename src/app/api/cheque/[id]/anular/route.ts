@@ -21,6 +21,11 @@ export async function POST(
       estado: estadoCheque.ANULADO
     },
     include:{
+      cuentaAfectada:{
+        include:{
+          entidad:true
+        }
+      },
       bancoCheque:true
     }
   })
@@ -47,9 +52,9 @@ export async function POST(
   const operacion = await prisma.operacion.create({
     data: {
       bancoInvolucrado: cheque.bancoCheque.nombre,
-      nombreInvolucrado: cheque.involucradoNombre,
-      rucInvolucrado: cheque.involucradoDocumentoIdentidad,
-      cuentaInvolucrado: cheque.involucradoCuentaBancaria,
+      nombreInvolucrado: cheque.cuentaAfectada.entidad.nombre,
+      rucInvolucrado: cheque.cuentaAfectada.entidad.ruc,
+      cuentaInvolucrado: cheque.cuentaAfectada.numeroCuenta,
       concepto: "ANULACION DE CHEQUE",
       fechaOperacion: new Date(),
       cuentaBancariaOrigenId: cheque.bancoChequeId,
