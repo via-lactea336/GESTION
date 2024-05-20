@@ -1,4 +1,5 @@
 "use client";
+import InputCalendar from "@/components/global/InputCalendar";
 import obtenerBancos from "@/lib/banco/obtenerBancos";
 import obtenerCuentaBancaria from "@/lib/cuentaBancaria/obtenerCuentaBancaria";
 import { CuentaBancariaAndBanco } from "@/lib/definitions";
@@ -93,8 +94,6 @@ export default function FormTransferencias() {
   useEffect(() => {
     fetchDatos();
   }, []);
-
-  const { maxDate } = useCalendar();
 
   return (
     <form className="w-full" onSubmit={handleSubmit}>
@@ -262,18 +261,10 @@ export default function FormTransferencias() {
       <div className="flex flex-wrap -mx-3 mb-2">
         <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
           <label className="mb-2">Fecha de la Transacción</label>
-          <input
+          <InputCalendar
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="fechaOperacion"
-            type="date"
             required
-            placeholder="012345"
-            max={maxDate}
-            onChange={(e) => {
-              if (e.currentTarget.value > maxDate) {
-                e.currentTarget.value = maxDate;
-              }
-            }}
           />
         </div>
         <div className="w-full md:w-2/3 px-3 mb-6 md:mb-0">
