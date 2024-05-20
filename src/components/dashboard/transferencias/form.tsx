@@ -269,7 +269,7 @@ export default function FormTransferencias() {
             required
             placeholder="012345"
             max={maxDate}
-            onKeyDown={(e) => {
+            onChange={(e) => {
               if (e.currentTarget.value > maxDate) {
                 e.currentTarget.value = maxDate;
               }
