@@ -38,6 +38,7 @@ export default function FormTransferencias() {
       concepto: form["concepto"].value,
       numeroComprobante: form["comprobante"].value,
     };
+
     const response = await agregarOperacion(
       data.tipoOperacionId,
       data.fechaOperacion,
@@ -84,6 +85,7 @@ export default function FormTransferencias() {
       setBancos(bancos.data);
       setCuentasBancarias(cuentasBancarias.data);
       setOperaciones(operaciones.data);
+      setEsDebito(operaciones.data[0].esDebito);
     }
     setLoading(false);
   };
@@ -233,12 +235,17 @@ export default function FormTransferencias() {
         <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
           <label className=" mb-2">Monto</label>
           <input
-            className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className={`block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
             id="monto"
             type="number"
             required
             placeholder="150000"
             min={1}
+            onKeyDown={(e) => {
+              if (e.key === "-" || e.key === "+" || e.key === "e") {
+                e.preventDefault();
+              }
+            }}
           />
         </div>
         <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
@@ -262,6 +269,11 @@ export default function FormTransferencias() {
             required
             placeholder="012345"
             max={maxDate}
+            onKeyDown={(e) => {
+              if (e.currentTarget.value > maxDate) {
+                e.currentTarget.value = maxDate;
+              }
+            }}
           />
         </div>
         <div className="w-full md:w-2/3 px-3 mb-6 md:mb-0">
