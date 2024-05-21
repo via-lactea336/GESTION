@@ -1,7 +1,7 @@
 import { Decimal } from "@prisma/client/runtime/library";
 import prisma from "../prisma";
 
-export default async function reflejarChequeRecibido (
+export default async function reflejarCheque (
   monto:Decimal, 
   cuentaBancariaAfectadaBancoId:string,
   cuentaAfectadaId:string,

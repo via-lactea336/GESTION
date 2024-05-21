@@ -12,6 +12,7 @@ const BankAccount: React.FC<Props> = ({
   saldo,
   saldoDisponible,
   verSaldo,
+  
 }) => {
   const tipoDeCuenta = esCuentaAhorro ? "Cuenta de ahorro" : "Cuenta Corriente";
   const saldoFormateado = saldo;

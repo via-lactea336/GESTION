@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
   const bancoChequeId  = searchParams.get("bancoChequeId");
 
   const estado = searchParams.get("estado");
+  const esRecibido = searchParams.get("esRecibido");
 
   const cuenta = searchParams.get("cuentaId");
 
@@ -37,6 +38,7 @@ export async function GET(request: NextRequest) {
       gte: fechaDesde ? new Date(fechaDesde) : undefined,
       lte: fechaHasta ? new Date(fechaHasta) : undefined,
     },
+    esRecibido: esRecibido? esRecibido === "true"? true : esRecibido === "false"? false : undefined : undefined,
     bancoChequeId: bancoChequeId ? bancoChequeId : undefined,
     cuentaBancariaAfectadaId: cuenta? cuenta : undefined,
     estado: estado ? estado : undefined,
