@@ -233,7 +233,7 @@ const CrearCheques = () => {
           </div>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-end">
           <button
             type="submit"
             className=" bg-primary-800 text-white font-bold py-2 px-4 rounded-md hover:bg-primary-700 "
