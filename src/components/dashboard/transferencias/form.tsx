@@ -26,8 +26,10 @@ type Operacion = {
 
 export default function FormTransferencias() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    setLoading(true);
     event.preventDefault();
     const form = event.currentTarget;
+    const aux = event.target as HTMLFormElement;
     const data: Operacion = {
       tipoOperacionId: form["operacion"].value,
       fechaOperacion: new Date(form["fechaOperacion"].value),
@@ -56,7 +58,9 @@ export default function FormTransferencias() {
     if (response !== undefined && typeof response !== "string") {
       if (response.error) {
         toast.error("Error al registrar la operación");
+        setLoading(false);
       } else {
+        setLoading(false);
         toast.success("Operación registrada correctamente");
         // Limpiar formulario
         form.reset();
@@ -276,7 +280,10 @@ export default function FormTransferencias() {
       <div className="px-3 flex items-center justify-end mb-6 md:mb-0">
         <button
           type="submit"
-          className="bg-primary-800 mt-4 rounded-md px-3 py-3  hover:bg-primary-700 cursor-pointer"
+          className={
+            "bg-primary-800 mt-4 rounded-md px-3 py-3  hover:bg-primary-700 " +
+            (loading ? " cursor-progress" : "cursor-pointer")
+          }
         >
           Registrar Operación
         </button>
