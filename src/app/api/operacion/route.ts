@@ -8,7 +8,7 @@ import reflejarOperacion from "@/lib/operacion/reflejarOperacion";
 export async function POST(req: NextRequest) {
   
   const body: Operacion = await req.json();
-  const { tipoOperacionId, cuentaBancariaOrigenId, monto, concepto, numeroComprobante, cuentaInvolucrado, nombreInvolucrado, bancoInvolucrado, rucInvolucrado  } = body;
+  const { tipoOperacionId, cuentaBancariaOrigenId, monto, concepto, numeroComprobante, cuentaInvolucrado, nombreInvolucrado, bancoInvolucrado, rucInvolucrado, fechaOperacion  } = body;
 
   const currentCuentaBancarioOrigen = await prisma.cuentaBancaria.findFirst({
     where:{
@@ -17,20 +17,49 @@ export async function POST(req: NextRequest) {
   })
   if(!currentCuentaBancarioOrigen) return generateApiErrorResponse("Cuenta bancaria no encontrada", 400)
 
-  if(!tipoOperacionId || !monto || !numeroComprobante || !concepto || !cuentaBancariaOrigenId || !cuentaInvolucrado || !nombreInvolucrado || !bancoInvolucrado || !rucInvolucrado) return generateApiErrorResponse("Missing data to create the operation", 400) //Validate credentials
+  if(!tipoOperacionId || !monto || !numeroComprobante || !concepto || !cuentaBancariaOrigenId || !fechaOperacion || !cuentaInvolucrado || !nombreInvolucrado || !bancoInvolucrado || !rucInvolucrado) return generateApiErrorResponse("Missing data to create the operation", 400) //Validate credentials
 
   if(currentCuentaBancarioOrigen.numeroCuenta === cuentaInvolucrado) return generateApiErrorResponse("Las cuentas involucradas no pueden ser iguales", 400)
 
   if(Number(monto) <= 0) return generateApiErrorResponse("Monto invalido", 400)
   
   try{
+    //Obtener la cuenta bancaria afectada
+    const cuentaBancariaVerif = await prisma.cuentaBancaria.findUnique({
+      where: {
+        id: cuentaBancariaOrigenId,
+      },
+    });
+  
+    //Validar la existencia del tipo de operacion
+    const tipoOperacion = await prisma.tipoOperacion.findFirst({
+      where: {
+        id: tipoOperacionId,
+      },
+    });
+  
+    //Validar la existencia del tipo de operacion
+    if (!tipoOperacion)
+      throw new Error("No existe el tipo de Operacion ingresado");
+  
 
-    //Refleja el incremento o decremento en el saldo de la cuenta bancaria siguien las propiedades del tipo de Operacion
-    reflejarOperacion(cuentaBancariaOrigenId, monto, tipoOperacionId)
+    //Obtener caracteristicas clave del tipo de operacion a ejecutar
+    const esDebito = tipoOperacion.esDebito;
+    const afectaSaldo = tipoOperacion.afectaSaldo;
+  
+    //Validar si el saldo es suficiente
+    if (
+      esDebito &&
+      afectaSaldo &&
+      Number(cuentaBancariaVerif?.saldoDisponible) - Number(monto) <= 0
+    )
+      throw new Error("Saldo disponible insuficiente para realizar la operacion");
+    if (esDebito && Number(cuentaBancariaVerif?.saldo) - Number(monto) <= 0)
+      throw new Error("Saldo retenido insuficiente para realizar la operacion");
 
     const operacion = await prisma.operacion.create({
       data: {
-        tipoOperacionId, cuentaBancariaOrigenId, monto, concepto, numeroComprobante, cuentaInvolucrado, nombreInvolucrado, bancoInvolucrado, rucInvolucrado
+        tipoOperacionId, cuentaBancariaOrigenId, monto, concepto, numeroComprobante, cuentaInvolucrado, nombreInvolucrado, bancoInvolucrado, rucInvolucrado, fechaOperacion
       },
       include: {
         tipoOperacion: true
@@ -38,6 +67,9 @@ export async function POST(req: NextRequest) {
     })
   
     if(!operacion) return generateApiErrorResponse("Error generating operation", 400)  
+
+    //Refleja el incremento o decremento en el saldo de la cuenta bancaria siguien las propiedades del tipo de Operacion
+    await reflejarOperacion(cuentaBancariaOrigenId, Number(monto), esDebito, afectaSaldo)
 
     return generateApiSuccessResponse(200, "operation added successfully")
   

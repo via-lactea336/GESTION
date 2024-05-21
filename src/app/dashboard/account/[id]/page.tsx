@@ -169,26 +169,25 @@ export default function AccountDetailsTab() {
             >
               Ver Cheques
             </Link>
-            <button className="mr-4 bg-gray-800 hover:bg-gray-900 text-white py-2 px-4 rounded-md">
-              <PDFDownloadLink
-                document={
-                  <DetalleCuentasReceipt
-                    operaciones={operaciones}
-                    cuenta={accountData}
-                    //concepto={concepto}
-                  />
-                }
-                fileName="detalle-cuentas.pdf"
-              >
-                {({ loading, url, error, blob }) =>
-                  loading ? (
-                    <button> Cargando documento... </button>
-                  ) : (
-                    <button>Descargar</button>
-                  )
-                }
-              </PDFDownloadLink>
-            </button>
+            <PDFDownloadLink
+              className="mr-4 bg-gray-800 hover:bg-gray-900 text-white py-2 px-4 rounded-md"
+              document={
+                <DetalleCuentasReceipt
+                  operaciones={operaciones}
+                  cuenta={accountData}
+                  //concepto={concepto}
+                />
+              }
+              fileName="detalle-cuentas.pdf"
+            >
+              {({ loading, url, error, blob }) =>
+                loading ? (
+                  <button> Cargando documento... </button>
+                ) : (
+                  <button>Descargar</button>
+                )
+              }
+            </PDFDownloadLink>
             <Link
               href="/dashboard/account"
               className="bg-gray-800 hover:bg-gray-900 text-white  py-2 px-4 rounded"

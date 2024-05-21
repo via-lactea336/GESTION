@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   const body: TipoOperacion = await req.json();
   const { nombre, esDebito, afectaSaldo } = body;
   
-  if( !nombre || !esDebito || !afectaSaldo) return generateApiErrorResponse("No hay datos necesarios para crear el tipo de operacion", 400) //Validate credentials
+  if( !nombre || esDebito === undefined || afectaSaldo === undefined) return generateApiErrorResponse("No hay datos necesarios para crear el tipo de operacion", 400) //Validate credentials
 
   try{
     const tipoOperacion = await prisma.tipoOperacion.create({

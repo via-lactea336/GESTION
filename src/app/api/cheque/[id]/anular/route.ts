@@ -5,22 +5,33 @@ import {
   generateApiErrorResponse,
   generateApiSuccessResponse,
 } from "@/lib/apiResponse";
+import reflejarOperacion from "@/lib/operacion/reflejarOperacion";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const id = params.id;
+  const {bancoAfectadoId} : {bancoAfectadoId: string} = await req.json();
 
   const cheque = await prisma.cheque.update({
     where: {
       id:id,
-      estado: estadoCheque.EMITIDO
+      estado: estadoCheque.EMITIDO,
+      bancoChequeId:{
+        not:bancoAfectadoId
+      },
+      esRecibido:true
     },
     data:{
       estado: estadoCheque.ANULADO
     },
     include:{
+      cuentaAfectada:{
+        include:{
+          entidad:true
+        }
+      },
       bancoCheque:true
     }
   })
@@ -30,7 +41,7 @@ export async function POST(
 
   const tipoOperacionId = await prisma.tipoOperacion.findUnique({
     where: {
-      nombre: cheque.esRecibido? "ANULACION DE CHEQUE RECIBIDO" : "ANULACION DE CHEQUE EMITIDO"
+      nombre: "ANULACION DE CHEQUE"
     },
     select:{
       id: true
@@ -38,26 +49,31 @@ export async function POST(
   })
 
   if(!tipoOperacionId) return generateApiErrorResponse("Tipo de operacion para anulacion de cheque no encontrada", 404)
-
-  // const newSaldoRetenido = {
-  //   decrement: cheque.esRecibido === true ? cheque.monto : undefined, //Si fue recibido entonces decrementa el saldo igual al monto. 
-  //   increment: cheque.esRecibido === false ? cheque.monto : undefined, //Si no es recibido (emitido) entonces incrementa el saldo igual el monto
-  // }
   
   const operacion = await prisma.operacion.create({
     data: {
       bancoInvolucrado: cheque.bancoCheque.nombre,
-      nombreInvolucrado: cheque.involucradoNombre,
-      rucInvolucrado: cheque.involucradoDocumentoIdentidad,
-      cuentaInvolucrado: cheque.involucradoCuentaBancaria,
+      nombreInvolucrado: cheque.cuentaAfectada.entidad.nombre,
+      rucInvolucrado: cheque.cuentaAfectada.entidad.ruc,
+      cuentaInvolucrado: cheque.cuentaAfectada.numeroCuenta,
       concepto: "ANULACION DE CHEQUE",
       fechaOperacion: new Date(),
-      cuentaBancariaOrigenId: cheque.bancoChequeId,
+      cuentaBancariaOrigenId: cheque.cuentaBancariaAfectadaId,
       monto: cheque.monto,
       tipoOperacionId: tipoOperacionId.id,
       numeroComprobante: cheque.numeroCheque,
+    },
+    include: {
+      tipoOperacion: {
+        select: {
+          esDebito: true,
+          afectaSaldo: true,
+        }
+      },
     }
   })
+
+  await reflejarOperacion(operacion.cuentaBancariaOrigenId, Number(operacion.monto), operacion.tipoOperacion.esDebito, operacion.tipoOperacion.afectaSaldo)
 
   if(!operacion) return generateApiErrorResponse("Error creando la operacion para anular el cheque", 404)
 

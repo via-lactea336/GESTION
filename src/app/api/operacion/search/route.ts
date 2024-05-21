@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   const skip = searchParams.get("skip");
   const upTo  = searchParams.get("upTo");
 
-  const cuenta = searchParams.get("cuenta");
+  const cuenta = searchParams.get("cuentaId");
 
   const verifiedSkip = (!skip || Number.isNaN(parseInt(skip))) ? 0 : parseInt(skip)
   const verifiedUpTo = (!upTo || Number.isNaN(parseInt(upTo))) ? 4 : parseInt(upTo)
@@ -50,6 +50,9 @@ export async function GET(request: NextRequest) {
     where: where as any,
     include:{
       tipoOperacion: true
+    },
+    orderBy:{
+      fechaOperacion: "desc"
     }
   });
 
