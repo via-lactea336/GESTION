@@ -297,7 +297,7 @@ export default function AccountDetailsTab() {
                 <option key={i} value={option.id}>{option.nombre}</option>
               ))}
             </select>
-          </div>
+          </div>  
 
 
           <div>
