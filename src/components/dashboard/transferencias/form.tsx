@@ -1,4 +1,5 @@
 "use client";
+import InputCalendar from "@/components/global/InputCalendar";
 import obtenerBancos from "@/lib/banco/obtenerBancos";
 import obtenerCuentaBancaria from "@/lib/cuentaBancaria/obtenerCuentaBancaria";
 import { CuentaBancariaAndBanco } from "@/lib/definitions";
@@ -38,6 +39,7 @@ export default function FormTransferencias() {
       concepto: form["concepto"].value,
       numeroComprobante: form["comprobante"].value,
     };
+
     const response = await agregarOperacion(
       data.tipoOperacionId,
       data.fechaOperacion,
@@ -84,6 +86,7 @@ export default function FormTransferencias() {
       setBancos(bancos.data);
       setCuentasBancarias(cuentasBancarias.data);
       setOperaciones(operaciones.data);
+      setEsDebito(operaciones.data[0].esDebito);
     }
     setLoading(false);
   };
@@ -91,8 +94,6 @@ export default function FormTransferencias() {
   useEffect(() => {
     fetchDatos();
   }, []);
-
-  const { maxDate } = useCalendar();
 
   return (
     <form className="w-full" onSubmit={handleSubmit}>
@@ -233,12 +234,17 @@ export default function FormTransferencias() {
         <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
           <label className=" mb-2">Monto</label>
           <input
-            className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className={`block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
             id="monto"
             type="number"
             required
             placeholder="150000"
             min={1}
+            onKeyDown={(e) => {
+              if (e.key === "-" || e.key === "+" || e.key === "e") {
+                e.preventDefault();
+              }
+            }}
           />
         </div>
         <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
@@ -255,13 +261,10 @@ export default function FormTransferencias() {
       <div className="flex flex-wrap -mx-3 mb-2">
         <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
           <label className="mb-2">Fecha de la Transacción</label>
-          <input
+          <InputCalendar
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="fechaOperacion"
-            type="date"
             required
-            placeholder="012345"
-            max={maxDate}
           />
         </div>
         <div className="w-full md:w-2/3 px-3 mb-6 md:mb-0">
