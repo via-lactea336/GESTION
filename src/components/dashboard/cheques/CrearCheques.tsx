@@ -1,15 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import agregarCheque from "@/lib/cheque/agregarCheque";
-import obtenerBancoPorId from "@/lib/banco/obtenerBancoPorId";
-import obtenerCuentaBancariaPorId from "@/lib/entidad/obtenerEntidadPorId";
 import obtenerBancos from "@/lib/banco/obtenerBancos";
 import { Banco } from "@prisma/client";
-import obtenerTiposOperacion from "@/lib/tipoOperacion/obtenerTiposOperacion";
-import { TipoOperacion } from "@prisma/client";
 import obtenerCuentaBancaria from "@/lib/cuentaBancaria/obtenerCuentaBancaria";
-import { CuentaBancaria } from "@prisma/client";
-import obtenerCuentasFiltros from "@/lib/cuentaBancaria/obtenerCuentasFiltros";
 import { CuentaBancariaAndBanco } from "@/lib/definitions";
 import { Toaster, toast } from "sonner";
 
@@ -116,11 +110,12 @@ const CrearCheques = () => {
           <label htmlFor="numeroCheque" className="block font-medium">
             Número de Cheque:
           </label>
-          <input
+          <input 
             type="text"
             id="numeroCheque"
             value={numeroCheque}
             onChange={(e) => setNumeroCheque(e.target.value)}
+            required
             className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
@@ -132,6 +127,7 @@ const CrearCheques = () => {
             type="number"
             id="monto"
             onChange={(e) => setMonto(Number(e.target.value))}
+            required
             className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
@@ -156,6 +152,7 @@ const CrearCheques = () => {
             id="fechaEmision"
             value={fechaEmision}
             onChange={(e) => setFechaEmision(e.target.value)}
+            required
             className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
@@ -218,6 +215,7 @@ const CrearCheques = () => {
             id="bancoChequeId"
             value={bancoChequeId}
             onChange={(e) => setBancoChequeId(e.target.value)}
+            required
             className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Selecciona un banco</option>
@@ -236,6 +234,7 @@ const CrearCheques = () => {
             id="cuentaBancariaId"
             value={cuentaBancariaAfectadaId}
             onChange={(e) => setCuentaBancariaAfectadaId(e.target.value)}
+            required
             className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Selecciona una cuenta</option>
