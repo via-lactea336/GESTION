@@ -7,6 +7,7 @@ import obtenerCuentaBancaria from "@/lib/cuentaBancaria/obtenerCuentaBancaria";
 import { CuentaBancariaAndBanco } from "@/lib/definitions";
 import { Toaster, toast } from "sonner";
 import { useCalendar } from "@/lib/hooks/useCalendar";
+import InputCalendar from "@/components/global/InputCalendar";
 
 const CrearCheques = () => {
   const estadoInicial = [{ id: "0", nombre: "No hay bancos", deleted: null }];
@@ -115,32 +116,35 @@ const CrearCheques = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-gray-800 py-6 px-4 rounded-md shadow-md [min-width:300px]">
+    <div className=" mx-auto bg-gray-800 py-6 px-4 rounded-md shadow-md [min-width:300px]">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="numeroCheque" className="block font-medium">
-            Número de Cheque:
-          </label>
-          <input 
-            type="text"
-            id="numeroCheque"
-            required
-            value={numeroCheque}
-            onChange={(e) => setNumeroCheque(e.target.value)}
-            className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-        <div>
-          <label htmlFor="monto" className="block font-medium">
-            Monto:
-          </label>
-          <input
-            type="number"
-            required
-            id="monto"
-            onChange={(e) => setMonto(Number(e.target.value))}
-            className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
+        <div className="flex space-x-4">
+          <div className="flex-1">
+            <label htmlFor="numeroCheque" className="block font-medium">
+              Número de Cheque:
+            </label>
+            <input 
+              type="text"
+              id="numeroCheque"
+              required
+              value={numeroCheque}
+              onChange={(e) => setNumeroCheque(e.target.value)}
+              className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="flex-1">
+            <label htmlFor="monto" className="block font-medium">
+              Monto:
+            </label>
+            <input
+              type="number"
+              required
+              id="monto"
+              value={monto}
+              onChange={(e) => setMonto(Number(e.target.value))}
+              className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
         </div>
         <div>
           <input
@@ -182,51 +186,57 @@ const CrearCheques = () => {
           />
         </div>
         
-        <div>
-          <label htmlFor="bancoChequeId" className="block font-medium">
-            Banco del cheque:
-          </label>
-          <select
-            id="bancoChequeId"
-            value={bancoChequeId}
-            required
-            disabled={!esRecibido}
-            onChange={(e) => setBancoChequeId(e.target.value)}
-            className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-700 disabled:opacity-50" 
-          >
-            <option value="">Selecciona un banco</option>
-            {bancos.map((banco) => (
-              <option key={banco.id} value={banco.id}>
-                {banco.nombre}
-              </option>
-            ))}
-          </select>
+        <div className="flex space-x-4">
+  <div className="flex-1">
+    <label htmlFor="bancoChequeId" className="block font-medium">
+      Banco del cheque:
+    </label>
+    <select
+      id="bancoChequeId"
+      value={bancoChequeId}
+      required
+      disabled={!esRecibido}
+      onChange={(e) => setBancoChequeId(e.target.value)}
+      className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-700 disabled:opacity-50"
+    >
+      <option value="">Selecciona un banco</option>
+      {bancos.map((banco) => (
+        <option key={banco.id} value={banco.id}>
+          {banco.nombre}
+        </option>
+      ))}
+    </select>
+          </div>
+          <div className="flex-1">
+            <label htmlFor="cuentaBancariaId" className="block font-medium">
+              Cuenta bancaria Afectada:
+            </label>
+            <select
+              id="cuentaBancariaId"
+              value={cuentaBancariaAfectadaId}
+              onChange={handleSetCuentaBancariaAfectadaId}
+              className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">Selecciona una cuenta</option>
+              {cuentasBancarias.map((cuentasBancarias) => (
+                <option key={cuentasBancarias.id} value={cuentasBancarias.id}>
+                  {cuentasBancarias.banco.nombre} {cuentasBancarias.numeroCuenta}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-        <div>
-          <label htmlFor="cuentaBancariaId" className="block font-medium">
-            Cuenta bancaria Afectada:
-          </label>
-          <select
-            id="cuentaBancariaId"
-            value={cuentaBancariaAfectadaId}
-            onChange={handleSetCuentaBancariaAfectadaId}
-            className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="">Selecciona una cuenta</option>
-            {cuentasBancarias.map((cuentasBancarias) => (
-              <option key={cuentasBancarias.id} value={cuentasBancarias.id}>
-                {cuentasBancarias.banco.nombre} {cuentasBancarias.numeroCuenta}
-              </option>
-            ))}
-          </select>
-        </div>
+
+        <div className="flex justify-center">
 
         <button
           type="submit"
-          className="w-full bg-primary-800 text-white font-bold py-2 px-4 rounded-md hover:bg-primary-700"
+          className=" bg-primary-800 text-white font-bold py-2 px-4 rounded-md hover:bg-primary-700 "
         >
           Registrar Cheque
+          
         </button>
+        </div>
       </form>
       <Toaster richColors />
     </div>
