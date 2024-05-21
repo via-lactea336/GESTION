@@ -1,4 +1,5 @@
 "use client";
+import Input from "@/components/global/Input";
 import InputCalendar from "@/components/global/InputCalendar";
 import obtenerBancos from "@/lib/banco/obtenerBancos";
 import obtenerCuentaBancaria from "@/lib/cuentaBancaria/obtenerCuentaBancaria";
@@ -198,8 +199,8 @@ export default function FormTransferencias() {
           <label className="mb-2">
             Cuenta del {esDebito ? "Beneficiario" : "Remitente"}
           </label>
-          <input
-            className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          <Input
+            className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="cuentaInvolucrado"
             required
             type="text"
@@ -213,8 +214,8 @@ export default function FormTransferencias() {
           <label className=" mb-2">
             Nombre del {esDebito ? "Beneficiario" : "Remitente"}
           </label>
-          <input
-            className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          <Input
+            className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="nombreInvolucrado"
             type="text"
             required
@@ -223,8 +224,8 @@ export default function FormTransferencias() {
         </div>
         <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
           <label className="mb-2">Ruc</label>
-          <input
-            className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          <Input
+            className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="rucInvolucrado"
             type="text"
             required
@@ -233,24 +234,18 @@ export default function FormTransferencias() {
         </div>
         <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
           <label className=" mb-2">Monto</label>
-          <input
-            className={`block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+          <Input
+            className={`block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none`}
             id="monto"
             type="number"
             required
             placeholder="150000"
-            min={1}
-            onKeyDown={(e) => {
-              if (e.key === "-" || e.key === "+" || e.key === "e") {
-                e.preventDefault();
-              }
-            }}
           />
         </div>
         <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
           <label className="mb-2">Número de Comprobante</label>
-          <input
-            className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          <Input
+            className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="comprobante"
             type="text"
             required
@@ -269,8 +264,8 @@ export default function FormTransferencias() {
         </div>
         <div className="w-full md:w-2/3 px-3 mb-6 md:mb-0">
           <label className="mb-2">Concepto</label>
-          <input
-            className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          <Input
+            className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="concepto"
             type="text"
             required
