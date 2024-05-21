@@ -21,7 +21,7 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import obtenerBancos from "@/lib/banco/obtenerBancos";
 import InputCalendar from "@/components/global/InputCalendar";
 export default function AccountDetailsTab() {
-  const quantityPerPage = parseInt(process.env.QUANTITY_PER_PAGE || "4");
+  const quantityPerPage = parseInt(process.env.QUANTITY_PER_PAGE || "8");
   const [indicesPagina, setindicesPagina] = useState(0);
   const [indiceActual, setIndiceActual] = useState(0);
   const [accountData, setAccountData] = useState<CuentaBancaria | null>(null);
@@ -287,7 +287,8 @@ export default function AccountDetailsTab() {
           <div>
             <label>Tipo Operacion</label>
             <select
-              className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
+              className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3 
+              [max-width:200px]"
               name="tipoOperacionId"
               onChange={handleChange}
             >
@@ -298,7 +299,7 @@ export default function AccountDetailsTab() {
                 </option>
               ))}
             </select>
-          </div>
+          </div>  
 
           <div>
             <label>Operacion</label>
