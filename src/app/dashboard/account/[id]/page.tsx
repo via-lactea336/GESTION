@@ -18,6 +18,7 @@ import {
   ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import obtenerBancos from "@/lib/banco/obtenerBancos";
 export default function AccountDetailsTab() {
   const quantityPerPage = parseInt(process.env.QUANTITY_PER_PAGE || "4");
   const [indicesPagina, setindicesPagina] = useState(0);
@@ -26,6 +27,15 @@ export default function AccountDetailsTab() {
   const [operaciones, setOperaciones] = useState<OperacionAndTipoOperacion[]>(
     []
   );
+  const [bancos, setBancos] = useState<
+    ApiResponseData<
+      {
+        id: string;
+        nombre: string;
+        deleted: Date | null;
+      }[]
+    >
+  >();
   const [operacionesFiltradas, setOperacionesFiltradas] = useState<
     OperacionAndTipoOperacion[]
   >([]);
@@ -34,7 +44,7 @@ export default function AccountDetailsTab() {
       {
         id: string;
         nombre: string;
-        esDebito: boolean;
+        esDebito: boolean | null;
         afectaSaldo: boolean;
         deleted: Date | null;
       }[]
@@ -42,11 +52,11 @@ export default function AccountDetailsTab() {
   >();
 
   const [filtros, setFiltros] = useState({
-    tipoOperacionId: "Todas",
+    tipoOperacionId: "",
     fechaMin: "",
     fechaMax: "",
     banco:"",
-    esDebito: false,
+    esDebito: true,
     pagina: 0,
   });
 
@@ -85,8 +95,24 @@ export default function AccountDetailsTab() {
         console.error(error);
       }
     };
+
+    const fetchBancos = async () => {
+      try {
+        const tipoOperacionesReq = await obtenerBancos();
+        if (tipoOperacionesReq === undefined) {
+          throw new Error("Error obteniendo las operaciones");
+        }
+        if (typeof tipoOperacionesReq === "string" || !tipoOperacionesReq) {
+          throw new Error(tipoOperacionesReq);
+        }
+        setBancos(tipoOperacionesReq);
+      } catch (error) {
+        console.error(error);
+      }
+    };
     fetchAccount();
     fetchTiposOperaciones();
+    fetchBancos();
   }, [id]);
 
   const fetchOperaciones = useCallback(async () => {
@@ -102,6 +128,7 @@ export default function AccountDetailsTab() {
         banco: filtros.banco,
         tipoOperacionId: filtros.tipoOperacionId,
       });
+      console.log(operacionesReq);
 
       if (typeof operacionesReq === "string") {
         throw new Error(operacionesReq);
@@ -133,6 +160,17 @@ export default function AccountDetailsTab() {
     }-${year}`;
     return formattedDate;
   };
+
+  const formatTime = (dateString: Date) => {
+    const date = new Date(dateString);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const formattedTime = `${hours < 10 ? "0" + hours : hours}:${
+      minutes < 10 ? "0" + minutes : minutes}`;
+    return formattedTime;
+  };
+
+
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -249,34 +287,67 @@ export default function AccountDetailsTab() {
           <div>
             <label>Tipo Operacion</label>
             <select
-              className="bg-gray-800 text-white py-1 px-2 rounded-md ml-3 mr-3"
-              name="tipoOperacion"
+              className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
+              name="tipoOperacionId"
               onChange={handleChange}
             >
-              <option value="Todas">Todas</option>
+              <option value="">Todas</option>
               {tipoOperaciones?.data.map((option, i) => (
-                <option key={i}>{option.nombre}</option>
+                <option key={i} value={option.id}>{option.nombre}</option>
               ))}
             </select>
           </div>
+
+
           <div>
-            <label>Fecha minima</label>
+            <label>Operacion</label>
+            <select
+              className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
+              name="esDebito"
+              onChange={handleChange}
+            >
+              <option value="">Todas</option>
+              <option value="true">Debito</option>
+              <option value="false">Credito</option>
+            </select>
+          </div>
+
+          
+          <div>
+            <label>Banco</label>
+            <select
+              className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
+              name="banco"
+              onChange={handleChange}
+            >
+              <option value="">Todos</option>
+              {bancos?.data.map((option, i) => (
+                <option key={i} value={option.nombre}>{option.nombre}</option>
+              ))}
+            </select>
+          </div>
+
+
+          <div>
+            <label>Fecha desde</label>
             <input
               type="date"
               name="fechaMin"
               value={filtros.fechaMin}
               onChange={handleChange}
-              className="bg-gray-800 text-white py-1 px-2 rounded-md ml-3 mr-3"
+              className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
             />
           </div>
+
+
           <div>
-            <label>Fecha Maxima</label>
+            <label>Fecha hasta</label>
             <input
               type="date"
               name="fechaMax"
               value={filtros.fechaMax}
               onChange={handleChange}
-              className="bg-gray-800 text-white py-1 px-2 rounded-md ml-3 mr-3"
+              className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
             />
           </div>
         </div>
@@ -285,31 +356,38 @@ export default function AccountDetailsTab() {
           <table className="border-collapse w-full">
             <tbody>
               <tr>
-                <td className="w-1/6">
-                  <span className="text-md mt-1 text-primary-400">
+                <td>
+                  <span className="text-md text-primary-400">
                     Operacion
                   </span>
                 </td>
-                <td className="w-1/6">
-                  <span className="text-md mt-1 text-primary-400">Fecha</span>
-                </td>
-                <td className="w-1/6">
-                  <span className="text-md mt-1 text-primary-400">
-                    Banco Involucrado
+                <td>
+                  <span className="text-md mr-2 text-primary-400">
+                    Fecha
                   </span>
                 </td>
-                <td className="w-1/6">
-                  <span className="text-md mt-1 text-primary-400">
-                    Involucrado
+                <td>
+                  <span className="text-md mr-2 text-primary-400">
+                    Hora
                   </span>
                 </td>
-                <td className="w-1/6">
-                  <span className="text-md mt-1 text-primary-400">
+                <td>
+                  <span className="text-md mr-2 text-primary-400">
+                    Banco
+                  </span>
+                </td>
+                <td>
+                  <span className="text-md mr-2 text-primary-400">
+                    Titular
+                  </span>
+                </td>
+                <td>
+                  <span className="text-md mr-2 text-primary-400">
                     Concepto
                   </span>
                 </td>
-                <td className="w-1/6">
-                  <span className="text-md mt-1 text-primary-400">Monto</span>
+                <td>
+                  <span className="text-md mr-2 text-primary-400">Monto</span>
                 </td>
               </tr>
               {operacionesFiltradas.map((operacion, index) => (
@@ -333,6 +411,11 @@ export default function AccountDetailsTab() {
                   <td>
                     <h1 className="text-sm font-normal mt-1">
                       {formatDate(operacion.fechaOperacion)}
+                    </h1>
+                  </td>
+                  <td>
+                    <h1 className="text-sm font-normal mt-1">
+                      {formatTime(operacion.fechaOperacion)}
                     </h1>
                   </td>
                   <td>
