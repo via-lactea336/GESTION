@@ -42,9 +42,11 @@ export default function AccountDetailsTab() {
   >();
 
   const [filtros, setFiltros] = useState({
-    tipoOperacion: "Todas",
+    tipoOperacionId: "Todas",
     fechaMin: "",
     fechaMax: "",
+    banco:"",
+    esDebito: false,
     pagina: 0,
   });
 
@@ -96,6 +98,9 @@ export default function AccountDetailsTab() {
         fechaHasta: filtros.fechaMax,
         skip: filtros.pagina,
         upTo: quantityPerPage,
+        esDebito: filtros.esDebito,
+        banco: filtros.banco,
+        tipoOperacionId: filtros.tipoOperacionId,
       });
 
       if (typeof operacionesReq === "string") {

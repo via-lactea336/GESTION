@@ -15,6 +15,8 @@ export async function GET(request: NextRequest) {
   const montoHasta = searchParams.get("montoHasta")
 
   const esDebito = searchParams.get("esDebito");
+  const tipoOperacion = searchParams.get("tipoOperacion");
+  const banco = searchParams.get("banco");
 
   const skip = searchParams.get("skip");
   const upTo  = searchParams.get("upTo");
@@ -36,11 +38,15 @@ export async function GET(request: NextRequest) {
       lte: fechaHasta ? new Date(fechaHasta) : undefined,
     },
     cuentaBancariaOrigenId: cuenta? cuenta : undefined,
+    bancoInvolucrado: banco? banco : undefined,
     monto:{
       gte:amounts[0],
       lte:amounts[1]
     },
-    esDebito: esDebito ? esDebito === "true"? true : esDebito === "false"? false : undefined : undefined,
+    tipoOperacion:esDebito || tipoOperacion? {
+      id: tipoOperacion? tipoOperacion : undefined,
+      esDebito: esDebito ? esDebito === "true"? true : esDebito === "false"? false : undefined : undefined,
+    }:undefined
   };
 
   //Asignar los elementos encontrados a los valores
