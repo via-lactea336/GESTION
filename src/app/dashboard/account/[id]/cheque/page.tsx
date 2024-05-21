@@ -43,6 +43,7 @@ export default function Cheque({ params }: { params: { id: string } }) {
     estado?: estadoCheque,
     montoDesde?: number,
     montoHasta?: number,
+    esRecibido?: boolean
   }>(
     filtroInit
   )
@@ -86,7 +87,7 @@ export default function Cheque({ params }: { params: { id: string } }) {
   }, [indiceActual])
 
   const handleOnChange = (e: React.ChangeEvent< HTMLSelectElement | HTMLInputElement>) => {
-    const { name, value } = e.target
+    const { name, value, type } = e.target
     setFiltro({
       ...filtro,
       [name]: value === "" ? undefined : value
@@ -162,7 +163,6 @@ export default function Cheque({ params }: { params: { id: string } }) {
                 }
               </select>
             </div>
-
             <div className="flex items-center gap-3">
               <h3 className="mr-2">Estado</h3>
               <select
@@ -176,6 +176,16 @@ export default function Cheque({ params }: { params: { id: string } }) {
                 }
               </select>
             </div>
+          </div>
+          <div className='flex flex-col items-center gap-3'>
+              <div className="flex flex-col items-center justify-between gap-3">
+                <h3 className="mr-2">Emitido/Recibido</h3>
+                <select className="bg-gray-800 text-white py-1 px-2 rounded" name='esRecibido' onChange={handleOnChange}> 
+                  <option value={""}>Todos</option>
+                  <option value={"true"}>Recibido</option>
+                  <option value={"false"}>Emitido</option>
+                </select>
+              </div>
           </div>
           <div className='flex flex-col items-center gap-3'>
               <div className="flex items-center gap-3">
@@ -281,18 +291,21 @@ export default function Cheque({ params }: { params: { id: string } }) {
                         }</td>
                       <td>{Number(cheque.monto).toLocaleString()}</td>
                       <td className='flex justify-center'>
-                        {cheque.esRecibido && cheque.bancoChequeId != cheque.cuentaAfectada.bancoId && cheque.estado === estadoCheque.EMITIDO?
+                        { (!cheque.esRecibido || cheque.bancoChequeId != cheque.cuentaAfectada.bancoId) && cheque.estado === estadoCheque.EMITIDO?
                           <div className='flex gap-2'>
                             <button 
                               onClick={async () => await handleConciliar(cheque.id, cheque.cuentaAfectada.bancoId)} 
                               className='disabled:opacity-50 disabled:cursor-not-allowed border-gray-700 border-2 hover:bg-green-900 p-1 rounded'>
                               Conciliar
                             </button>
-                            <button 
+                            {
+                              cheque.esRecibido && 
+                              <button 
                               onClick={async () => await handleAnular(cheque.id, cheque.cuentaAfectada.bancoId)} 
                               className='border-gray-700 border-2 hover:bg-red-900 p-1 rounded'>
                                 Anular
-                            </button>
+                              </button>
+                            }
                           </div>
                           :
                           <span>-</span>

@@ -6,7 +6,7 @@ import {
   generateApiErrorResponse,
   generateApiSuccessResponse,
 } from "@/lib/apiResponse";
-import reflejarChequeRecibido from "@/lib/cheque/reflejarCheque";
+import reflejarCheque from "@/lib/cheque/reflejarCheque";
 import { estadoCheque } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
@@ -47,8 +47,8 @@ export async function POST(req: NextRequest) {
     },
   });
   if (!cuentaBancariaAfectada)
-    throw new Error(
-      "No existe la cuenta la cual se vera afectada por esta operacion"
+    return generateApiErrorResponse(
+      "No existe la cuenta la cual se vera afectada por esta operacion", 404
     );
 
   if (
@@ -67,10 +67,10 @@ export async function POST(req: NextRequest) {
     !esRecibido &&
     Number(cuentaBancariaAfectada.saldoDisponible) - Number(monto) <= 0
   )
-    throw new Error("Saldo disponible insuficiente para realizar la operacion");
+    return generateApiErrorResponse("Saldo disponible insuficiente para emitir el cheque", 400);
 
   if (!esRecibido && Number(cuentaBancariaAfectada.saldo) - Number(monto) <= 0)
-    throw new Error("Saldo retenido insuficiente para realizar la operacion");
+    throw generateApiErrorResponse("Saldo retenido insuficiente para emitir el cheque", 400);
 
   //Se obitene el id del banco de la cuenta afectada
   const bancoCuentaAfectada = cuentaBancariaAfectada.bancoId;
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
 
     if (!cheque) return generateApiErrorResponse("Error generando cheque", 400);
 
-    await reflejarChequeRecibido(
+    await reflejarCheque(
       monto,
       bancoCuentaAfectada,
       cuentaBancariaAfectadaId,

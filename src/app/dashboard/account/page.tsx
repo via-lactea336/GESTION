@@ -73,8 +73,6 @@ export default function Page() {
         <div className="grid flex-wrap p-6 gap-4 grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
           {cuentasFiltradas.map((cuenta) => (
             <BankAccount
-              createdAt={cuenta.createdAt}
-              updatedAt={cuenta.updatedAt}
               bancoId={cuenta.bancoId}
               entidadId={cuenta.entidadId}
               key={cuenta.id}
@@ -85,8 +83,7 @@ export default function Page() {
               saldo={cuenta.saldo}
               saldoDisponible={cuenta.saldoDisponible}
               verSaldo={verSaldo}
-              deleted={cuenta.deleted}
-            />
+              deleted={cuenta.deleted} createdAt={new Date()} updatedAt={new Date()}            />
           ))}
         </div>
       </div>

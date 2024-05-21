@@ -8,12 +8,18 @@ export default async function obtenerOperacionesFiltros(
     fechaDesde,
     fechaHasta,
     cuentaId,
+    banco,
+    tipoOperacionId,
+    esDebito,
   }:{
     skip?:number,
     upTo?:number,
     fechaDesde?:string,
     fechaHasta?:string,
-    cuentaId?:string
+    cuentaId?:string,
+    banco:string,
+    tipoOperacionId:string,
+    esDebito:boolean,
   }
 ){
   
@@ -24,6 +30,9 @@ export default async function obtenerOperacionesFiltros(
   if(skip) searchParams.append("skip", skip.toString())
   if(upTo) searchParams.append("upTo", upTo.toString())
   if(cuentaId) searchParams.append("cuentaId", cuentaId)
+  if(banco) searchParams.append("banco", banco)
+  if(tipoOperacionId) searchParams.append("tipoOperacion", tipoOperacionId)
+  if(esDebito !== null) searchParams.append("esDebito", `${esDebito}`)
 
   const queryString = searchParams.toString();
   try{
@@ -38,5 +47,4 @@ export default async function obtenerOperacionesFiltros(
   }catch(error){
     if(error instanceof Error) return error.message
   }
-
 }

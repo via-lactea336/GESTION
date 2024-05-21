@@ -23,10 +23,6 @@ export async function POST(
         where: {
           id,
           estado: estadoCheque.EMITIDO,
-          esRecibido:true,
-          bancoChequeId:{
-            not:bancoAfectadoId
-          },
         },
         data: {
           fechaPago: new Date(),
@@ -49,7 +45,8 @@ export async function POST(
         },
       });
 
-
+      if (!cheque) return generateApiErrorResponse("Cheque no encontrado", 404);
+      
       return generateApiSuccessResponse(
         200,
         `Cheque n° ${cheque.numeroCheque} fue pagado`,
