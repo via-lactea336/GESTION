@@ -19,6 +19,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import obtenerBancos from "@/lib/banco/obtenerBancos";
+import InputCalendar from "@/components/global/InputCalendar";
 export default function AccountDetailsTab() {
   const quantityPerPage = parseInt(process.env.QUANTITY_PER_PAGE || "4");
   const [indicesPagina, setindicesPagina] = useState(0);
@@ -55,7 +56,7 @@ export default function AccountDetailsTab() {
     tipoOperacionId: "",
     fechaMin: "",
     fechaMax: "",
-    banco:"",
+    banco: "",
     esDebito: undefined,
     pagina: 0,
   });
@@ -166,11 +167,10 @@ export default function AccountDetailsTab() {
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const formattedTime = `${hours < 10 ? "0" + hours : hours}:${
-      minutes < 10 ? "0" + minutes : minutes}`;
+      minutes < 10 ? "0" + minutes : minutes
+    }`;
     return formattedTime;
   };
-
-
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -293,11 +293,12 @@ export default function AccountDetailsTab() {
             >
               <option value="">Todas</option>
               {tipoOperaciones?.data.map((option, i) => (
-                <option key={i} value={option.id}>{option.nombre}</option>
+                <option key={i} value={option.id}>
+                  {option.nombre}
+                </option>
               ))}
             </select>
           </div>
-
 
           <div>
             <label>Operacion</label>
@@ -312,7 +313,6 @@ export default function AccountDetailsTab() {
             </select>
           </div>
 
-          
           <div>
             <label>Banco</label>
             <select
@@ -322,31 +322,29 @@ export default function AccountDetailsTab() {
             >
               <option value="">Todos</option>
               {bancos?.data.map((option, i) => (
-                <option key={i} value={option.nombre}>{option.nombre}</option>
+                <option key={i} value={option.nombre}>
+                  {option.nombre}
+                </option>
               ))}
             </select>
           </div>
 
-
           <div>
             <label>Fecha desde</label>
-            <input
-              type="date"
-              name="fechaMin"
+            <InputCalendar
+              id="fechaMin"
               value={filtros.fechaMin}
-              onChange={handleChange}
+              handleChange={handleChange}
               className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
             />
           </div>
 
-
           <div>
             <label>Fecha hasta</label>
-            <input
-              type="date"
-              name="fechaMax"
+            <InputCalendar
+              id="fechaMax"
               value={filtros.fechaMax}
-              onChange={handleChange}
+              handleChange={handleChange}
               className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
             />
           </div>
@@ -357,29 +355,19 @@ export default function AccountDetailsTab() {
             <tbody>
               <tr>
                 <td>
-                  <span className="text-md text-primary-400">
-                    Operacion
-                  </span>
+                  <span className="text-md text-primary-400">Operacion</span>
                 </td>
                 <td>
-                  <span className="text-md mr-2 text-primary-400">
-                    Fecha
-                  </span>
+                  <span className="text-md mr-2 text-primary-400">Fecha</span>
                 </td>
                 <td>
-                  <span className="text-md mr-2 text-primary-400">
-                    Hora
-                  </span>
+                  <span className="text-md mr-2 text-primary-400">Hora</span>
                 </td>
                 <td>
-                  <span className="text-md mr-2 text-primary-400">
-                    Banco
-                  </span>
+                  <span className="text-md mr-2 text-primary-400">Banco</span>
                 </td>
                 <td>
-                  <span className="text-md mr-2 text-primary-400">
-                    Titular
-                  </span>
+                  <span className="text-md mr-2 text-primary-400">Titular</span>
                 </td>
                 <td>
                   <span className="text-md mr-2 text-primary-400">

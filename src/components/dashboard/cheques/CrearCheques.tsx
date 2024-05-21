@@ -146,7 +146,7 @@ const CrearCheques = () => {
               type="number"
               required
               id="monto"
-              placeholder="1000"
+              placeholder=""
               value={`${monto === 0 ? "" : monto}`}
               onChange={(e) => setMonto(Number(e.target.value))}
               className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
@@ -169,14 +169,12 @@ const CrearCheques = () => {
           <label htmlFor="fechaEmision" className="block font-medium">
             Fecha de Emisión:
           </label>
-          <input
-            type="date"
+          <InputCalendar
             id="fechaEmision"
             required
-            max={maxDate}
             value={fechaEmision}
-            onChange={(e) => setFechaEmision(e.target.value)}
-            className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            setValue={setFechaEmision}
+            className="text-white py-1 px-4 bg-gray-900 mt-1 block w-full rounded-md shadow-sm focus:ring-blue-500"
           />
         </div>
         <div>
