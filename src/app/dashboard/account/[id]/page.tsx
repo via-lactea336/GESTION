@@ -56,7 +56,7 @@ export default function AccountDetailsTab() {
     fechaMin: "",
     fechaMax: "",
     banco:"",
-    esDebito: true,
+    esDebito: undefined,
     pagina: 0,
   });
 

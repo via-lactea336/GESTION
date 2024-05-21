@@ -17,9 +17,9 @@ export default async function obtenerOperacionesFiltros(
     fechaDesde?:string,
     fechaHasta?:string,
     cuentaId?:string,
-    banco:string,
-    tipoOperacionId:string,
-    esDebito:boolean,
+    banco?:string,
+    tipoOperacionId?:string,
+    esDebito?:boolean,
   }
 ){
   
