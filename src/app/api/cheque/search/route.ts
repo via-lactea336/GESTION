@@ -32,11 +32,13 @@ export async function GET(request: NextRequest) {
     (!montoHasta || Number.isNaN(parseFloat(montoHasta)))? undefined : parseFloat(montoHasta)
   ] 
 
+  const fechaHastaDateTime = fechaHasta ? new Date(Number(fechaHasta.split("-")[0]), Number(fechaHasta.split("-")[1]), Number(fechaHasta.split("-")[2]), 23, 59, 59, 999) : undefined
+
   //Si hay informacion para la busqueda, agregarla al filtro
   const where = {
     fechaEmision: {
       gte: fechaDesde ? new Date(fechaDesde) : undefined,
-      lte: fechaHasta ? new Date(fechaHasta) : undefined,
+      lte: fechaHastaDateTime ? fechaHastaDateTime : undefined,
     },
     esRecibido: esRecibido? esRecibido === "true"? true : esRecibido === "false"? false : undefined : undefined,
     bancoChequeId: bancoChequeId ? bancoChequeId : undefined,
