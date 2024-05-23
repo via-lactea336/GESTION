@@ -4,6 +4,7 @@ import {
   generateApiErrorResponse,
   generateApiSuccessResponse,
 } from "@/lib/apiResponse";
+import { DateTime } from "next-auth/providers/kakao";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -31,12 +32,12 @@ export async function GET(request: NextRequest) {
     (!montoHasta || Number.isNaN(parseFloat(montoHasta)))? undefined : parseFloat(montoHasta)
   ] 
 
-  const fechaHastaDateTime = fechaHasta ? new Date(Number(fechaHasta.split("-")[0]), Number(fechaHasta.split("-")[1]), Number(fechaHasta.split("-")[2]), 23, 59, 59, 999) : undefined
+  const fechaHastaDateTime = fechaHasta ? new Date(Number(fechaHasta.split("-")[0]), Number(fechaHasta.split("-")[1])-1, Number(fechaHasta.split("-")[2]), 23, 59, 59, 999) : undefined
 
   //Si hay informacion para la busqueda, agregarla al filtro
   const where = {
-    createdAt: {
-      gte: fechaDesde ? new Date(fechaDesde).toISOString() : undefined,
+    fechaOperacion: {
+      gte: fechaDesde ? new Date(fechaDesde) : undefined,
       lte: fechaHastaDateTime ? fechaHastaDateTime : undefined,
     },
     cuentaBancariaOrigenId: cuenta? cuenta : undefined,
@@ -65,7 +66,6 @@ export async function GET(request: NextRequest) {
   });
 
   const count = await prisma.operacion.count({ where: where as any });
-
   if (!values)
     return generateApiErrorResponse("Error intentando buscar Operaciones", 500);
 
