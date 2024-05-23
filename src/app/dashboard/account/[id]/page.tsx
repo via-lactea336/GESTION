@@ -20,6 +20,7 @@ import {
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import obtenerBancos from "@/lib/banco/obtenerBancos";
 import InputCalendar from "@/components/global/InputCalendar";
+import { Toaster, toast } from "sonner";
 export default function AccountDetailsTab() {
   const quantityPerPage = parseInt(process.env.QUANTITY_PER_PAGE || "8");
   const [indicesPagina, setindicesPagina] = useState(0);
@@ -118,7 +119,11 @@ export default function AccountDetailsTab() {
 
   const fetchOperaciones = useCallback(async () => {
     try {
-      console.log("fetching operaciones");
+      // Validar que la fecha mínima no sea mayor a la fecha máxima
+      if (new Date(filtros.fechaMin) > new Date(filtros.fechaMax)) {
+        toast.error("La fecha mínima no puede ser mayor a la fecha máxima");
+        return;
+      }
       const operacionesReq = await obtenerOperacionesFiltros({
         cuentaId: id as string,
         fechaDesde: filtros.fechaMin,
@@ -137,6 +142,10 @@ export default function AccountDetailsTab() {
 
       if (!operacionesReq || !operacionesReq.data) {
         throw new Error("Error obteniendo las operaciones");
+      }
+      if (operacionesReq.data.values.length === 0) {
+        toast.info("No se encontraron operaciones con los filtros aplicados");
+        return;
       }
 
       setOperaciones(operacionesReq.data.values);
@@ -178,7 +187,6 @@ export default function AccountDetailsTab() {
     >
   ) => {
     const { name, value } = e.target;
-
     setFiltros({
       ...filtros,
       [name]: value,
@@ -350,7 +358,7 @@ export default function AccountDetailsTab() {
             />
           </div>
         </div>
-
+        <Toaster richColors />
         <div className="flex-grow bg-gray-800 rounded-md p-5 flex flex-row">
           <table className="border-collapse w-full">
             <tbody>
