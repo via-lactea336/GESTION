@@ -262,7 +262,7 @@ export default function AccountDetailsTab() {
             </div>
             <div className="mb-4 flex items-center">
               <label className="block font-semibold mr-2">
-                Número de Cuenta:
+                Numero de Cuenta:
               </label>
               <p>{accountData.numeroCuenta}</p>
             </div>
@@ -285,7 +285,7 @@ export default function AccountDetailsTab() {
 
         <div className="flex justify-around gap-3 mb-1 bg-primary-800 p-4 rounded-md">
           <div>
-            <label>Tipo Operación</label>
+            <label>Tipo Operacion</label>
             <select
               className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3 
               [max-width:200px]"
@@ -299,10 +299,10 @@ export default function AccountDetailsTab() {
                 </option>
               ))}
             </select>
-          </div>  
+          </div>
 
           <div>
-            <label>Movimento</label>
+            <label>Operacion</label>
             <select
               className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
               name="esDebito"
@@ -356,7 +356,7 @@ export default function AccountDetailsTab() {
             <tbody>
               <tr>
                 <td>
-                  <span className="text-md text-primary-400">Movimiento</span>
+                  <span className="text-md text-primary-400">Operacion</span>
                 </td>
                 <td>
                   <span className="text-md mr-2 text-primary-400">Fecha</span>
@@ -371,7 +371,9 @@ export default function AccountDetailsTab() {
                   <span className="text-md mr-2 text-primary-400">Titular</span>
                 </td>
                 <td>
-                  <span className="text-md mr-2 text-primary-400">Concepto</span>
+                  <span className="text-md mr-2 text-primary-400">
+                    Concepto
+                  </span>
                 </td>
                 <td>
                   <span className="text-md mr-2 text-primary-400">Monto</span>
