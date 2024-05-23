@@ -121,7 +121,7 @@ export default function AccountDetailsTab() {
     try {
       // Validar que la fecha mínima no sea mayor a la fecha máxima
       if (new Date(filtros.fechaMin) > new Date(filtros.fechaMax)) {
-        toast.error("La fecha mínima no puede ser mayor a la fecha máxima");
+        toast.error("La fecha desde no puede ser mayor a la fecha hasta");
         return;
       }
       const operacionesReq = await obtenerOperacionesFiltros({
