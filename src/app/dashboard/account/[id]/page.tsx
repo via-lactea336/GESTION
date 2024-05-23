@@ -20,7 +20,6 @@ import {
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import obtenerBancos from "@/lib/banco/obtenerBancos";
 import InputCalendar from "@/components/global/InputCalendar";
-import LoadingCirleIcon from "@/components/global/LoadingCirleIcon";
 export default function AccountDetailsTab() {
   const quantityPerPage = parseInt(process.env.QUANTITY_PER_PAGE || "8");
   const [indicesPagina, setindicesPagina] = useState(0);
@@ -198,53 +197,51 @@ export default function AccountDetailsTab() {
     fetchOperaciones();
   }, [fetchOperaciones]);
 
-  return (
-    <div className="flex flex-col h-full -mt-8">
-      {/* Encabezado con título y botón de retroceso */}
-      <div className="flex justify-between items-center bg-primary-800 p-4 rounded-md">
-        <h1 className="text-2xl font-bold mt-2 mb-2">Detalle cuentas</h1>
-        <div>
-          <Link
-            className="px-4 py-2 bg-gray-800 rounded-md hover:bg-gray-900 mr-4"
-            href={`/dashboard/account/${id}/cheque`}
-          >
-            Ver Cheques
-          </Link>
-          <PDFDownloadLink
-            className="mr-4 bg-gray-800 hover:bg-gray-900 text-white py-2 px-4 rounded-md"
-            document={
-              accountData ? (
+  if (accountData === null || operaciones === null) {
+    return <h1>cargando....</h1>;
+  } else {
+    return (
+      <div className="flex flex-col h-full -mt-8">
+        {/* Encabezado con título y botón de retroceso */}
+        <div className="flex justify-between items-center bg-primary-800 p-4 rounded-md">
+          <h1 className="text-2xl font-bold mt-2 mb-2">Detalle cuentas</h1>
+          <div>
+            <Link
+              className="px-4 py-2 bg-gray-800 rounded-md hover:bg-gray-900 mr-4"
+              href={`/dashboard/account/${id}/cheque`}
+            >
+              Ver Cheques
+            </Link>
+            <PDFDownloadLink
+              className="mr-4 bg-gray-800 hover:bg-gray-900 text-white py-2 px-4 rounded-md"
+              document={
                 <DetalleCuentasReceipt
                   operaciones={operaciones}
                   cuenta={accountData}
                   //concepto={concepto}
                 />
-              ) : (
-                <LoadingCirleIcon />
-              )
-            }
-            fileName="detalle-cuentas.pdf"
-          >
-            {({ loading, url, error, blob }) =>
-              loading ? (
-                <button> Cargando documento... </button>
-              ) : (
-                <button>Descargar</button>
-              )
-            }
-          </PDFDownloadLink>
-          <Link
-            href="/dashboard/account"
-            className="bg-gray-800 hover:bg-gray-900 text-white  py-2 px-4 rounded"
-          >
-            Atrás
-          </Link>
+              }
+              fileName="detalle-cuentas.pdf"
+            >
+              {({ loading, url, error, blob }) =>
+                loading ? (
+                  <button> Cargando documento... </button>
+                ) : (
+                  <button>Descargar</button>
+                )
+              }
+            </PDFDownloadLink>
+            <Link
+              href="/dashboard/account"
+              className="bg-gray-800 hover:bg-gray-900 text-white  py-2 px-4 rounded"
+            >
+              Atrás
+            </Link>
+          </div>
         </div>
-      </div>
 
-      {/* Contenido principal */}
-      <div className="bg-gray-800 rounded-md  py-5 mt-2 flex gap-2 justify-around flex-wrap">
-        {accountData ? (
+        {/* Contenido principal */}
+        <div className="bg-gray-800 rounded-md  py-5 mt-2 flex gap-2 justify-around flex-wrap">
           <div className="w-20 h-20 mt-2">
             {accountData.esCuentaAhorro ? (
               <BanknotesIcon className="text-primary-400" />
@@ -252,127 +249,109 @@ export default function AccountDetailsTab() {
               <WalletIcon className="text-primary-400" />
             )}
           </div>
-        ) : (
-          <div className="w-20 h-20 bg-gray-300 rounded animate-pulse mt-2"></div>
-        )}
-        <div className="mt-5">
-          <div className="mb-4 flex items-center">
-            <label className="block  font-semibold mr-2">Tipo de Cuenta:</label>
-            {accountData ? (
+          <div className="mt-5">
+            <div className="mb-4 flex items-center">
+              <label className="block  font-semibold mr-2">
+                Tipo de Cuenta:
+              </label>
               <p>
                 {accountData.esCuentaAhorro
                   ? "Cuenta de ahorros"
                   : "Cuenta Corriente"}
               </p>
-            ) : (
-              <div className="w-28 h-4 bg-gray-300 rounded animate-pulse"></div>
-            )}
-          </div>
-          <div className="mb-4 flex items-center">
-            <label className="block font-semibold mr-2">
-              Numero de Cuenta:
-            </label>
-            {accountData ? (
+            </div>
+            <div className="mb-4 flex items-center">
+              <label className="block font-semibold mr-2">
+                Numero de Cuenta:
+              </label>
               <p>{accountData.numeroCuenta}</p>
-            ) : (
-              <div className="w-20 h-4 bg-gray-300 rounded animate-pulse"></div>
-            )}
+            </div>
           </div>
-        </div>
 
-        <div className="mt-5">
-          <div className="mb-4 flex items-center">
-            <label className="block font-semibold mr-2">Saldo Total:</label>
-            {accountData ? (
+          <div className="mt-5">
+            <div className="mb-4 flex items-center">
+              <label className="block font-semibold mr-2">Saldo Total:</label>
               <p>${Number(accountData.saldo).toLocaleString()}</p>
-            ) : (
-              <div className="w-28 h-4 bg-gray-300 rounded animate-pulse"></div>
-            )}
-          </div>
-          <div className="flex items-center">
-            <label className="block font-semibold mr-2">
-              Saldo Disponible:
-            </label>
-            {accountData ? (
+            </div>
+            <div className="flex items-center">
+              <label className="block font-semibold mr-2">
+                Saldo Disponible:
+              </label>
               <p>${Number(accountData.saldoDisponible).toLocaleString()}</p>
-            ) : (
-              <div className="w-28 h-4 bg-gray-300 rounded animate-pulse"></div>
-            )}
+            </div>
           </div>
         </div>
-      </div>
-      <h1 className="text-xl font-bold my-4">Movimientos</h1>
+        <h1 className="text-xl font-bold my-4">Movimientos</h1>
 
-      <div className="flex justify-around gap-3 mb-1 bg-primary-800 p-4 rounded-md">
-        <div>
-          <label>Tipo Operacion</label>
-          <select
-            className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3 
+        <div className="flex justify-around gap-3 mb-1 bg-primary-800 p-4 rounded-md">
+          <div>
+            <label>Tipo Operacion</label>
+            <select
+              className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3 
               [max-width:200px]"
-            name="tipoOperacionId"
-            onChange={handleChange}
-          >
-            <option value="">Todas</option>
-            {tipoOperaciones?.data.map((option, i) => (
-              <option key={i} value={option.id}>
-                {option.nombre}
-              </option>
-            ))}
-          </select>
+              name="tipoOperacionId"
+              onChange={handleChange}
+            >
+              <option value="">Todas</option>
+              {tipoOperaciones?.data.map((option, i) => (
+                <option key={i} value={option.id}>
+                  {option.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label>Operacion</label>
+            <select
+              className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
+              name="esDebito"
+              onChange={handleChange}
+            >
+              <option value="">Todas</option>
+              <option value="true">Debito</option>
+              <option value="false">Credito</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Banco</label>
+            <select
+              className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
+              name="banco"
+              onChange={handleChange}
+            >
+              <option value="">Todos</option>
+              {bancos?.data.map((option, i) => (
+                <option key={i} value={option.nombre}>
+                  {option.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label>Fecha desde</label>
+            <InputCalendar
+              id="fechaMin"
+              value={filtros.fechaMin}
+              handleChange={handleChange}
+              className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
+            />
+          </div>
+
+          <div>
+            <label>Fecha hasta</label>
+            <InputCalendar
+              id="fechaMax"
+              value={filtros.fechaMax}
+              handleChange={handleChange}
+              className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
+            />
+          </div>
         </div>
 
-        <div>
-          <label>Operacion</label>
-          <select
-            className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
-            name="esDebito"
-            onChange={handleChange}
-          >
-            <option value="">Todas</option>
-            <option value="true">Debito</option>
-            <option value="false">Credito</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Banco</label>
-          <select
-            className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
-            name="banco"
-            onChange={handleChange}
-          >
-            <option value="">Todos</option>
-            {bancos?.data.map((option, i) => (
-              <option key={i} value={option.nombre}>
-                {option.nombre}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label>Fecha desde</label>
-          <InputCalendar
-            id="fechaMin"
-            value={filtros.fechaMin}
-            handleChange={handleChange}
-            className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
-          />
-        </div>
-
-        <div>
-          <label>Fecha hasta</label>
-          <InputCalendar
-            id="fechaMax"
-            value={filtros.fechaMax}
-            handleChange={handleChange}
-            className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
-          />
-        </div>
-      </div>
-
-      <div className="flex-grow bg-gray-800 rounded-md p-5 flex flex-row">
-        {operacionesFiltradas.length > 0 ? (
+        <div className="flex-grow bg-gray-800 rounded-md p-5 flex flex-row">
           <table className="border-collapse w-full">
             <tbody>
               <tr>
@@ -460,45 +439,41 @@ export default function AccountDetailsTab() {
               ))}
             </tbody>
           </table>
-        ) : (
-          <div className="w-full flex justify-center">
-            <LoadingCirleIcon className="animate-spin" />
-          </div>
-        )}
-      </div>
-      <div className="flex justify-around items-center mt-2 ">
-        <button
-          onClick={async () => await changeIndicePagina(indiceActual - 1)}
-          disabled={indiceActual - 1 === -1}
-          className="w-8 bg-gray-700 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded"
-        >
-          <ChevronLeftIcon />
-        </button>
-        <div className="gap-2 flex">
-          {[...Array(indicesPagina)].map((_, index) => (
-            <button
-              key={index}
-              onClick={async () => await changeIndicePagina(index)}
-              className={
-                (index === indiceActual
-                  ? "opacity-50 cursor-not-allowed "
-                  : "hover:bg-gray-900 ") + "px-6 py-2 bg-gray-700 rounded"
-              }
-            >
-              <span className={"cursor-pointer m-auto"}>{index + 1}</span>
-            </button>
-          ))}
         </div>
-        <button
-          onClick={async () => await changeIndicePagina(indiceActual + 1)}
-          disabled={indiceActual + 1 === indicesPagina}
-          className={
-            "w-8 bg-gray-700 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded"
-          }
-        >
-          <ChevronRightIcon />
-        </button>
+        <div className="flex justify-around items-center mt-2 ">
+          <button
+            onClick={async () => await changeIndicePagina(indiceActual - 1)}
+            disabled={indiceActual - 1 === -1}
+            className="w-8 bg-gray-700 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded"
+          >
+            <ChevronLeftIcon />
+          </button>
+          <div className="gap-2 flex">
+            {[...Array(indicesPagina)].map((_, index) => (
+              <button
+                key={index}
+                onClick={async () => await changeIndicePagina(index)}
+                className={
+                  (index === indiceActual
+                    ? "opacity-50 cursor-not-allowed "
+                    : "hover:bg-gray-900 ") + "px-6 py-2 bg-gray-700 rounded"
+                }
+              >
+                <span className={"cursor-pointer m-auto"}>{index + 1}</span>
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={async () => await changeIndicePagina(indiceActual + 1)}
+            disabled={indiceActual + 1 === indicesPagina}
+            className={
+              "w-8 bg-gray-700 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded"
+            }
+          >
+            <ChevronRightIcon />
+          </button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
