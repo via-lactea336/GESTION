@@ -5,7 +5,11 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import DetalleCuentasReceipt from "../../../../components/PDF/DetalleCuentas";
 import obtenerOperacionesFiltros from "@/lib/operacion/obtenerOperacionesFiltros";
-import { ApiResponseData, OperacionAndTipoOperacion } from "@/lib/definitions";
+import {
+  ApiResponseData,
+  CuentaBancariaAndBanco,
+  OperacionAndTipoOperacion,
+} from "@/lib/definitions";
 import obtenerTiposOperacion from "@/lib/tipoOperacion/obtenerTiposOperacion";
 import { CuentaBancaria } from "@prisma/client";
 import Link from "next/link";
@@ -23,11 +27,14 @@ import InputCalendar from "@/components/global/InputCalendar";
 import { Toaster, toast } from "sonner";
 import LoadingCirleIcon from "@/components/global/LoadingCirleIcon";
 import Tabla from "@/components/dashboard/account/detalles/Tabla";
+import obtenerCuentaBancaria from "@/lib/cuentaBancaria/obtenerCuentaBancaria";
 export default function AccountDetailsTab() {
   const quantityPerPage = parseInt(process.env.QUANTITY_PER_PAGE || "8");
   const [indicesPagina, setindicesPagina] = useState(0);
   const [indiceActual, setIndiceActual] = useState(0);
-  const [accountData, setAccountData] = useState<CuentaBancaria | null>(null);
+  const [accountData, setAccountData] = useState<CuentaBancariaAndBanco | null>(
+    null
+  );
   const [operaciones, setOperaciones] = useState<OperacionAndTipoOperacion[]>(
     []
   );
@@ -75,11 +82,16 @@ export default function AccountDetailsTab() {
   useEffect(() => {
     const fetchAccount = async () => {
       try {
-        const cuentaReq = await obtenerCuentaBancariaPorId(id as string);
-        if (!cuentaReq || typeof cuentaReq === "string") {
-          throw new Error("Error obteniendo la cuenta");
+        const bancos = await obtenerCuentaBancaria();
+        if (bancos === undefined || typeof bancos === "string") {
+          throw new Error("Error obteniendo las cuentas");
         }
-        setAccountData(cuentaReq.data);
+        const cuenta = bancos.data.find((cuenta) => cuenta.id === id);
+        if (!cuenta) {
+          throw new Error("Cuenta no encontrada");
+        }
+
+        setAccountData(cuenta);
       } catch (error) {
         console.error(error);
       }
@@ -210,11 +222,11 @@ export default function AccountDetailsTab() {
             )}
           </div>
           <div className="mb-4 flex items-center">
-            <label className="block font-semibold mr-2">
-              Numero de Cuenta:
-            </label>
+            <label className="block font-semibold mr-2">Cuenta:</label>
             {accountData ? (
-              <p>{accountData.numeroCuenta}</p>
+              <p>
+                {accountData.banco.nombre} {accountData.numeroCuenta}
+              </p>
             ) : (
               <div className="bg-gray-300 h-4 w-20 rounded animate-pulse"></div>
             )}
