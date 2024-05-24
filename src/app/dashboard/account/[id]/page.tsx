@@ -309,7 +309,7 @@ export default function AccountDetailsTab() {
           <label>Tipo Operacion</label>
           <select
             className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3 
-              [max-width:200px]"
+              [width:200px]"
             name="tipoOperacionId"
             onChange={handleChange}
           >
@@ -325,20 +325,20 @@ export default function AccountDetailsTab() {
         <div>
           <label>Operacion</label>
           <select
-            className="bg-gray-800 text-white py-1 px-2 rounded mr-3"
+            className="bg-gray-800 text-white py-1 px-2 rounded mr-3 w-28"
             name="esDebito"
             onChange={handleChange}
           >
             <option value="">Todas</option>
-            <option value="true">Debito</option>
-            <option value="false">Credito</option>
+            <option value="true">Débito</option>
+            <option value="false">Crédito</option>
           </select>
         </div>
 
         <div>
           <label>Banco</label>
           <select
-            className="bg-gray-800 text-white py-1 px-2 rounded mr-3"
+            className="bg-gray-800 text-white py-1 px-2 rounded mr-3 [width:200px]"
             name="banco"
             onChange={handleChange}
           >

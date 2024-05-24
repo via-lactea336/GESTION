@@ -35,6 +35,8 @@ export default function Tabla({
     OperacionAndTipoOperacion[]
   >([]);
 
+  const [loading, setLoading] = useState(false);
+
   const formatDate = (dateString: Date) => {
     const date = new Date(dateString);
     const day = date.getDate();
@@ -61,10 +63,16 @@ export default function Tabla({
   const fetchOperaciones = useCallback(async () => {
     try {
       // Validar que la fecha mínima no sea mayor a la fecha máxima
+      if (
+        (filtros.fechaMin && !filtros.fechaMax) ||
+        (filtros.fechaMax && !filtros.fechaMin)
+      )
+        return;
       if (new Date(filtros.fechaMin) > new Date(filtros.fechaMax)) {
         toast.error("La fecha desde no puede ser mayor a la fecha hasta");
         return;
       }
+      setLoading(true);
       const operacionesReq = await obtenerOperacionesFiltros({
         cuentaId: id as string,
         fechaDesde: filtros.fechaMin,
@@ -93,6 +101,8 @@ export default function Tabla({
       );
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   }, [id, filtros, quantityPerPage, setOperaciones, setindicesPagina]);
 
@@ -100,13 +110,21 @@ export default function Tabla({
     fetchOperaciones();
   }, [fetchOperaciones]);
 
-  if (operacionesFiltradas.length === 0) {
+  if (loading)
     return (
       <div className="flex justify-center items-center w-full">
         <LoadingCirleIcon className="animate-spin" />
       </div>
     );
-  }
+
+  if (operacionesFiltradas.length === 0 && loading === false)
+    return (
+      <div className="flex justify-center items-center w-full">
+        <h1 className="text-xl text-primary-400">
+          No hay operaciones para mostrar
+        </h1>
+      </div>
+    );
 
   return (
     <table className="border-collapse w-full">
