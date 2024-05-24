@@ -119,66 +119,6 @@ export default function AccountDetailsTab() {
     fetchBancos();
   }, [id]);
 
-  const fetchOperaciones = useCallback(async () => {
-    try {
-      // Validar que la fecha mínima no sea mayor a la fecha máxima
-      if (new Date(filtros.fechaMin) > new Date(filtros.fechaMax)) {
-        toast.error("La fecha desde no puede ser mayor a la fecha hasta");
-        return;
-      }
-      const operacionesReq = await obtenerOperacionesFiltros({
-        cuentaId: id as string,
-        fechaDesde: filtros.fechaMin,
-        fechaHasta: filtros.fechaMax,
-        skip: filtros.pagina,
-        upTo: quantityPerPage,
-        esDebito: filtros.esDebito,
-        banco: filtros.banco,
-        tipoOperacionId: filtros.tipoOperacionId,
-      });
-      console.log(operacionesReq);
-
-      if (typeof operacionesReq === "string") {
-        throw new Error(operacionesReq);
-      }
-
-      if (!operacionesReq || !operacionesReq.data) {
-        throw new Error("Error obteniendo las operaciones");
-      }
-
-      setOperaciones(operacionesReq.data.values);
-      setOperacionesFiltradas(operacionesReq.data.values);
-      setindicesPagina(
-        operacionesReq.data.totalQuantity % quantityPerPage === 0
-          ? operacionesReq.data.totalQuantity / quantityPerPage
-          : Math.floor(operacionesReq.data.totalQuantity / quantityPerPage) + 1
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  }, [id, filtros, quantityPerPage]);
-
-  const formatDate = (dateString: Date) => {
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    const formattedDate = `${day < 10 ? "0" + day : day}-${
-      month < 10 ? "0" + month : month
-    }-${year}`;
-    return formattedDate;
-  };
-
-  const formatTime = (dateString: Date) => {
-    const date = new Date(dateString);
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const formattedTime = `${hours < 10 ? "0" + hours : hours}:${
-      minutes < 10 ? "0" + minutes : minutes
-    }`;
-    return formattedTime;
-  };
-
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
