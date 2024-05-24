@@ -4,7 +4,6 @@ import {
   generateApiErrorResponse,
   generateApiSuccessResponse,
 } from "@/lib/apiResponse";
-import { estadoCheque } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -21,8 +20,9 @@ export async function GET(request: NextRequest) {
   const bancoChequeId  = searchParams.get("bancoChequeId");
 
   const estado = searchParams.get("estado");
+  const esRecibido = searchParams.get("esRecibido");
 
-  const cuenta = searchParams.get("cuenta");
+  const cuenta = searchParams.get("cuentaId");
 
   const verifiedSkip = (!skip || Number.isNaN(parseInt(skip))) ? 0 : parseInt(skip)
   const verifiedUpTo = (!upTo || Number.isNaN(parseInt(upTo))) ? 4 : parseInt(upTo)
@@ -32,12 +32,15 @@ export async function GET(request: NextRequest) {
     (!montoHasta || Number.isNaN(parseFloat(montoHasta)))? undefined : parseFloat(montoHasta)
   ] 
 
+  const fechaHastaDateTime = fechaHasta ? new Date(Number(fechaHasta.split("-")[0]), Number(fechaHasta.split("-")[1])-1, Number(fechaHasta.split("-")[2]), 23, 59, 59, 999) : undefined
+
   //Si hay informacion para la busqueda, agregarla al filtro
   const where = {
     fechaEmision: {
-      gte: fechaDesde ? new Date(fechaDesde) : undefined,
-      lte: fechaHasta ? new Date(fechaHasta) : undefined,
+      gte: fechaDesde ? new Date(fechaDesde).toISOString() : undefined,
+      lte: fechaHastaDateTime ? fechaHastaDateTime : undefined,
     },
+    esRecibido: esRecibido? esRecibido === "true"? true : esRecibido === "false"? false : undefined : undefined,
     bancoChequeId: bancoChequeId ? bancoChequeId : undefined,
     cuentaBancariaAfectadaId: cuenta? cuenta : undefined,
     estado: estado ? estado : undefined,
@@ -55,6 +58,9 @@ export async function GET(request: NextRequest) {
     include:{
       cuentaAfectada: true,
       bancoCheque: true
+    },
+    orderBy:{
+      fechaEmision: "desc"
     }
   });
 

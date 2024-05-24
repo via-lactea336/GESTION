@@ -1,11 +1,11 @@
 import { ApiResponseData } from "../definitions"
 
-export default async function concicliarCheque(
+export default async function anularCheque(
   chequeId:string,
   bancoAfectadoId:string
 ){
   try{
-    const response = await fetch(`/api/cheque/${chequeId}/conciliar`, {
+    const response = await fetch(`/api/cheque/${chequeId}/anular`, {
       method: "POST",
       headers:{
         "Content-Type": "application/json",

@@ -6,15 +6,11 @@ import {
   generateApiErrorResponse,
   generateApiSuccessResponse,
 } from "@/lib/apiResponse";
-import reflejarChequeRecibido from "@/lib/cheque/reflejarCheque";
+import reflejarCheque from "@/lib/cheque/reflejarCheque";
 import { estadoCheque } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   const body: Cheque = await req.json();
-  const involucrado = {
-    nombre: body.involucradoNombre,
-    cedula: body.involucradoDocumentoIdentidad,
-  };
   const {
     esRecibido,
     numeroCheque,
@@ -22,15 +18,17 @@ export async function POST(req: NextRequest) {
     fechaEmision,
     bancoChequeId,
     cuentaBancariaAfectadaId,
-    involucradoCuentaBancaria,
+    involucrado,
   } = body;
+
+  console.log("body", body);
 
   if (
     !numeroCheque ||
     !monto ||
+    !involucrado ||
     esRecibido === null ||
     !fechaEmision ||
-    !involucrado ||
     !bancoChequeId ||
     !cuentaBancariaAfectadaId
   )
@@ -49,12 +47,12 @@ export async function POST(req: NextRequest) {
     },
   });
   if (!cuentaBancariaAfectada)
-    throw new Error(
-      "No existe la cuenta la cual se vera afectada por esta operacion"
+    return generateApiErrorResponse(
+      "No existe la cuenta la cual se vera afectada por esta operacion", 404
     );
 
   if (
-    involucrado.nombre.trim() === cuentaBancariaAfectada.entidad.nombre.trim()
+    involucrado.trim() === cuentaBancariaAfectada.entidad.nombre.trim()
   )
     return generateApiErrorResponse(
       "El emisor del cheque y el acreedor no pueden ser iguales",
@@ -69,10 +67,10 @@ export async function POST(req: NextRequest) {
     !esRecibido &&
     Number(cuentaBancariaAfectada.saldoDisponible) - Number(monto) <= 0
   )
-    throw new Error("Saldo disponible insuficiente para realizar la operacion");
+    return generateApiErrorResponse("Saldo disponible insuficiente para emitir el cheque", 400);
 
   if (!esRecibido && Number(cuentaBancariaAfectada.saldo) - Number(monto) <= 0)
-    throw new Error("Saldo retenido insuficiente para realizar la operacion");
+    throw generateApiErrorResponse("Saldo retenido insuficiente para emitir el cheque", 400);
 
   //Se obitene el id del banco de la cuenta afectada
   const bancoCuentaAfectada = cuentaBancariaAfectada.bancoId;
@@ -81,7 +79,7 @@ export async function POST(req: NextRequest) {
     const cheque = await prisma.cheque.create({
       data: {
         numeroCheque,
-        involucradoCuentaBancaria,
+        involucrado,
         monto,
         esRecibido,
         fechaEmision,
@@ -91,8 +89,6 @@ export async function POST(req: NextRequest) {
           esRecibido && bancoChequeId === bancoCuentaAfectada
             ? fechaEmision
             : null,
-        involucradoNombre: involucrado.nombre,
-        involucradoDocumentoIdentidad: involucrado.cedula,
         estado:
           esRecibido && bancoChequeId === bancoCuentaAfectada
             ? estadoCheque.PAGADO
@@ -104,7 +100,7 @@ export async function POST(req: NextRequest) {
 
     if (!cheque) return generateApiErrorResponse("Error generando cheque", 400);
 
-    await reflejarChequeRecibido(
+    await reflejarCheque(
       monto,
       bancoCuentaAfectada,
       cuentaBancariaAfectadaId,
