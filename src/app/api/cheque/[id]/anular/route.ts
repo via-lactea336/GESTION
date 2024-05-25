@@ -17,7 +17,6 @@ export async function POST(
   const cheque = await prisma.cheque.update({
     where: {
       id:id,
-      estado: estadoCheque.EMITIDO,
       bancoChequeId:{
         not:bancoAfectadoId
       },
@@ -52,10 +51,7 @@ export async function POST(
   
   const operacion = await prisma.operacion.create({
     data: {
-      bancoInvolucrado: cheque.bancoCheque.nombre,
-      nombreInvolucrado: cheque.cuentaAfectada.entidad.nombre,
-      rucInvolucrado: cheque.cuentaAfectada.entidad.ruc,
-      cuentaInvolucrado: cheque.cuentaAfectada.numeroCuenta,
+      nombreInvolucrado: cheque.involucrado,
       concepto: "ANULACION DE CHEQUE",
       fechaOperacion: new Date(),
       cuentaBancariaOrigenId: cheque.cuentaBancariaAfectadaId,
@@ -68,12 +64,13 @@ export async function POST(
         select: {
           esDebito: true,
           afectaSaldo: true,
+          afectaSaldoDisponible: true,
         }
       },
     }
   })
 
-  await reflejarOperacion(operacion.cuentaBancariaOrigenId, Number(operacion.monto), operacion.tipoOperacion.esDebito, operacion.tipoOperacion.afectaSaldo)
+  await reflejarOperacion(operacion.cuentaBancariaOrigenId, operacion.monto, operacion.tipoOperacion.esDebito, operacion.tipoOperacion.afectaSaldo, operacion.tipoOperacion.afectaSaldoDisponible)
 
   if(!operacion) return generateApiErrorResponse("Error creando la operacion para anular el cheque", 404)
 

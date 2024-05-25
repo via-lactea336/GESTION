@@ -70,34 +70,46 @@ async function main() {
   const tiposOperacion = await prisma.tipoOperacion.createMany({
     data: [
       {
-        nombre: "Pago de Servicios",
+        nombre: "Movimiento Debito",
         esDebito: true,
         afectaSaldo: true,
+        afectaSaldoDisponible: true,
       },
       {
-        nombre: "Pago de Salario",
-        esDebito: true,
+        nombre: "Movimiento Credito",
+        esDebito: false,
         afectaSaldo: true,
+        afectaSaldoDisponible: true,
       },
       {
         nombre: "Transferencia",
         esDebito: true,
         afectaSaldo: true,
+        afectaSaldoDisponible: true,
       },
       {
         nombre: "Depósito",
         esDebito: false,
         afectaSaldo: true,
-      },
-      {
-        nombre: "Retiro",
-        esDebito: true,
-        afectaSaldo: true,
+        afectaSaldoDisponible: true,
       },
       {
         nombre: "ANULACION DE CHEQUE",
         esDebito: true,
+        afectaSaldo: true,
+        afectaSaldoDisponible: true,
+      },
+      {
+        nombre: "CONCILIACION DE CHEQUE",
+        esDebito: true,
         afectaSaldo: false,
+        afectaSaldoDisponible: true,
+      },
+      {
+        nombre: "Emitir Cheque",
+        esDebito: true,
+        afectaSaldo: true,
+        afectaSaldoDisponible: false,
       },
     ],
     skipDuplicates: true,
@@ -110,7 +122,7 @@ async function main() {
   const operacionesCuentaBancoFamiliar = await prisma.operacion.createMany({
     data: [
       {
-        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Pago de Servicios").id,
+        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Movimiento Debito").id,
         fechaOperacion: new Date(),
         monto: 100000,
         cuentaBancariaOrigenId: cuentaBancariaBancoFamiliar.id,
@@ -122,7 +134,7 @@ async function main() {
         numeroComprobante: "000001",
       },
       {
-        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Pago de Salario").id,
+        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Movimiento Debito").id,
         fechaOperacion: new Date(),
         monto: 150000,
         cuentaBancariaOrigenId: cuentaBancariaBancoFamiliar.id,
@@ -146,7 +158,7 @@ async function main() {
         numeroComprobante: "000003",
       },
       {
-        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Depósito").id,
+        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Movimiento Credito").id,
         fechaOperacion: new Date(),
         monto: 200000,
         cuentaBancariaOrigenId: cuentaBancariaBancoFamiliar.id,
@@ -164,7 +176,7 @@ async function main() {
   const operacionesCuentaBancoItau = await prisma.operacion.createMany({
     data: [
       {
-        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Pago de Servicios").id,
+        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Movimiento Credito").id,
         fechaOperacion: new Date(),
         monto: 100000,
         cuentaBancariaOrigenId: cuentaBancariaBancoItau.id,
@@ -176,7 +188,7 @@ async function main() {
         numeroComprobante: "000005",
       },
       {
-        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Pago de Salario").id,
+        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Movimiento Credito").id,
         fechaOperacion: new Date(),
         monto: 150000,
         cuentaBancariaOrigenId: cuentaBancariaBancoItau.id,
@@ -200,7 +212,7 @@ async function main() {
         numeroComprobante: "000007",
       },
       {
-        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Depósito").id,
+        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Movimiento Debito").id,
         fechaOperacion: new Date(),
         monto: 200000,
         cuentaBancariaOrigenId: cuentaBancariaBancoItau.id,
@@ -215,55 +227,55 @@ async function main() {
     skipDuplicates: true,
   });
   
-  const cheques = await prisma.cheque.createMany({
-    data: [
-      {
-        numeroCheque: "000001",
-        esRecibido: true,
-        fechaEmision: new Date(),
-        involucrado: "Mirian Gonzalez",
-        bancoChequeId: itau.id,
-        cuentaBancariaAfectadaId: cuentaBancariaBancoItau.id,
-        monto: 15000,
-      },
-      {
-        numeroCheque: "000002",
-        esRecibido: true,
-        fechaEmision: new Date(),
-        involucrado: "Pedro Ramirez",
-        bancoChequeId: atlas.id,
-        cuentaBancariaAfectadaId: cuentaBancariaBancoItau.id,
-        monto: 25000,
-      },
-      {
-        numeroCheque: "000003",
-        esRecibido: false,
-        fechaEmision: new Date(),
-        involucrado: "Augusto Tomphson",
-        bancoChequeId: bancoFamiliar.id,
-        cuentaBancariaAfectadaId: cuentaBancariaBancoItau.id,
-        monto: 7500,
-      },
-      {
-        numeroCheque: "000004",
-        esRecibido: false,
-        fechaEmision: new Date(),
-        involucrado: "Augusto Tomphson",
-        bancoChequeId: bancoFamiliar.id,
-        cuentaBancariaAfectadaId: cuentaBancariaBancoAtlas.id,
-        monto: 7500,
-      },
-      {
-        numeroCheque: "000005",
-        esRecibido: true,
-        fechaEmision: new Date(),
-        involucrado: "Antonio Gonzalez",
-        bancoChequeId: itau.id,
-        cuentaBancariaAfectadaId: cuentaBancariaBancoFamiliar.id,
-        monto: 18000,
-      }
-    ]
-  })
+  // const cheques = await prisma.cheque.createMany({
+  //   data: [
+  //     {
+  //       numeroCheque: "000001",
+  //       esRecibido: true,
+  //       fechaEmision: new Date(),
+  //       involucrado: "Mirian Gonzalez",
+  //       bancoChequeId: itau.id,
+  //       cuentaBancariaAfectadaId: cuentaBancariaBancoItau.id,
+  //       monto: 15000,
+  //     },
+  //     {
+  //       numeroCheque: "000002",
+  //       esRecibido: true,
+  //       fechaEmision: new Date(),
+  //       involucrado: "Pedro Ramirez",
+  //       bancoChequeId: atlas.id,
+  //       cuentaBancariaAfectadaId: cuentaBancariaBancoItau.id,
+  //       monto: 25000,
+  //     },
+  //     {
+  //       numeroCheque: "000003",
+  //       esRecibido: false,
+  //       fechaEmision: new Date(),
+  //       involucrado: "Augusto Tomphson",
+  //       bancoChequeId: bancoFamiliar.id,
+  //       cuentaBancariaAfectadaId: cuentaBancariaBancoItau.id,
+  //       monto: 7500,
+  //     },
+  //     {
+  //       numeroCheque: "000004",
+  //       esRecibido: false,
+  //       fechaEmision: new Date(),
+  //       involucrado: "Augusto Tomphson",
+  //       bancoChequeId: bancoFamiliar.id,
+  //       cuentaBancariaAfectadaId: cuentaBancariaBancoAtlas.id,
+  //       monto: 7500,
+  //     },
+  //     {
+  //       numeroCheque: "000005",
+  //       esRecibido: true,
+  //       fechaEmision: new Date(),
+  //       involucrado: "Antonio Gonzalez",
+  //       bancoChequeId: itau.id,
+  //       cuentaBancariaAfectadaId: cuentaBancariaBancoFamiliar.id,
+  //       monto: 18000,
+  //     }
+  //   ]
+  // })
 
   console.log("Se han creado los registros correctamente.");
 }
