@@ -18,6 +18,7 @@ import {
 import { type Cheque, estadoCheque, Banco } from "@prisma/client";
 import Link from "next/link";
 import React, { useEffect } from "react";
+import { Toaster, toast } from "sonner";
 
 export default function Cheque({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -65,6 +66,15 @@ export default function Cheque({ params }: { params: { id: string } }) {
   };
 
   const obtenerChequesFiltroHandler = async () => {
+    if (
+      filtro.fechaDesde &&
+      filtro.fechaHasta &&
+      filtro.fechaDesde > filtro.fechaHasta
+    ) {
+      toast.error("La fecha desde no puede ser mayor a la fecha hasta");
+      setLoadingTable(false);
+      return;
+    }
     setLoadingTable(true);
     const response = await obtenerChequesFiltros(filtro);
 
@@ -410,6 +420,7 @@ export default function Cheque({ params }: { params: { id: string } }) {
           </>
         )}
       </div>
+      <Toaster richColors />
     </div>
   );
 }
