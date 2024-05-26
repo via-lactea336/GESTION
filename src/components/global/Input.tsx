@@ -4,7 +4,7 @@ type InputProps = {
   className: string;
   type: "text" | "number";
   placeholder: string;
-  value?: string;
+  value?: string | number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onkeydown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   error?: string;

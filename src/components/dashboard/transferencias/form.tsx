@@ -26,13 +26,30 @@ type Operacion = {
 
 export default function FormTransferencias() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    setLoading(true);
+    setLoadingSend(true);
     event.preventDefault();
     const form = event.currentTarget;
+    console.log(form["fechaOperacion"].value);
+    const dateValue = form["fechaOperacion"].value;
+    // Desglosar manualmente la fecha seleccionada
+    const [year, month, day] = dateValue.split("-").map(Number);
+    const fecha = new Date(year, month - 1, day); // Nota: los meses en JavaScript son 0-indexados
+
+    // Obtener la fecha y hora actuales
+    const fechaActual = new Date();
+
+    // Establecer los componentes de tiempo actuales en el objeto fecha
+    fecha.setHours(fechaActual.getHours());
+    fecha.setMinutes(fechaActual.getMinutes());
+    fecha.setSeconds(fechaActual.getSeconds());
+    fecha.setMilliseconds(fechaActual.getMilliseconds());
+
+    // Ahora fecha tiene la fecha seleccionada con la hora actual
+    console.log(fecha);
     const aux = event.target as HTMLFormElement;
     const data: Operacion = {
       tipoOperacionId: form["operacion"].value,
-      fechaOperacion: new Date(form["fechaOperacion"].value),
+      fechaOperacion: fecha,
       monto: Number(form["monto"].value),
       cuentaBancariaOrigenId: form["cuentaBancariaOrigenId"].value,
       bancoInvolucrado: form["bancoInvolucrado"].value,
@@ -57,10 +74,10 @@ export default function FormTransferencias() {
     );
     if (response !== undefined && typeof response !== "string") {
       if (response.error) {
-        toast.error("Error al registrar la operación");
-        setLoading(false);
+        toast.error(response.error);
+        setLoadingSend(false);
       } else {
-        setLoading(false);
+        setLoadingSend(false);
         toast.success("Operación registrada correctamente");
         // Limpiar formulario
         form.reset();
@@ -74,6 +91,7 @@ export default function FormTransferencias() {
   >([]);
   const [operaciones, setOperaciones] = useState<TipoOperacion[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingSend, setLoadingSend] = useState(false);
 
   const fetchDatos = async () => {
     setLoading(true);
@@ -282,10 +300,10 @@ export default function FormTransferencias() {
           type="submit"
           className={
             "bg-primary-800 mt-4 rounded-md px-3 py-3  hover:bg-primary-700 " +
-            (loading ? " cursor-progress" : "cursor-pointer")
+            (loading || loadingSend ? " cursor-progress" : "cursor-pointer")
           }
         >
-          Registrar Operación
+          {loadingSend ? "Registrando..." : "Registrar Transacción"}
         </button>
       </div>
       <Toaster richColors />

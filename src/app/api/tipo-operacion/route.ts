@@ -8,14 +8,14 @@ import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiRes
 export async function POST(req: NextRequest) {
   
   const body: TipoOperacion = await req.json();
-  const { nombre, esDebito, afectaSaldo } = body;
+  const { nombre, esDebito, afectaSaldo, afectaSaldoDisponible } = body;
   
-  if( !nombre || esDebito === undefined || afectaSaldo === undefined) return generateApiErrorResponse("No hay datos necesarios para crear el tipo de operacion", 400) //Validate credentials
+  if( !nombre || esDebito === undefined || afectaSaldo === undefined || afectaSaldoDisponible === undefined) return generateApiErrorResponse("No hay datos necesarios para crear el tipo de operacion", 400) //Validate credentials
 
   try{
     const tipoOperacion = await prisma.tipoOperacion.create({
       data: {
-        nombre, esDebito, afectaSaldo
+        nombre, esDebito, afectaSaldo, afectaSaldoDisponible
       }
     })
   

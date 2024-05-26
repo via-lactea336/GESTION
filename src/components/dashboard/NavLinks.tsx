@@ -12,8 +12,8 @@ import { usePathname } from "next/navigation";
 const links = [
   { name: "Cuenta", href: "/dashboard/account", icon: UserIcon },
   {
-    name: "Transferencias",
-    href: "/dashboard/transferencias",
+    name: "Transacciones",
+    href: "/dashboard/transacciones",
     icon: ArrowsRightLeftIcon,
   },
   {
