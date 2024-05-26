@@ -54,7 +54,10 @@ model TipoOperacion {
   id                    String              @id @default(uuid())
   nombre                String              @unique
   esDebito              Boolean             
+  
   afectaSaldo           Boolean
+  afectaSaldoDisponible Boolean
+
   operaciones           Operacion[]
 
   deleted               DateTime?
@@ -71,23 +74,26 @@ model Operacion {
   cuentaBancariaOrigen CuentaBancaria       @relation(fields: [cuentaBancariaOrigenId], references: [id], onDelete: NoAction)
   cuentaBancariaOrigenId String
 
-  bancoInvolucrado    String               @db.VarChar(128)
-  nombreInvolucrado   String               @db.VarChar(128)
-  cuentaInvolucrado   String               @db.VarChar(128)
-  rucInvolucrado      String               @db.VarChar(128)
+  bancoInvolucrado    String?               @db.VarChar(128)
+  nombreInvolucrado   String                @db.VarChar(128)
+  cuentaInvolucrado   String?               @db.VarChar(128)
+  rucInvolucrado      String?               @db.VarChar(128)
 
   concepto            String               @db.VarChar(255)
 
   numeroComprobante   String               @db.VarChar(128)
 
-  createdAt                  DateTime         @default(now())
-  updatedAt                  DateTime         @updatedAt @default(now())
+  cheque              Cheque[]
+
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt @default(now())
 }
 
 enum estadoCheque {
   EMITIDO
   PAGADO
   ANULADO
+  PENDIENTE
 }
 
 model Cheque {
@@ -96,15 +102,18 @@ model Cheque {
   esRecibido                Boolean               
   monto                     Decimal          @db.Money        
   
-  fechaEmision                    DateTime
-  fechaPago                       DateTime?
+  fechaEmision              DateTime
+  fechaPago                 DateTime?
 
-  involucrado                     String @db.VarChar(128)
+  involucrado               String @db.VarChar(128)
 
-  estado                          estadoCheque     @default(EMITIDO)
+  estado                    estadoCheque     @default(EMITIDO)
   
   bancoCheque               Banco            @relation(references: [id], fields: [bancoChequeId], onDelete: NoAction)
   bancoChequeId             String
+
+  operacion                 Operacion        @relation(references: [id], fields: [operacionId], onDelete: NoAction)
+  operacionId               String
   
   cuentaAfectada            CuentaBancaria   @relation(fields: [cuentaBancariaAfectadaId], references: [id], onDelete: NoAction)
   cuentaBancariaAfectadaId  String
@@ -123,4 +132,288 @@ model User {
   username  String @unique
   password  String
   rol       Roles @default(EMPLOYEES)
+  
+  cajeros   Cajero?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+}
+
+//************************** CAJA **********************************
+model Cajero {
+  id        String @id @default(uuid())
+  user      User @relation(references: [id], fields: [userId], onDelete: NoAction)
+  userId    String @unique
+
+  aperturas    AperturaCaja[]
+
+  deleted   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Caja {
+  id        String @id @default(uuid())
+  numero    Int @db.Integer @unique
+  
+  aperturas AperturaCaja[]
+
+  saldo     Decimal @db.Money
+
+  deleted   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AperturaCaja {
+  id          String @id @default(uuid())
+  
+  caja        Caja  @relation(references: [id], fields: [cajaId], onDelete: NoAction)
+  cajaId      String
+
+  cajero      Cajero  @relation(references: [id], fields: [cajeroId], onDelete: NoAction)
+  cajeroId    String
+
+  movimiento Movimiento[]
+  arqueo     ArqueoDeCaja[]
+
+  apertura     DateTime @default(now())
+
+  aperturaDeCaja Decimal @db.Money
+
+  cierreCaja   DateTime?
+
+  observaciones String?
+
+  deleted   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Cliente {
+  id           String @id @default(uuid())
+  
+  nombre       String @db.VarChar(128)
+  docIdentidad String @db.VarChar(128)
+  
+  deleted   DateTime?
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ArqueoDeCaja {
+  id        String @id @default(uuid())
+
+  apertura  AperturaCaja @relation(references: [id], fields: [aperturaId], onDelete: NoAction)
+  aperturaId String
+
+  montoRegistrado Decimal @db.Money
+
+  deleted   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum medioDePago {
+  EFECTIVO
+  CHEQUE
+  TARJETA
+}
+
+model TipoMovimiento{
+  id        String @id @default(uuid())
+  nombre    String @db.VarChar(128)
+
+  movimientosDetalles MovimientoDetalle[]
+
+  metodoPago medioDePago @default(EFECTIVO)
+
+  esIngreso     Boolean
+
+  deleted     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Movimiento{
+  id            String @id @default(uuid())
+  
+  apertura      AperturaCaja    @relation(references: [id], fields: [aperturaId], onDelete: NoAction)
+  aperturaId    String
+
+  monto         Decimal @db.Money
+
+  recibosDetalles ReciboDetalle[]
+  movimientoDetalles MovimientoDetalle[]
+  comprobantes Comprobante[]
+
+  deleted       DateTime?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model MovimientoDetalle {
+  id        String @id @default(uuid())
+  
+  movimiento     Movimiento @relation(references: [id], fields: [movimientoId], onDelete: NoAction)
+  movimientoId   String
+
+  monto          Decimal @db.Money
+
+  tipoMov       TipoMovimiento  @relation(references: [id], fields: [tipoMovId], onDelete: NoAction)
+  tipoMovId     String
+
+  chequeCaja    ChequeCaja[]
+  tarjeta       Tarjeta[] 
+
+  deleted       DateTime?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Factura {
+  id        String @id @default(uuid())
+  
+  ruc       String @db.VarChar(128)
+  nombre    String @db.VarChar(128)
+  esContado Boolean
+
+  total       Decimal @db.Money
+  iva         Decimal @db.Money
+
+  facturaDetalles FacturaDetalles[]
+  recibos Recibos?
+
+  deleted   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FacturaDetalles {
+  id          String @id @default(uuid())
+  
+  factura     Factura @relation(references: [id], fields: [facturaId], onDelete: NoAction)
+  facturaId   String
+
+  producto    Producto @relation(references: [id], fields: [productoId], onDelete: NoAction)
+  productoId  String
+
+  costoUnit   Decimal @db.Money
+  cantidad    Int
+
+  monto       Decimal @db.Money
+
+  deleted     DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Recibos {
+  id          String @id @default(uuid())
+  
+  ruc         String @db.VarChar(128)
+  nombre      String @db.VarChar(128)
+  
+  factura     Factura @relation(references: [id], fields: [facturaId], onDelete: NoAction)
+  facturaId   String @unique
+
+  totalPagado Decimal @db.Money
+
+  estaPagado  Boolean
+
+  recibosDetalles ReciboDetalle[]
+
+  deleted   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ReciboDetalle {
+  id        String @id @default(uuid())
+  
+  monto     Decimal @db.Money
+
+  recibo    Recibos @relation(references: [id], fields: [reciboId], onDelete: NoAction)
+  reciboId  String
+
+  movimiento Movimiento @relation(references: [id], fields: [movimientoId], onDelete: NoAction)
+  movimientoId String
+
+  deleted   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Producto {
+  id        String @id @default(uuid())
+  
+  nombre    String @db.VarChar(128)
+  precio    Decimal @db.Money
+
+  facturaDetalles FacturaDetalles[]
+
+  deleted   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Comprobante {
+  id            String @id @default(uuid())
+
+  concepto      String
+  monto         Decimal @db.Money
+  docIdentidad  String @db.VarChar(128)
+  nombre        String @db.VarChar(128)
+
+  movimiento    Movimiento @relation(references: [id], fields: [movimientoId], onDelete: NoAction)
+  movimientoId  String
+
+  deleted   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ChequeCaja {
+  id            String @id @default(uuid())
+  numeroCheque  String @unique
+  librador      String @db.VarChar(128)
+
+  movimientoDetalles MovimientoDetalle @relation(references: [id], fields: [movimientoId], onDelete: NoAction)
+  movimientoId       String
+
+  deleted   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tarjeta {
+  id            String @id @default(uuid())
+  esCredito     Boolean
+  numeroTarjeta String @unique
+  exp           DateTime
+  cvv           String
+  nombre        String @db.VarChar(128)
+
+  movimientoDetalles MovimientoDetalle @relation(references: [id], fields: [movimientoId], onDelete: NoAction)
+  movimientoId       String
+
+  deleted   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

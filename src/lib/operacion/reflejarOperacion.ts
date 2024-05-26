@@ -1,10 +1,12 @@
 import prisma from "../prisma";
+import { Decimal } from "@prisma/client/runtime/library";
 
 const reflejarOperacion = async (
   idCuentaBancariaOrigen: string,
-  monto: number,
+  monto: Decimal,
   esDebito:boolean,
-  afectaSaldo:boolean
+  afectaSaldo:boolean,
+  afectaSaldoDisponible:boolean
 ) => {
   
   //Verificar si se da debito o credito a nuestra cuenta
@@ -13,15 +15,14 @@ const reflejarOperacion = async (
     increment: esDebito === false ? monto : undefined,
   };
 
-  //Aumenta o decrece el saldo total de nuestra cuenta bancaria
+  //Aumenta o decrece los saldos de nuestra cuenta bancaria
   await prisma.cuentaBancaria.update({
     where: {
       id: idCuentaBancariaOrigen,
     },
     data: {
-      saldo: saldoNuevo,
-      //Si afectaSaldo, entonces se afecta al saldo disponible con el caso (credito = increment o debito = decrement) y el monto especificado
-      saldoDisponible: afectaSaldo ? saldoNuevo : undefined,
+      saldo: afectaSaldo? saldoNuevo : undefined,
+      saldoDisponible: afectaSaldoDisponible ? saldoNuevo : undefined,
     },
   });
 };
