@@ -39,3 +39,5 @@ export type DatosFiltrados<T> = {
   values: T[],
   totalQuantity: number
 }
+
+export type ChequeAndOperacion = Operacion & {cheques?: Cheque[]}

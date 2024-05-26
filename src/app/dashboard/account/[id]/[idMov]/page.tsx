@@ -11,8 +11,8 @@ export default function PageComponent() {
   const [numComprobante, setNumComprobante] = useState("undefined");
   const [concepto, setConcepto] = useState("undefined");
   const [nombreDestino, setNombreDestino] = useState("undefined");
-  const [numCuentaDestino, setNumCuentaDestino] = useState("undefined");
-  const [bancoDestino, setBancoDestino] = useState("undefined");
+  const [numCuentaDestino, setNumCuentaDestino] = useState<string|null>("undefined");
+  const [bancoDestino, setBancoDestino] = useState<string|null>("undefined");
   const [nombreOrigen, setNombreOrigen] = useState("undefined");
   const [numCuentaOrigen, setNumCuentaOrigen] = useState("undefined");
   const [bancoOrigen, setBancoOrigen] = useState("undefined");
@@ -212,8 +212,8 @@ export default function PageComponent() {
                 numComprobante={numComprobante}
                 concepto={concepto}
                 nombreDestino={nombreDestino}
-                numCuentaDestino={numCuentaDestino}
-                bancoDestino={bancoDestino}
+                numCuentaDestino={numCuentaDestino||""}
+                bancoDestino={bancoDestino||""}
                 nombreOrigen={nombreOrigen}
                 numCuentaOrigen={numCuentaOrigen}
                 tipoOperacion={tipoOperacion}

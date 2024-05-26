@@ -1,30 +1,24 @@
 import { ApiResponseData } from "../definitions";
 
-/**
- * Permite crear una operacion en la base de datos
- * @param tipoOperacionId El tipo de operacion ha ser realizada
- * @param fechaOperacion Fecha en la que se realiza la operacion
- * @param monto Monto de la operacion
- * @param cuentaBancariaOrigenId Es la cuenta de la empresa que se vera afectada en la operacion
- * @param bancoInvolucado Es el banco desde donde se realizo la operacion
- * @param nombreInvolucrado Es el nombre del individuo externo involucrado en la operacion
- * @param cuentaInvolucrado Es la cuenta del individuo externo involucrado en la operacion
- * @param rucInvolucrado Es el documento del individuo externo involucrado en la operacion
- * @param concepto Es el concepto de la operacion
- * @param numeroComprobante Es el comprobante de la operacion realizada
- * @returns
- */
 export default async function agregarOperacion(
   tipoOperacionId: string,
   fechaOperacion: Date,
   monto: number,
   cuentaBancariaOrigenId: string,
-  bancoInvolucrado: string,
   nombreInvolucrado: string,
-  cuentaInvolucrado: string,
-  rucInvolucrado: string,
   concepto: string,
-  numeroComprobante: string
+  numeroComprobante: string,
+  cuentaInvolucrado?: string,
+  rucInvolucrado?: string,
+  bancoInvolucrado?: string,
+  cheques?: {
+    numeroCheque: string,
+    involucrado: string,
+    monto: number,
+    fechaEmision: Date,
+    esRecibido: boolean,
+    bancoChequeId: string,
+  }
 ): Promise<ApiResponseData | string | undefined> {
   try {
     const response = await fetch("/api/operacion", {
@@ -43,6 +37,7 @@ export default async function agregarOperacion(
         rucInvolucrado: rucInvolucrado,
         concepto: concepto,
         numeroComprobante: numeroComprobante,
+        cheques: cheques
       }),
     });
 

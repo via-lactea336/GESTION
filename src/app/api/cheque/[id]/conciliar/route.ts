@@ -6,17 +6,15 @@ import {
   generateApiSuccessResponse,
 } from "@/lib/apiResponse";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import reflejarOperacion from "@/lib/operacion/reflejarOperacion";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
 
-  const {bancoAfectadoId} : {bancoAfectadoId: string} = await req.json();
   const id = params.id;
-
-  if(!bancoAfectadoId) return generateApiErrorResponse("No hay informacion suficiente para conciliar el cheque", 500);
-
+  
     try{
       //Conciliar el cheque
       const cheque = await prisma.cheque.update({
@@ -28,24 +26,38 @@ export async function POST(
           fechaPago: new Date(),
           estado: estadoCheque.PAGADO,
         },
-      });
+      })
 
-      const saldoUpdate = {
-        increment: cheque.esRecibido === true ? cheque.monto : undefined, //Si es recibido entonces incrementa el saldo con el monto
-        decrement: cheque.esRecibido === false ? cheque.monto : undefined, //Si no es recibido (emitido) entonces decrementa el saldo con el monto
-      };
+      if (!cheque) return generateApiErrorResponse("Cheque no encontrado", 404)
 
-      //Actualizar el saldo de la cuenta
-      await prisma.cuentaBancaria.update({
+      const tipoOperacion = await prisma.tipoOperacion.findUnique({
         where: {
-          id: cheque.cuentaBancariaAfectadaId,
-        },
+          nombre: "CONCILIACION DE CHEQUE",
+        },select:{
+          id: true,
+          esDebito: true,
+          afectaSaldo: true,
+          afectaSaldoDisponible: true
+        }
+      });	
+
+      if(!tipoOperacion) return generateApiErrorResponse("Tipo de operacion para conciliacion de cheque no encontrada", 404)
+
+      const operacion = await prisma.operacion.create({
         data: {
-          saldoDisponible: saldoUpdate,
+          nombreInvolucrado: cheque.involucrado,
+          concepto: "CONCILIACION DE CHEQUE",
+          fechaOperacion: new Date(),
+          cuentaBancariaOrigenId: cheque.cuentaBancariaAfectadaId,
+          monto: cheque.monto,
+          tipoOperacionId: tipoOperacion.id,
+          numeroComprobante: cheque.numeroCheque,
         },
       });
 
-      if (!cheque) return generateApiErrorResponse("Cheque no encontrado", 404);
+      if (!operacion) return generateApiErrorResponse("Operacion no creada", 500)
+
+      await reflejarOperacion(operacion.cuentaBancariaOrigenId, cheque.monto, tipoOperacion.esDebito, tipoOperacion.afectaSaldo, tipoOperacion.afectaSaldoDisponible);
       
       return generateApiSuccessResponse(
         200,
