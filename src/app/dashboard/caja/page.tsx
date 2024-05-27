@@ -1,5 +1,6 @@
 "use client";
-import { link } from "fs";
+import FormApertura from "@/components/cajaVentanasEmergentes/FormApertura";
+import { Modal } from "@/components/global/Modal";
 import Link from "next/link";
 import React, { useState, useEffect, useCallback } from "react";
 
@@ -9,24 +10,31 @@ export default function Page() {
       {
         nombreCaja: "Caja1",
         esActiva: false,
-        link: "/dashboard/caja/1",
+        id: "1",
       },
       {
         nombreCaja: "Caja2",
         esActiva: false,
-        link: "/dashboard/caja/2",
+        id: "2",
       },
       {
         nombreCaja: "Caja3",
         esActiva: false,
-        link: "/dashboard/caja/3",
+        id: "3",
       },
     ],
     nombreCuenta: "Belencita Uwu",
   };
 
+  const [showModal, setShowModal] = useState(false);
+  const [selectedId, setSelectedId] = useState("");
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setShowModal(true);
+    setSelectedId(e.currentTarget.id);
+  };
   return (
-    <div>
+    <div className="relative">
       <header className="flex gap-3 justify-between items-center flex-wrap px-8 py-4 -mt-8 w-full rounded-md bg-primary-800 text-white">
         <h1 className="text-2xl font-bold">Punto de venta</h1>
         <nav className="flex flex-wrap items-center gap-6">
@@ -35,7 +43,11 @@ export default function Page() {
           </div>
         </nav>
       </header>
-      <div className="text-center text-white">
+      <div
+        className={
+          showModal ? "blur-sm brightness-50" : "text-center text-white"
+        }
+      >
         <div className="text-black flex ml-20 mr-20 mt-10">
           <div className="flex-1 px-4 py-2 rounded-md bg-primary-400 m-5 pt-5 pb-5">
             N° Caja
@@ -56,18 +68,24 @@ export default function Page() {
               <div className="flex-1 px-4 py-2 rounded-md bg-gray-700 m-5 ml-10 mr-10 pt-3 pb-3">
                 {caja.esActiva ? "Activa" : "Cerrada"}
               </div>
-              <div className="flex-1 px-4 py-2 bg-gray-700 m-5 rounded-md pt-3 pb-3">
-                <Link
-                  href={caja.link}
-                  className="bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-2 px-4 rounded-full"
-                >
-                  &gt;
-                </Link>
-              </div>
+              <button
+                onClick={handleClick}
+                id={caja.id}
+                className="flex-1 px-4 py-2 rounded-md bg-gray-700 m-5 ml-10 mr-10 pt-3 pb-3 hover:bg-gray-800"
+              >
+                Abrir caja
+              </button>
             </div>
           ))}
         </div>
       </div>
+      {showModal && (
+        <div className="absolute top-1/3 w-full">
+          <Modal setShowModal={setShowModal}>
+            <FormApertura id={selectedId} />
+          </Modal>
+        </div>
+      )}
     </div>
   );
 }
