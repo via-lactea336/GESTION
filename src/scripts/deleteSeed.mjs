@@ -3,14 +3,15 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+
+  // Delete Cheque
+  await prisma.cheque.deleteMany({});
+  
   // Delete operations
   await prisma.operacion.deleteMany({});
 
   // Delete tipoOperacion
   await prisma.tipoOperacion.deleteMany({});
-
-  // Delete Cheque
-  await prisma.cheque.deleteMany({});
 
   // Delete cuentaBancaria
   await prisma.cuentaBancaria.deleteMany({});

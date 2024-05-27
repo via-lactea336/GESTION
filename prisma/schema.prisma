@@ -128,30 +128,27 @@ enum Roles {
 }
 
 model User {
-  id        String @id @default(uuid())
-  username  String @unique
-  password  String
-  rol       Roles @default(EMPLOYEES)
+  id            String @id @default(uuid())
   
-  cajeros   Cajero?
+  nombre        String @db.VarChar(128)
+  apellido      String @db.VarChar(128)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  username      String @unique @db.VarChar(128)
+  docIdentidad  String @unique @db.VarChar(128)
+
+  password      String
+
+  rol           Roles @default(EMPLOYEES)
+
+  aperturas     AperturaCaja[]	
+
+  deleted       DateTime?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt @default(now())
 }
 
 //************************** CAJA **********************************
-model Cajero {
-  id        String @id @default(uuid())
-  user      User @relation(references: [id], fields: [userId], onDelete: NoAction)
-  userId    String @unique
-
-  aperturas    AperturaCaja[]
-
-  deleted   DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
 
 model Caja {
   id        String @id @default(uuid())
@@ -173,8 +170,8 @@ model AperturaCaja {
   caja        Caja  @relation(references: [id], fields: [cajaId], onDelete: NoAction)
   cajaId      String
 
-  cajero      Cajero  @relation(references: [id], fields: [cajeroId], onDelete: NoAction)
-  cajeroId    String
+  cajero      User  @relation(references: [id], fields: [cajeroId], onDelete: NoAction)
+  cajeroId    String 
 
   movimiento Movimiento[]
   arqueo     ArqueoDeCaja[]
@@ -242,21 +239,21 @@ model TipoMovimiento{
 }
 
 model Movimiento{
-  id            String @id @default(uuid())
+  id                  String @id @default(uuid())
   
-  apertura      AperturaCaja    @relation(references: [id], fields: [aperturaId], onDelete: NoAction)
-  aperturaId    String
+  apertura            AperturaCaja    @relation(references: [id], fields: [aperturaId], onDelete: NoAction)
+  aperturaId          String
 
-  monto         Decimal @db.Money
+  monto               Decimal @db.Money
 
-  recibosDetalles ReciboDetalle[]
-  movimientoDetalles MovimientoDetalle[]
-  comprobantes Comprobante[]
+  recibosDetalles     ReciboDetalle[]
+  movimientoDetalles  MovimientoDetalle[]
+  comprobantes        Comprobante[]
 
-  deleted       DateTime?
+  deleted             DateTime?
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt           DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model MovimientoDetalle {
