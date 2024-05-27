@@ -156,8 +156,6 @@ model Caja {
   
   aperturas AperturaCaja[]
 
-  saldo     Decimal @db.Money
-
   deleted   DateTime?
 
   createdAt DateTime @default(now())
@@ -178,7 +176,7 @@ model AperturaCaja {
 
   apertura     DateTime @default(now())
 
-  aperturaDeCaja Decimal @db.Money
+  saldoInicial Decimal @db.Money
 
   cierreCaja   DateTime?
 
@@ -209,6 +207,7 @@ model ArqueoDeCaja {
   aperturaId String
 
   montoRegistrado Decimal @db.Money
+  montoEsperado   Decimal @db.Money
 
   deleted   DateTime?
 
@@ -220,22 +219,6 @@ enum medioDePago {
   EFECTIVO
   CHEQUE
   TARJETA
-}
-
-model TipoMovimiento{
-  id        String @id @default(uuid())
-  nombre    String @db.VarChar(128)
-
-  movimientosDetalles MovimientoDetalle[]
-
-  metodoPago medioDePago @default(EFECTIVO)
-
-  esIngreso     Boolean
-
-  deleted     DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Movimiento{
@@ -250,10 +233,12 @@ model Movimiento{
   movimientoDetalles  MovimientoDetalle[]
   comprobantes        Comprobante[]
 
+  esIngreso           Boolean
+
   deleted             DateTime?
 
   createdAt           DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  updatedAt           DateTime @updatedAt
 }
 
 model MovimientoDetalle {
@@ -264,8 +249,7 @@ model MovimientoDetalle {
 
   monto          Decimal @db.Money
 
-  tipoMov       TipoMovimiento  @relation(references: [id], fields: [tipoMovId], onDelete: NoAction)
-  tipoMovId     String
+  metodoPago     medioDePago @default(EFECTIVO)
 
   chequeCaja    ChequeCaja[]
   tarjeta       Tarjeta[] 
