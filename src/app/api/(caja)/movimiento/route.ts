@@ -11,6 +11,7 @@ export async function POST(req: NextRequest) {
   const { 
     aperturaId,
     monto,
+    esIngreso
    } = body;
 
   if(!aperturaId || !monto ) return generateApiErrorResponse("Faltan datos para el movimiento", 400)
@@ -20,6 +21,7 @@ export async function POST(req: NextRequest) {
       data: {
         monto,
         aperturaId, 
+        esIngreso
       }
     })
   
