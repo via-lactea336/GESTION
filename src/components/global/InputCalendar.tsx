@@ -1,3 +1,4 @@
+"use client";
 import { useCalendar } from "@/lib/hooks/useCalendar";
 import { useState } from "react";
 
@@ -6,6 +7,7 @@ type InputCalendarProps = {
   required?: boolean;
   className?: string;
   value?: string;
+  placeholder?: string;
   setValue?: (value: string) => void;
   handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
@@ -17,6 +19,7 @@ export default function InputCalendar({
   value,
   setValue,
   handleChange,
+  placeholder,
 }: InputCalendarProps) {
   const { maxDate } = useCalendar();
   const [error, setError] = useState<string>("");
@@ -31,6 +34,7 @@ export default function InputCalendar({
         required={required || false}
         max={maxDate}
         value={value}
+        placeholder={placeholder}
         onChange={(e) => {
           if (e.currentTarget.value > maxDate) {
             setError(`Por favor, seleccione una fecha válida.`);

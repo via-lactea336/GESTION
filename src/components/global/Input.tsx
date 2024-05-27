@@ -1,3 +1,4 @@
+"use client";
 type InputProps = {
   id: string;
   required?: boolean;
