@@ -3,6 +3,7 @@ import {
   UserIcon,
   ArrowsRightLeftIcon,
   BanknotesIcon,
+  CircleStackIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -20,6 +21,11 @@ const links = [
     name: "Cheques",
     href: "/dashboard/cheques",
     icon: BanknotesIcon,
+  },
+  {
+    name: "Caja",
+    href: "/dashboard/caja",
+    icon: CircleStackIcon,
   },
 ];
 
