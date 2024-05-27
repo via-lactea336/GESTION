@@ -15,11 +15,6 @@ export type ApiResponseData<T=undefined> = {
   success: boolean
 }
 
-export type SignUpCredentials = {
-  username: string
-  password: string
-}
-
 export type OperacionDetails = Operacion & {
   tipoOperacion: TipoOperacion;
   cuentaBancariaOrigen: CuentaBancaria & {banco: Banco} & {entidad: Entidad};
