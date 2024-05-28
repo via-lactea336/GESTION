@@ -268,7 +268,7 @@ model Factura {
   esContado Boolean
 
   total       Decimal @db.Money
-  iva         Decimal @db.Money
+  ivaTotal    Decimal  @db.Money
 
   facturaDetalles FacturaDetalles[]
   recibos Recibos?
@@ -292,6 +292,8 @@ model FacturaDetalles {
   cantidad    Int
 
   monto       Decimal @db.Money
+  ivaPorcent  Float?
+  iva         Decimal @db.Money
 
   deleted     DateTime?
 
@@ -342,6 +344,7 @@ model Producto {
   
   nombre    String @db.VarChar(128)
   precio    Decimal @db.Money
+  iva       Float?
 
   facturaDetalles FacturaDetalles[]
 

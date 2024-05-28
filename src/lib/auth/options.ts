@@ -1,10 +1,11 @@
 import CredentialsProvider from "next-auth/providers/credentials"
+import { NextAuthOptions } from "next-auth"
 import prisma from "@/lib/prisma"
 import bcrypt from "bcrypt"
 
 const LOGIN_URL = process.env.LOGIN_URL || "/auth/login"
 
-const authOptions = {
+const authOptions:NextAuthOptions = {
   // Configure one or more authentication providers
   providers: [
     CredentialsProvider({
@@ -34,7 +35,11 @@ const authOptions = {
       }
   })
   ],
-
+  callbacks: {
+    async session({ session, user }) {
+      return session || null
+    }
+  },
   pages: {
       signIn:LOGIN_URL,
       signOut:"/",

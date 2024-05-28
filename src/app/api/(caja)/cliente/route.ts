@@ -34,6 +34,6 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const cajas = await prisma.caja.findMany()
-  return generateApiSuccessResponse(200, "Exito al obtener la lista de clientes", cajas)
+  const clientes = await prisma.cliente.findMany()
+  return generateApiSuccessResponse(200, "Exito al obtener la lista de clientes", clientes)
 }
