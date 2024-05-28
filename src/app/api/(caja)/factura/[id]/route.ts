@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { Cliente } from "@prisma/client";
+import { Factura } from "@prisma/client";
 import { NextRequest } from "next/server";
 import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiResponse";
 
@@ -7,16 +7,16 @@ export async function GET(req:NextRequest, { params }: { params: { id: string } 
 
   const id = params.id
   
-  const cliente = await prisma.cliente.findUnique({
+  const factura = await prisma.factura.findUnique({
     where: {
       id
     }
   })
 
-  if(!cliente) return generateApiErrorResponse("El cliente no existe en la base de datos", 404)
+  if(!factura) return generateApiErrorResponse("La factura no existe en la base de datos", 404)
 
   //Return success
-  return generateApiSuccessResponse(200, `El cliente con ${id}:`, cliente)
+  return generateApiSuccessResponse(200, `Exito obteniendo la factura`, factura)
 }
 
 
@@ -31,7 +31,7 @@ export async function DELETE(req:NextRequest, { params }: { params: { id: string
           id
         }
       })
-      return generateApiSuccessResponse(200, `El cliente con id:${id} fue eliminado correctamente de la base de datos`, caja);
+      return generateApiSuccessResponse(200, `La factura fue eliminada correctamente de la base de datos`, caja);
     }
 
     const caja = await prisma.cliente.update({
@@ -43,30 +43,29 @@ export async function DELETE(req:NextRequest, { params }: { params: { id: string
       }
     });
 
-    if(!caja) return generateApiErrorResponse("No se ha podido eliminar al cliente", 500)
+    if(!caja) return generateApiErrorResponse("No se ha podido eliminar la factura", 500)
 
-    return generateApiSuccessResponse(200, `El cliente con id:${id} fue eliminado correctamente`, caja);
+    return generateApiSuccessResponse(200, `La factura fue eliminada correctamente`, caja);
   } catch (error) {
     // Si hay un error al eliminar, devuelve un mensaje de error
-    return generateApiErrorResponse("Error eliminando al cliente", 500);
+    return generateApiErrorResponse("Error eliminando la factura", 500);
   }
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   const id = params.id;
-  const newData:Cliente = await req.json();
+  const newData:Factura = await req.json();
 
   try {
-    const cliente = await prisma.cliente.update({
+    const factura = await prisma.factura.update({
       where: {
         id
       },
       data: newData
     });
 
-    return generateApiSuccessResponse(200, `El cliente con id:${id} fue actualizado`, cliente);
+    return generateApiSuccessResponse(200, `La factura fue actualizada`, factura);
   } catch (error) {
-    // Si hay un error al actualizar, devuelve un mensaje de error
-    return generateApiErrorResponse("Error actualizando al cliente", 500);
+    return generateApiErrorResponse("Error actualizando la factura", 500);
   }
 }
