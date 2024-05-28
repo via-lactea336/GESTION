@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { XCircleIcon } from "@heroicons/react/24/outline";
 
 type ModalProps = {
   children: React.ReactNode;
@@ -17,7 +17,7 @@ export function Modal({ children, setShowModal }: ModalProps) {
         className="absolute right-4 top-4"
         title="cerrar"
       >
-        X
+        <XCircleIcon className="text-white  w-7 h-7 hover:text-primary-400" />
       </button>
       <div>{children}</div>
     </div>
