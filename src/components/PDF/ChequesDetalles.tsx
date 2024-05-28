@@ -81,10 +81,10 @@ const detalleCheques = ({ cheques, cuenta }: { cheques: ChequeDetails[], cuenta:
           {cheques.map((cheque, index) => (
             <View key={index} style={styles.tableRow}>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{cheque.operacion}</Text>
+                <Text style={styles.tableCell}>{cheque.operacionId}</Text>
               </View>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{new Date(cheque.fecha).toLocaleDateString()}</Text>
+                <Text style={styles.tableCell}>{new Date(cheque.fechaEmision).toLocaleDateString()}</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text style={styles.tableCell}>{cheque.bancoCheque.nombre}</Text>
@@ -93,7 +93,7 @@ const detalleCheques = ({ cheques, cuenta }: { cheques: ChequeDetails[], cuenta:
                 <Text style={styles.tableCell}>{cheque.estado}</Text>
               </View>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{cheque.monto}</Text>
+                <Text style={styles.tableCell}>{cheque.monto.toString()}</Text>
               </View>
             </View>
           ))}

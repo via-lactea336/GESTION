@@ -12,14 +12,14 @@ export async function POST(req: NextRequest) {
     cajaId,
     cajeroId,
     apertura,
-    aperturaDeCaja,
+    saldoInicial,
    } = body;
 
   if(
     !cajaId || 
     !cajeroId || 
     !apertura || 
-    !aperturaDeCaja
+    !saldoInicial
   ) return generateApiErrorResponse("Faltan datos para la apertura de caja", 400)
 
   try{
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
         cajaId,
         cajeroId,
         apertura,
-        aperturaDeCaja,
+        saldoInicial,
       }
     })
   

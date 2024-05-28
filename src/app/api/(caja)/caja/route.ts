@@ -8,15 +8,14 @@ import { Caja } from "@prisma/client";
 export async function POST(req: NextRequest) {
   
   const body: Caja = await req.json();
-  const { numero, saldo } = body;
+  const { numero } = body;
 
-  if(!numero || !saldo ) return generateApiErrorResponse("Faltan datos para la caja", 400)
+  if(!numero ) return generateApiErrorResponse("Faltan datos para la caja", 400)
 
   try{
     const caja = await prisma.caja.create({
       data: {
         numero,
-        saldo
       }
     })
   
