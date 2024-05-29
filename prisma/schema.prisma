@@ -192,9 +192,12 @@ model Cliente {
   id           String @id @default(uuid())
   
   nombre       String @db.VarChar(128)
-  docIdentidad String @db.VarChar(128)
+  docIdentidad String @db.VarChar(128) @unique
+
+  facturas     Factura[]
+  recibos      Recibos[]
   
-  deleted   DateTime?
+  deleted      DateTime?
   
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -229,7 +232,7 @@ model Movimiento{
 
   monto               Decimal @db.Money
 
-  recibosDetalles     ReciboDetalle[]
+  recibos     Recibos[]
   movimientoDetalles  MovimientoDetalle[]
   comprobantes        Comprobante[]
 
@@ -263,11 +266,14 @@ model MovimientoDetalle {
 model Factura {
   id        String @id @default(uuid())
   
-  ruc       String @db.VarChar(128)
-  nombre    String @db.VarChar(128)
+  cliente   Cliente @relation(references: [id], fields: [clienteId], onDelete: NoAction)
+  clienteId String
+
   esContado Boolean
 
   total       Decimal @db.Money
+  totalSaldoPagado Decimal @db.Money
+
   ivaTotal    Decimal  @db.Money
 
   facturaDetalles FacturaDetalles[]
@@ -304,34 +310,16 @@ model FacturaDetalles {
 model Recibos {
   id          String @id @default(uuid())
   
-  ruc         String @db.VarChar(128)
-  nombre      String @db.VarChar(128)
+  cliente     Cliente @relation(references: [id], fields: [clienteId], onDelete: NoAction)
+  clienteId   String
   
   factura     Factura @relation(references: [id], fields: [facturaId], onDelete: NoAction)
   facturaId   String @unique
 
-  totalPagado Decimal @db.Money
-
-  estaPagado  Boolean
-
-  recibosDetalles ReciboDetalle[]
-
-  deleted   DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model ReciboDetalle {
-  id        String @id @default(uuid())
-  
-  monto     Decimal @db.Money
-
-  recibo    Recibos @relation(references: [id], fields: [reciboId], onDelete: NoAction)
-  reciboId  String
-
   movimiento Movimiento @relation(references: [id], fields: [movimientoId], onDelete: NoAction)
   movimientoId String
+
+  totalPagado Decimal @db.Money
 
   deleted   DateTime?
 
@@ -359,6 +347,7 @@ model Comprobante {
 
   concepto      String
   monto         Decimal @db.Money
+
   docIdentidad  String @db.VarChar(128)
   nombre        String @db.VarChar(128)
 
@@ -373,8 +362,8 @@ model Comprobante {
 
 model ChequeCaja {
   id            String @id @default(uuid())
+  
   numeroCheque  String @unique
-  librador      String @db.VarChar(128)
 
   movimientoDetalles MovimientoDetalle @relation(references: [id], fields: [movimientoId], onDelete: NoAction)
   movimientoId       String
