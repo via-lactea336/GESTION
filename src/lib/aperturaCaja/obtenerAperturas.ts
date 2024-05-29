@@ -7,8 +7,10 @@ import { ApiResponseData } from "../definitions";
  */
 
 export default async function obtenerAperturas() {
+  const server_url = process.env.URL;
+  const url = server_url || "";
   try {
-    const aperturasCaja = await fetch("/api/apertura-caja", {
+    const aperturasCaja = await fetch(`${url}/api/apertura-caja`, {
       headers: {
         "Content-Type": "application/json",
       },
