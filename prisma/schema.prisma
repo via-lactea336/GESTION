@@ -152,15 +152,17 @@ model User {
 //************************** CAJA **********************************
 
 model Caja {
-  id        String @id @default(uuid())
-  numero    Int @db.Integer @unique
+  id          String @id @default(uuid())
+  numero      Int @db.Integer @unique
   
-  aperturas AperturaCaja[]
+  estaCerrado Boolean @default(true)
 
-  deleted   DateTime?
+  aperturas   AperturaCaja[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  deleted     DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model AperturaCaja {
