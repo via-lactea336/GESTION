@@ -35,6 +35,17 @@ export async function POST(req: NextRequest) {
   
     if(!facturaDetalle) return generateApiErrorResponse("Error generando la factura detalle", 400) 
 
+    await prisma.factura.update({
+      where: {
+        id:facturaId
+      },
+      data: {
+        total: {
+          increment: monto
+        }
+      }
+    })
+
     return generateApiSuccessResponse(200, "La factura detalle fue generada correctamente")
   
   }catch(err){

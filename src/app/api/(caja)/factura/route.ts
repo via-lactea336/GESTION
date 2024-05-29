@@ -3,26 +3,29 @@ import prisma from "@/lib/prisma";
 import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
 import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiResponse";
 
-import { Factura } from "@prisma/client";
+import { Factura, FacturaDetalles } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   
-  const body: Factura = await req.json();
+  const body:{factura:Factura, facturaDetalles?:FacturaDetalles[]} = await req.json();
+  
   const { 
-    nombre,
-    ruc,
+    clienteId,
     esContado,
     total,
-    ivaTotal
-   } = body;
+    ivaTotal,
+    totalSaldoPagado
+   } = body.factura;
+  
+  const { facturaDetalles } = body 
 
-  if(!ruc || !total || !nombre || !esContado  ) return generateApiErrorResponse("Faltan datos para la creacion de la factura", 400)
+  if(!clienteId || !total || (esContado !== undefined && esContado !== null) ) return generateApiErrorResponse("Faltan datos para la creacion de la factura", 400)
 
   try{
     const factura = await prisma.factura.create({
       data: {
-        nombre,
-        ruc,
+        clienteId,
+        totalSaldoPagado:totalSaldoPagado? totalSaldoPagado : esContado? total : 0, 
         esContado,
         total,
         ivaTotal,
@@ -30,6 +33,13 @@ export async function POST(req: NextRequest) {
     })
   
     if(!factura) return generateApiErrorResponse("Error generando la factura", 400) 
+  
+    //Creacion de detalle facturas
+    if(facturaDetalles && facturaDetalles.length > 0){
+      await prisma.facturaDetalles.createMany({
+        data: facturaDetalles
+      })
+    }
 
     return generateApiSuccessResponse(200, "La factura fue generada correctamente")
   
