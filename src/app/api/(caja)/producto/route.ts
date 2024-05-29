@@ -11,17 +11,19 @@ export async function POST(req: NextRequest) {
   const { 
     nombre,
     precio,
-    iva
+    iva,
+    codigo
    } = body;
 
-  if(!nombre || !precio ) return generateApiErrorResponse("Faltan datos para el producto", 400)
+  if(!nombre || !precio || !codigo ) return generateApiErrorResponse("Faltan datos para el producto", 400)
 
   try{
     const producto = await prisma.producto.create({
       data: {
         nombre, 
         precio,
-        iva
+        iva,
+        codigo
       }
     })
   

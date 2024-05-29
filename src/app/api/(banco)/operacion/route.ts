@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { estadoCheque } from "@prisma/client";
 import {PrismaClientKnownRequestError, Decimal} from "@prisma/client/runtime/library";
 import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiResponse";
-import reflejarOperacion from "@/lib/operacion/reflejarOperacion";
+import reflejarOperacion from "@/lib/moduloBanco/operacion/reflejarOperacion";
 import { ChequeAndOperacion } from "@/lib/definitions";
 
 export async function POST(req: NextRequest) {

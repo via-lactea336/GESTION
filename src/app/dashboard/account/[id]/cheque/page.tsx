@@ -4,10 +4,10 @@ import InputCalendar from "@/components/global/InputCalendar";
 import LoadingCirleIcon from "@/components/global/LoadingCirleIcon";
 import LoadingPage from "@/components/global/LoadingPage";
 import Pagination from "@/components/global/Pagination";
-import obtenerBancos from "@/lib/banco/obtenerBancos";
-import anularCheque from "@/lib/cheque/anularCheque";
-import concicliarCheque from "@/lib/cheque/conciliarCheque";
-import obtenerChequesFiltros from "@/lib/cheque/obtenerChequesFiltros";
+import obtenerBancos from "@/lib/moduloBanco/banco/obtenerBancos";
+import anularCheque from "@/lib/moduloBanco/cheque/anularCheque";
+import concicliarCheque from "@/lib/moduloBanco/cheque/conciliarCheque";
+import obtenerChequesFiltros from "@/lib/moduloBanco/cheque/obtenerChequesFiltros";
 import { ChequeDetails } from "@/lib/definitions";
 import {
   ArrowDownLeftIcon,

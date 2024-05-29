@@ -4,7 +4,7 @@ import {Decimal, PrismaClientKnownRequestError} from "@prisma/client/runtime/lib
 import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiResponse";
 
 import { ArqueoDeCaja } from "@prisma/client";
-import calcularMontoEsperado from "@/lib/arqueoCaja/calcularMontoEsperado";
+import calcularMontoEsperado from "@/lib/moduloCaja/arqueoCaja/calcularMontoEsperado";
 
 export async function POST(req: NextRequest) {
   

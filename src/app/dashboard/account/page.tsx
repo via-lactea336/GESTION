@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Header from "@/components/dashboard/account/Header";
 import BankAccount from "@/components/dashboard/account/BankAccount";
-import obtenerCuentaBancaria from "@/lib/cuentaBancaria/obtenerCuentaBancaria";
+import obtenerCuentaBancaria from "@/lib/moduloBanco/cuentaBancaria/obtenerCuentaBancaria";
 import { CuentaBancariaAndBanco } from "@/lib/definitions";
 
 export default function Page() {

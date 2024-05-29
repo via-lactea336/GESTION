@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import agregarCheque from "@/lib/cheque/agregarCheque";
-import obtenerBancos from "@/lib/banco/obtenerBancos";
+import agregarCheque from "@/lib/moduloBanco/cheque/agregarCheque";
+import obtenerBancos from "@/lib/moduloBanco/banco/obtenerBancos";
 import { Banco } from "@prisma/client";
-import obtenerCuentaBancaria from "@/lib/cuentaBancaria/obtenerCuentaBancaria";
+import obtenerCuentaBancaria from "@/lib/moduloBanco/cuentaBancaria/obtenerCuentaBancaria";
 import { CuentaBancariaAndBanco } from "@/lib/definitions";
 import { Toaster, toast } from "sonner";
 import { useCalendar } from "@/lib/hooks/useCalendar";
