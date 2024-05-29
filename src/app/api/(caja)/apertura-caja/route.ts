@@ -34,6 +34,15 @@ export async function POST(req: NextRequest) {
   
     if(!aperturaCaja) return generateApiErrorResponse("Error generando la apertura de caja", 400) 
 
+    await prisma.caja.update({
+      where: {
+        id: cajaId
+      },
+      data: {
+        estaCerrado: false
+      }
+    })
+
     return generateApiSuccessResponse(200, "La apertura de caja fue generada correctamente")
   
   }catch(err){
