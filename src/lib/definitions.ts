@@ -1,4 +1,11 @@
-import { Banco, Cheque, CuentaBancaria, Entidad, Operacion, TipoOperacion } from "@prisma/client";
+import {
+  Banco,
+  Cheque,
+  CuentaBancaria,
+  Entidad,
+  Operacion,
+  TipoOperacion,
+} from "@prisma/client";
 
 export type LoadingProps = {
   loading: boolean;
@@ -8,31 +15,42 @@ export type ErrorProps = {
   message: string;
 };
 
-export type ApiResponseData<T=undefined> = {
-  data: T
-  message?: string
-  error?: string
-  success: boolean
-}
+export type ApiResponseData<T = undefined> = {
+  data: T;
+  message?: string;
+  error?: string;
+  success: boolean;
+};
 
 export type OperacionDetails = Operacion & {
   tipoOperacion: TipoOperacion;
-  cuentaBancariaOrigen: CuentaBancaria & {banco: Banco} & {entidad: Entidad};
-}
+  cuentaBancariaOrigen: CuentaBancaria & { banco: Banco } & {
+    entidad: Entidad;
+  };
+};
 
 export type OperacionAndTipoOperacion = Operacion & {
-  tipoOperacion: TipoOperacion
-}
+  tipoOperacion: TipoOperacion;
+};
 
 export type CuentaBancariaAndBanco = CuentaBancaria & {
-  banco: Banco
-}
+  banco: Banco;
+};
 
-export type ChequeDetails = Cheque & {cuentaAfectada: CuentaBancaria} & {bancoCheque: Banco}
+export type ChequeDetails = Cheque & { cuentaAfectada: CuentaBancaria } & {
+  bancoCheque: Banco;
+};
 
 export type DatosFiltrados<T> = {
-  values: T[],
-  totalQuantity: number
-}
+  values: T[];
+  totalQuantity: number;
+};
 
-export type ChequeAndOperacion = Operacion & {cheques?: Cheque[]}
+export type ChequeAndOperacion = Operacion & { cheques?: Cheque[] };
+
+export type AperturaCajaData = {
+  cajaId: string;
+  cajeroId: string;
+  apertura: Date;
+  saldoInicial: number;
+};

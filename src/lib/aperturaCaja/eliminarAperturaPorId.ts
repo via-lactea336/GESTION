@@ -7,8 +7,10 @@ import { ApiResponseData } from "../definitions";
  */
 
 export default async function eliminarAperturaPorId({ id }: { id: string }) {
+  const server_url = process.env.URL;
+  const url = server_url || "";
   try {
-    const aperturasCaja = await fetch(`/api/apertura-caja/${id}`, {
+    const aperturasCaja = await fetch(`${url}/api/apertura-caja/${id}`, {
       headers: {
         "Content-Type": "application/json",
       },
