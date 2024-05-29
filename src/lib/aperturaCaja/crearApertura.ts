@@ -11,6 +11,7 @@ export default async function crearApertura({
   cajeroId,
   apertura,
   saldoInicial,
+  observaciones,
 }: AperturaCajaData) {
   const server_url = process.env.URL;
   const url = server_url || "";
@@ -25,9 +26,10 @@ export default async function crearApertura({
         cajeroId,
         apertura,
         saldoInicial,
+        observaciones,
       }),
     });
-    const data: ApiResponseData<AperturaCaja> = await aperturaCaja.json();
+    const data: ApiResponseData = await aperturaCaja.json();
     if (data.error) throw new Error(data.error);
     if (!data.data) throw new Error("Error al crear la apertura de caja");
     if (typeof data.data === "undefined")

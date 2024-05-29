@@ -16,7 +16,7 @@ export default async function eliminarAperturaPorId({ id }: { id: string }) {
       },
       method: "DELETE",
     });
-    const data: ApiResponseData<AperturaCaja[]> = await aperturasCaja.json();
+    const data: ApiResponseData = await aperturasCaja.json();
     return data;
   } catch (err) {
     if (err instanceof Error) return err.message;

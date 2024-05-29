@@ -80,7 +80,7 @@ export async function GET() {
   const arqueosCaja = await prisma.arqueoDeCaja.findMany();
   return generateApiSuccessResponse(
     200,
-    "Exito al obtener la lista de cajas",
+    "Exito al obtener la lista de arqueo cajas",
     arqueosCaja
   );
 }
