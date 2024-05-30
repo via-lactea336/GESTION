@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   
   const { facturaDetalles } = body 
 
-  if(!clienteId || !total || (esContado !== undefined && esContado !== null) ) return generateApiErrorResponse("Faltan datos para la creacion de la factura", 400)
+  if(!clienteId || !total || (esContado === undefined && esContado === null) ) return generateApiErrorResponse("Faltan datos para la creacion de la factura", 400)
 
   try{
     const factura = await prisma.factura.create({

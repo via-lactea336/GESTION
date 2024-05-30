@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
  datasource db {
@@ -151,15 +152,17 @@ model User {
 //************************** CAJA **********************************
 
 model Caja {
-  id        String @id @default(uuid())
-  numero    Int @db.Integer @unique
+  id          String @id @default(uuid())
+  numero      Int @db.Integer @unique
   
-  aperturas AperturaCaja[]
+  estaCerrado Boolean @default(true)
 
-  deleted   DateTime?
+  aperturas   AperturaCaja[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  deleted     DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model AperturaCaja {
@@ -271,13 +274,13 @@ model Factura {
 
   esContado Boolean
 
-  total       Decimal @db.Money
+  total            Decimal @db.Money
   totalSaldoPagado Decimal @db.Money
 
   ivaTotal    Decimal  @db.Money
 
   facturaDetalles FacturaDetalles[]
-  recibos Recibos?
+  recibos         Recibos[]
 
   deleted   DateTime?
 
@@ -314,7 +317,7 @@ model Recibos {
   clienteId   String
   
   factura     Factura @relation(references: [id], fields: [facturaId], onDelete: NoAction)
-  facturaId   String @unique
+  facturaId   String 
 
   movimiento Movimiento @relation(references: [id], fields: [movimientoId], onDelete: NoAction)
   movimientoId String
@@ -328,9 +331,10 @@ model Recibos {
 }
 
 model Producto {
-  id        String @id @default(uuid())
+  id        String  @id @default(uuid())
   
-  nombre    String @db.VarChar(128)
+  codigo    String  @unique
+  nombre    String  @db.VarChar(256) @unique
   precio    Decimal @db.Money
   iva       Float?
 

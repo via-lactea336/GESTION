@@ -1,6 +1,6 @@
 import LoadingCirleIcon from "@/components/global/LoadingCirleIcon";
 import { OperacionAndTipoOperacion } from "@/lib/definitions";
-import obtenerOperacionesFiltros from "@/lib/operacion/obtenerOperacionesFiltros";
+import obtenerOperacionesFiltros from "@/lib/moduloBanco/operacion/obtenerOperacionesFiltros";
 import {
   ArrowUpRightIcon,
   ArrowDownLeftIcon,

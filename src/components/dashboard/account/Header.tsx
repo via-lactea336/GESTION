@@ -3,7 +3,7 @@
 
 import React from "react";
 import { useEffect, useState } from "react";
-import obtenerBancos from "@/lib/banco/obtenerBancos";
+import obtenerBancos from "@/lib/moduloBanco/banco/obtenerBancos";
 import { Banco } from "@prisma/client";
 
 type MenuItem = {

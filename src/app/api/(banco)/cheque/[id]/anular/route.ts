@@ -5,7 +5,7 @@ import {
   generateApiErrorResponse,
   generateApiSuccessResponse,
 } from "@/lib/apiResponse";
-import reflejarOperacion from "@/lib/operacion/reflejarOperacion";
+import reflejarOperacion from "@/lib/moduloBanco/operacion/reflejarOperacion";
 
 export async function POST(
   req: NextRequest,

@@ -10,7 +10,7 @@ import {
 } from "@/lib/apiResponse";
 
 import { ArqueoDeCaja } from "@prisma/client";
-import calcularMontoEsperado from "@/lib/arqueoCaja/calcularMontoEsperado";
+import calcularMontoEsperado from "@/lib/moduloCaja/arqueoCaja/calcularMontoEsperado";
 
 export async function POST(req: NextRequest) {
   const body: ArqueoDeCaja = await req.json();
@@ -22,20 +22,49 @@ export async function POST(req: NextRequest) {
   const montoEsperado = await calcularMontoEsperado(aperturaId);
 
   try {
-    const caja = await prisma.arqueoDeCaja.create({
+    const arqueoCaja = await prisma.arqueoDeCaja.create({
       data: {
         aperturaId,
         montoRegistrado,
         montoEsperado: new Decimal(montoEsperado),
       },
+      include:{
+        apertura: {
+          select:{
+            cajaId: true
+          }
+        }
+      }
     });
 
-    if (!caja)
+    if (!arqueoCaja)
       return generateApiErrorResponse("Error generando el arqueo de caja", 400);
+    
+    if(montoRegistrado.equals(montoEsperado)){
+      const aperturaCaja = await prisma.aperturaCaja.update({
+        where: {
+          id: arqueoCaja.aperturaId
+        },
+        data: {
+          cierreCaja: new Date()
+        }
+      })
+      const caja = await prisma.caja.update({
+        where: {
+          id: arqueoCaja.apertura.cajaId
+        },
+        data: {
+          estaCerrado: true
+        }
+      })
+      if(!aperturaCaja || !caja) return generateApiErrorResponse("Error cerrando la caja y la apertura de caja", 400);
+      return generateApiSuccessResponse(200, "El arqueo fue generada correctamente y la caja fue cerrada", arqueoCaja);
+    }
     return generateApiSuccessResponse(
       200,
-      "El arqueo fue generada correctamente"
+      "El arqueo fue generada correctamente pero los datos no coinciden, se necesita intervencion del administrador"
     );
+
   } catch (err) {
     if (err instanceof PrismaClientKnownRequestError && err.code === "P2002")
       return generateApiErrorResponse("La caja ya existe", 400);
@@ -48,10 +77,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const cajas = await prisma.arqueoDeCaja.findMany();
+  const arqueosCaja = await prisma.arqueoDeCaja.findMany();
   return generateApiSuccessResponse(
     200,
     "Exito al obtener la lista de arqueo cajas",
-    cajas
+    arqueosCaja
   );
 }

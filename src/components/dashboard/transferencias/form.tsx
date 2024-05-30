@@ -1,12 +1,12 @@
 "use client";
 import Input from "@/components/global/Input";
 import InputCalendar from "@/components/global/InputCalendar";
-import obtenerBancos from "@/lib/banco/obtenerBancos";
-import obtenerCuentaBancaria from "@/lib/cuentaBancaria/obtenerCuentaBancaria";
+import obtenerBancos from "@/lib/moduloBanco/banco/obtenerBancos";
+import obtenerCuentaBancaria from "@/lib/moduloBanco/cuentaBancaria/obtenerCuentaBancaria";
 import { CuentaBancariaAndBanco } from "@/lib/definitions";
 import { useCalendar } from "@/lib/hooks/useCalendar";
-import agregarOperacion from "@/lib/operacion/agregarOperacion";
-import obtenerTiposOperacion from "@/lib/tipoOperacion/obtenerTiposOperacion";
+import agregarOperacion from "@/lib/moduloBanco/operacion/agregarOperacion";
+import obtenerTiposOperacion from "@/lib/moduloBanco/tipoOperacion/obtenerTiposOperacion";
 import { Banco, TipoOperacion } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";

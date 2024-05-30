@@ -3,29 +3,40 @@ import prisma from "@/lib/prisma";
 import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
 import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiResponse";
 
-import { Movimiento } from "@prisma/client";
+import { Movimiento, MovimientoDetalle } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   
-  const body: Movimiento = await req.json();
+  const body:{ mov:Movimiento, movsDetalles?:MovimientoDetalle[] }= await req.json();
   const { 
-    aperturaId,
-    monto,
-    esIngreso
+    mov,
+    movsDetalles
    } = body;
 
-  if(!aperturaId || !monto ) return generateApiErrorResponse("Faltan datos para el movimiento", 400)
+  if(!mov ) return generateApiErrorResponse("Faltan datos para el movimiento", 400)
 
   try{
     const movimiento = await prisma.movimiento.create({
       data: {
-        monto,
-        aperturaId, 
-        esIngreso
+        monto: mov.monto,
+        aperturaId: mov.aperturaId, 
+        esIngreso: mov.esIngreso
       }
     })
   
     if(!movimiento) return generateApiErrorResponse("Error generando el movimiento", 400) 
+
+    if(movsDetalles && movsDetalles.length > 0){
+      const sum = movsDetalles.reduce(
+        (total, m) => total + (+m.monto),
+        0
+      )
+      if(movimiento.monto.greaterThan(sum)) return generateApiErrorResponse("La suma de los movimientos detalle no coincide con el monto del movimiento", 400)
+      await prisma.movimientoDetalle.createMany({
+        data:movsDetalles, 
+        skipDuplicates: true
+      })
+    }
 
     return generateApiSuccessResponse(200, "El movimiento fue generada correctamente")
   
