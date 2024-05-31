@@ -8,6 +8,7 @@ import verificarApiResponse from "@/lib/verificarApiResponse";
 import { Caja } from "@prisma/client";
 import { useState, useEffect } from "react";
 import { CajaData } from "@/lib/definitions";
+import { useRouter } from "next/navigation";
 
 type Props = {
   cajeroId: string;
@@ -20,12 +21,16 @@ export default function ContenedorCajas({ cajeroId, cajeroNombre }: Props) {
   const [data, setData] = useState<Caja[]>([]);
   const [mensaje, setMensaje] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setShowModal(true);
     const id = e.currentTarget.id;
     const caja = data.find((c) => c.id === id);
     if (caja) setSelectedCaja(caja);
+    if (caja?.estaCerrado) {
+      setShowModal(true);
+    }
   };
 
   useEffect(() => {

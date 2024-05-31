@@ -38,9 +38,14 @@ export default function ListaDeCajas({
           <button
             onClick={handleClick}
             id={caja.id}
-            className="flex-1 px-4 py-3 rounded-md bg-gray-700 hover:bg-gray-800"
+            className={
+              "flex-1 px-4 py-3 rounded-md bg-gray-700 hover:bg-gray-800 " +
+              (caja.estaCerrado
+                ? "cursor-pointer"
+                : "bg-gray-800 cursor-not-allowed")
+            }
           >
-            Abrir caja
+            {caja.estaCerrado ? "Abrir Caja" : "Cajero Trabajando"}
           </button>
         </div>
       ))}

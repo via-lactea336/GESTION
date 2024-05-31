@@ -126,6 +126,7 @@ model Cheque {
 enum Roles { 
   ADMIN
   EMPLOYEES
+  CAJERO
 }
 
 model User {

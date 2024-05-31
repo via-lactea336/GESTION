@@ -34,6 +34,7 @@ const authOptions: NextAuthOptions = {
           id: user.id,
           username:user.username,
           nombre:user.nombre + " " + user.apellido,
+          rol:user.rol
         }
       },
   })
@@ -44,6 +45,7 @@ const authOptions: NextAuthOptions = {
       if(user) {
         token.nombre = user.nombre
         token.id = user.id
+        token.rol = user.rol
       }
       return token
     }, 
@@ -52,6 +54,7 @@ const authOptions: NextAuthOptions = {
       if (token) {
         session.user.id = token.id;
         session.user.nombre = token.nombre;
+        session.user.rol = token.rol
       }
       return session
     },

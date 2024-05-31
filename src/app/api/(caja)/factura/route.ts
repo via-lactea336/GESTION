@@ -37,7 +37,12 @@ export async function POST(req: NextRequest) {
     //Creacion de detalle facturas
     if(facturaDetalles && facturaDetalles.length > 0){
       await prisma.facturaDetalles.createMany({
-        data: facturaDetalles
+        data: facturaDetalles.map(facturaDetalle => {
+          return {
+            ...facturaDetalle,
+            facturaId: factura.id
+          }
+        })
       })
     }
 
