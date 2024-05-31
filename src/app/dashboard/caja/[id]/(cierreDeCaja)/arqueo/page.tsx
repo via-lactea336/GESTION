@@ -81,7 +81,7 @@ export default function Page() {
     monto += totales.totalTarjetaCredito * 1;
     monto += totales.totalTarjetaDebito * 1;
     monto += totales.totalEfectivo * 1;
-    setMontoTotal(monto)
+    setMontoTotal(monto);
   }, [totales]);
 
   return (
@@ -91,7 +91,8 @@ export default function Page() {
           showModal
             ? "blur-sm brightness-50 p-10 -mt-7 bg-primary-800"
             : "p-10 -mt-7 bg-primary-800"
-        }>
+        }
+      >
         <div className="flex flex-row ">
           <h1 className="text-3xl font-bold mt-2 mb-2">Arqueo de caja</h1>
           <p className="font-bold mt-4 mb-2 ml-auto">
