@@ -60,3 +60,9 @@ export type ArqueoCajaData = {
   aperturaId: string;
   montoRegistrado: number;
 };
+
+export type CajaData = {
+  id: string;
+  numero: number;
+  deleted: Date | null;
+};
