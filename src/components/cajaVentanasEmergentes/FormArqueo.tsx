@@ -1,5 +1,7 @@
 "use client";
 import Input from "@/components/global/Input";
+import crearArqueo from "@/lib/arqueoCaja/crearArqueo";
+import { ArqueoCajaData } from "@/lib/definitions";
 import calcularMontoEsperado from "@/lib/moduloCaja/arqueoCaja/calcularMontoEsperado";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -12,20 +14,18 @@ type Params = {
 export default function FormArqueo({ id, monto }: Params) {
     const [exitoArqueo, setExitoArqueo] = useState(false);
     const router = useRouter();
-    const [montoEsperado, setMontoEsperado] = useState(0);
-    
+    console.log(id + "    " + monto)
     const fetchCalculo = async () => {
         try {
-            const montoApi = await calcularMontoEsperado(id);
+            const arqueo: ArqueoCajaData = {
+                aperturaId: id,
+                montoRegistrado: monto
+            }
+            const montoApi = await crearArqueo(arqueo);
             if (montoApi === undefined || typeof montoApi === "string") {
                 throw new Error("Error obteniendo las cuentas");
             }
-            console.log("Monto api: " + montoApi)
-            console.log("Monto param: " + monto)
-            setMontoEsperado(montoApi);
-            if(montoApi == montoApi){
-                setExitoArqueo(true)
-            }
+            console.log(montoApi);
         } catch (error) {
             console.error(error);
         }
@@ -34,12 +34,7 @@ export default function FormArqueo({ id, monto }: Params) {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        router.push(`/dashboard/caja/1/resumenDiario`);
     };
-    console.log(monto)
-
-
-
 
     return (
         exitoArqueo? 

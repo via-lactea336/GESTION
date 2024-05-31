@@ -23,19 +23,16 @@ export default function Page() {
   });
 
   const [totales, setTotales] = useState({
-    fondoCaja: apertura.saldoInicial,
     totalEfectivo: 0,
     totalCheque: 0,
     totalTarjetaDebito: 0,
     totalTarjetaCredito: 0,
-    montoTotal: 0,
   });
+  const [montoTotal, setMontoTotal] = useState(0);
   const [showModal, setShowModal] = useState(false);
-  const [selectedId, setSelectedId] = useState("");
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setShowModal(true);
-    setSelectedId(e.currentTarget.id);
   };
 
   const handleChange = (
@@ -76,7 +73,6 @@ export default function Page() {
       ...totales,
       ["totalEfectivo"]: total,
     });
-    console.log(totales.totalEfectivo);
   }, [denominaciones]);
 
   useEffect(() => {
@@ -85,16 +81,17 @@ export default function Page() {
     monto += totales.totalTarjetaCredito * 1;
     monto += totales.totalTarjetaDebito * 1;
     monto += totales.totalEfectivo * 1;
-    monto += Number(totales.fondoCaja) * 1;
-    setTotales({
-      ...totales,
-      ["montoTotal"]: monto,
-    });
+    setMontoTotal(monto)
   }, [totales]);
 
   return (
     <div>
-      <div className="p-10 -mt-7 bg-primary-800">
+      <div
+        className={
+          showModal
+            ? "blur-sm brightness-50 p-10 -mt-7 bg-primary-800"
+            : "p-10 -mt-7 bg-primary-800"
+        }>
         <div className="flex flex-row ">
           <h1 className="text-3xl font-bold mt-2 mb-2">Arqueo de caja</h1>
           <p className="font-bold mt-4 mb-2 ml-auto">
@@ -112,12 +109,6 @@ export default function Page() {
       >
         <div className="bg-primary-500 flex flex-col p-5 rounded-md mb-auto">
           <h1 className="text-center text-xl">Según Cajero</h1>
-          <div className="m-5 flex justify-between">
-            <label>Apertura</label>
-            <div className="ml-10 rounded-md bg-gray-600 min-w-[195px] text-center">
-              {Number(totales.fondoCaja).toLocaleString("de-DE")}
-            </div>
-          </div>
           <div className="m-5 flex justify-between">
             <label>Efectivo</label>
             <div className="ml-10 rounded-md bg-gray-600 min-w-[195px] text-center">
@@ -164,7 +155,7 @@ export default function Page() {
           <div className="m-5 flex justify-between">
             <label>Total Ingresos</label>
             <div className="ml-10 rounded-md bg-gray-600 min-w-[195px] text-center">
-              {totales.montoTotal.toLocaleString("de-DE")}
+              {montoTotal.toLocaleString("de-DE")}
             </div>
           </div>
 
@@ -372,9 +363,9 @@ export default function Page() {
       </div>
       {showModal && (
         <div className="flex items-center justify-center h-screen">
-          <div className="absolute top-1/3 w-full">
+          <div className="absolute top-20 w-full">
             <Modal setShowModal={setShowModal}>
-              <FormArqueo id={selectedId} monto={totales.montoTotal} />
+              <FormArqueo id={apertura.id} monto={120000} />
             </Modal>
           </div>
         </div>
