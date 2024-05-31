@@ -4,11 +4,11 @@ import { useRouter } from "next/navigation";
 
 type Params = {
     id: string;
+    exitoArqueo: boolean;
 };
 
-export default function FormArqueo({ id }: Params) {
+export default function FormArqueo({ id, exitoArqueo }: Params) {
     const router = useRouter();
-    const exitoArqueo = false;
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         router.push(`/dashboard/caja/1/resumenDiario`);
