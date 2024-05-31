@@ -7,7 +7,7 @@ type ReturnData<T> = {
 };
 
 export default function verificarApiResponse<T = undefined>(
-  response: ApiResponseData<T[]> | string | undefined
+  response: ApiResponseData<T[]> | ApiResponseData | string | undefined
 ): ReturnData<T> {
   if (typeof response === "string" || response === undefined)
     return {
@@ -17,7 +17,7 @@ export default function verificarApiResponse<T = undefined>(
     };
 
   return {
-    data: response.data,
+    data: response.data || [],
     mensaje: response.message!,
     success: response.success,
   };

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import obtenerOperacionPorId from "../../../../../lib/operacion/obtenerOperacionPorId";
+import obtenerOperacionPorId from "../../../../../lib/moduloBanco/operacion/obtenerOperacionPorId";
 import TransferReceipt from '../../../../../components/PDF/TransferenciaDetails';
 import { PDFDownloadLink } from "@react-pdf/renderer";
 

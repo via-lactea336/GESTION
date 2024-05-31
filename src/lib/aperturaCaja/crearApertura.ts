@@ -1,4 +1,3 @@
-import { AperturaCaja } from "@prisma/client";
 import { AperturaCajaData, ApiResponseData } from "../definitions";
 
 /**
@@ -11,7 +10,8 @@ export default async function crearApertura({
   cajeroId,
   apertura,
   saldoInicial,
-}: AperturaCajaData) {
+  observaciones,
+}: AperturaCajaData): Promise<ApiResponseData | string | undefined> {
   const server_url = process.env.URL;
   const url = server_url || "";
   try {
@@ -25,13 +25,11 @@ export default async function crearApertura({
         cajeroId,
         apertura,
         saldoInicial,
+        observaciones,
       }),
     });
-    const data: ApiResponseData<AperturaCaja> = await aperturaCaja.json();
+    const data: ApiResponseData = await aperturaCaja.json();
     if (data.error) throw new Error(data.error);
-    if (!data.data) throw new Error("Error al crear la apertura de caja");
-    if (typeof data.data === "undefined")
-      throw new Error("Error al crear la apertura de caja");
     return data;
   } catch (err) {
     if (err instanceof Error) return err.message;

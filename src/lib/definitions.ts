@@ -53,4 +53,16 @@ export type AperturaCajaData = {
   cajeroId: string;
   apertura: Date;
   saldoInicial: number;
+  observaciones?: string;
+};
+
+export type ArqueoCajaData = {
+  aperturaId: string;
+  montoRegistrado: number;
+};
+
+export type CajaData = {
+  id: string;
+  numero: number;
+  deleted: Date | null;
 };

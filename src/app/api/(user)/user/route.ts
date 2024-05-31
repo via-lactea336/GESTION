@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   const body: User = await req.json();
   const { nombre, apellido, docIdentidad, username, password, rol } = body;
   
-  if( !nombre || !apellido || !docIdentidad || !username || !password) return generateApiErrorResponse("Missing username or password", 400) //Validate credentials
+  if( !nombre || !apellido || !docIdentidad || !username || !password) return generateApiErrorResponse("No hay informacion suficiente para la creacion del nuevo usuario", 400) //Validate credentials
 
   if(rol && rol in Roles) return generateApiErrorResponse("El Rol ingresado es invalido", 400)
 

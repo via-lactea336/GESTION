@@ -28,7 +28,7 @@ export default async function actualizarAperturaPorId({
         saldoInicial,
       }),
     });
-    const data: ApiResponseData<AperturaCaja> = await aperturaCaja.json();
+    const data: ApiResponseData = await aperturaCaja.json();
     if (data.error) throw new Error(data.error);
     if (!data.data) throw new Error("Error al actualizar la apertura de caja");
     if (typeof data.data === "undefined")

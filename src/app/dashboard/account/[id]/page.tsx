@@ -1,16 +1,16 @@
 "use client";
-import obtenerCuentaBancariaPorId from "@/lib/cuentaBancaria/obtenerCuentaBancariaPorId";
+import obtenerCuentaBancariaPorId from "@/lib/moduloBanco/cuentaBancaria/obtenerCuentaBancariaPorId";
 import { useParams } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import DetalleCuentasReceipt from "../../../../components/PDF/DetalleCuentas";
-import obtenerOperacionesFiltros from "@/lib/operacion/obtenerOperacionesFiltros";
+import obtenerOperacionesFiltros from "@/lib/moduloBanco/operacion/obtenerOperacionesFiltros";
 import {
   ApiResponseData,
   CuentaBancariaAndBanco,
   OperacionAndTipoOperacion,
 } from "@/lib/definitions";
-import obtenerTiposOperacion from "@/lib/tipoOperacion/obtenerTiposOperacion";
+import obtenerTiposOperacion from "@/lib/moduloBanco/tipoOperacion/obtenerTiposOperacion";
 import { CuentaBancaria } from "@prisma/client";
 import Link from "next/link";
 import {
@@ -22,12 +22,12 @@ import {
   ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import obtenerBancos from "@/lib/banco/obtenerBancos";
+import obtenerBancos from "@/lib/moduloBanco/banco/obtenerBancos";
 import InputCalendar from "@/components/global/InputCalendar";
 import { Toaster, toast } from "sonner";
 import LoadingCirleIcon from "@/components/global/LoadingCirleIcon";
 import Tabla from "@/components/dashboard/account/detalles/Tabla";
-import obtenerCuentaBancaria from "@/lib/cuentaBancaria/obtenerCuentaBancaria";
+import obtenerCuentaBancaria from "@/lib/moduloBanco/cuentaBancaria/obtenerCuentaBancaria";
 export default function AccountDetailsTab() {
   const quantityPerPage = parseInt(process.env.QUANTITY_PER_PAGE || "8");
   const [indicesPagina, setindicesPagina] = useState(0);

@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
  datasource db {
@@ -151,15 +152,19 @@ model User {
 //************************** CAJA **********************************
 
 model Caja {
-  id        String @id @default(uuid())
-  numero    Int @db.Integer @unique
+  id          String @id @default(uuid())
+  numero      Int @db.Integer @unique
   
-  aperturas AperturaCaja[]
+  estaCerrado Boolean @default(true)
 
-  deleted   DateTime?
+  aperturas   AperturaCaja[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  saldo       Decimal @db.Money @default(0)
+
+  deleted     DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model AperturaCaja {
@@ -173,6 +178,7 @@ model AperturaCaja {
 
   movimiento Movimiento[]
   arqueo     ArqueoDeCaja[]
+  registros  RegistroCaja[]
 
   apertura     DateTime @default(now())
 
@@ -271,13 +277,13 @@ model Factura {
 
   esContado Boolean
 
-  total       Decimal @db.Money
+  total            Decimal @db.Money
   totalSaldoPagado Decimal @db.Money
 
   ivaTotal    Decimal  @db.Money
 
   facturaDetalles FacturaDetalles[]
-  recibos Recibos?
+  recibos         Recibos[]
 
   deleted   DateTime?
 
@@ -314,7 +320,7 @@ model Recibos {
   clienteId   String
   
   factura     Factura @relation(references: [id], fields: [facturaId], onDelete: NoAction)
-  facturaId   String @unique
+  facturaId   String 
 
   movimiento Movimiento @relation(references: [id], fields: [movimientoId], onDelete: NoAction)
   movimientoId String
@@ -328,9 +334,10 @@ model Recibos {
 }
 
 model Producto {
-  id        String @id @default(uuid())
+  id        String  @id @default(uuid())
   
-  nombre    String @db.VarChar(128)
+  codigo    String  @unique
+  nombre    String  @db.VarChar(256) @unique
   precio    Decimal @db.Money
   iva       Float?
 
@@ -384,6 +391,37 @@ model Tarjeta {
 
   movimientoDetalles MovimientoDetalle @relation(references: [id], fields: [movimientoId], onDelete: NoAction)
   movimientoId       String
+
+  deleted   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RegistroCaja {
+  id              String @id @default(uuid())
+
+  apertura        AperturaCaja @relation(references: [id], fields: [aperturaId], onDelete: NoAction)
+  aperturaId      String @unique
+
+  montoRegistrado Decimal @db.Money
+  montoEsperado   Decimal @db.Money
+  montoInicial    Decimal @db.Money
+
+  cantCheques     Int
+  cantTarjetas    Int
+
+  //I=E TOTAL
+  montoIngreso    Decimal @db.Money
+  montoEgreso     Decimal @db.Money
+
+  //I=E CHEQUE
+  montoIngresoCheque  Decimal @db.Money
+  montoEgresoCheque   Decimal @db.Money
+
+  //I=E TARJETA
+  montoIngresoTarjeta Decimal @db.Money
+  montoEgresoTarjeta  Decimal @db.Money
 
   deleted   DateTime?
 
