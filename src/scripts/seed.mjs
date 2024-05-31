@@ -227,6 +227,27 @@ async function main() {
     skipDuplicates: true,
   });
   
+  const cajas = await prisma.caja.createMany({
+    data: [
+      {
+        "id": "db639420-1db5-4cee-8f1e-c27435baba47",
+        "numero": 1,
+        "estaCerrado": true,
+      },
+      {
+        "id": "2f353283-8c52-44e8-ac6b-bb807b11b5dd",
+        "numero": 2,
+        "estaCerrado": true,
+      },
+      {
+        "id": "fc103569-4d29-47b6-a43d-786d600c8008",
+        "numero": 3,
+        "estaCerrado": true,
+      }
+    ]
+  })
+
+
   // const cheques = await prisma.cheque.createMany({
   //   data: [
   //     {

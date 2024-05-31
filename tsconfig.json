@@ -12,6 +12,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "typeRoots": ["@/lib/auth/types"],
     "plugins": [
       {
         "name": "next"

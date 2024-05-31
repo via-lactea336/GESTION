@@ -32,14 +32,28 @@ const authOptions: NextAuthOptions = {
         // If everything is correct, return the session
         return {
           id: user.id,
-          username: user.username,
-        };
+          username:user.username,
+          nombre:user.nombre + " " + user.apellido,
+        }
       },
-    }),
+  })
   ],
   callbacks: {
-    async session({ session, user }) {
-      return session || null;
+    async jwt(params) {
+      const {token, user} = params
+      if(user) {
+        token.nombre = user.nombre
+        token.id = user.id
+      }
+      return token
+    }, 
+    async session(params) {
+      const {token, session} = params
+      if (token) {
+        session.user.id = token.id;
+        session.user.nombre = token.nombre;
+      }
+      return session
     },
   },
   pages: {
