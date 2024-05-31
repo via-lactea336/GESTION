@@ -48,7 +48,8 @@ export async function POST(req: NextRequest) {
 
     return generateApiSuccessResponse(
       200,
-      "La apertura de caja fue generada correctamente"
+      "La apertura de caja fue generada correctamente",
+      [aperturaCaja]
     );
   } catch (err) {
     if (err instanceof PrismaClientKnownRequestError && err.code === "P2002")

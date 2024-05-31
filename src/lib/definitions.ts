@@ -66,3 +66,8 @@ export type CajaData = {
   numero: number;
   deleted: Date | null;
 };
+
+export type Cajero = {
+  id: string;
+  nombre: string;
+};
