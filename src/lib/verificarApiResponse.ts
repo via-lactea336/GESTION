@@ -30,7 +30,7 @@ type FetchPlusRes<T> = {
   success: boolean
 }
 
-export const fetchPlus = async <T>(url:string, options?:RequestInit):Promise<FetchPlusRes<T>> => {
+export const fetchPlus = async <T=undefined>(url:string, options?:RequestInit):Promise<FetchPlusRes<T>> => {
   try{
     //Get the response
     const res = await fetch(url, options)
