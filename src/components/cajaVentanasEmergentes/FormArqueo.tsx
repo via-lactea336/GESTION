@@ -4,23 +4,24 @@ import { useRouter } from "next/navigation";
 
 type Params = {
     id: string;
-    exitoArqueo: boolean;
+    monto: number;
 };
 
-export default function FormArqueo({ id, exitoArqueo }: Params) {
+export default function FormArqueo({ id, monto }: Params) {
+    const exitoArqueo = false;
     const router = useRouter();
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         router.push(`/dashboard/caja/1/resumenDiario`);
     };
+    console.log(monto)
+
     return (
-
-
         exitoArqueo? 
             <div>
                 <h1 className="text-white text-center text-2xl">El Cierre de Caja Fue Exitoso</h1><br />
-                <p className="text-white text-left">Numero de arqueo: 1234</p>
                 <p className="text-white text-left">Fecha: 31-05-2024</p>
+                <p className="text-white text-left">Hora: 14:46 {}</p>
                 <p className="text-white text-left">Monto de cierre: 500.000 Gs.</p>
             </div> 
         :

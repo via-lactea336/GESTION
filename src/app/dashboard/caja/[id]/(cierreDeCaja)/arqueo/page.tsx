@@ -1,19 +1,16 @@
 "use client";
-import InputCalendar from "@/components/global/InputCalendar";
 import React, { useState, useEffect } from "react";
 import { Modal } from "@/components/global/Modal";
 import FormArqueo from "@/components/cajaVentanasEmergentes/FormArqueo";
-import { useParams } from "next/navigation";
-import crearArqueo from "@/lib/arqueoCaja/crearArqueo";
-import actualizarArqueoPorId from "@/lib/arqueoCaja/actualizarArqueo";
-import calcularMontoEsperado from "@/lib/moduloCaja/arqueoCaja/calcularMontoEsperado";
-import obtenerCajaPorId from "@/lib/cajas/obtenerCajaPorId";
-import { ApiResponseData } from "@/lib/definitions";
-import { Decimal } from "@prisma/client/runtime/library";
+import { Cajero } from "@/lib/definitions";
+import { obtenerCookie } from "@/lib/obtenerCookie";
+import { AperturaCaja, Caja } from "@prisma/client";
 
 
 export default function Page() {
-  const { id } = useParams();
+  const caja: Caja = obtenerCookie("caja")
+  const cajero: Cajero = obtenerCookie("cajero")
+  const apertura: AperturaCaja = obtenerCookie("apertura")
   const [denominaciones, setDenominaciones] = useState({
     moneda500 : 0,
     moneda1000 : 0,
@@ -26,87 +23,20 @@ export default function Page() {
   })
 
   const [totales, setTotales] = useState({
-    fondoCaja: 0,
+    fondoCaja: apertura.saldoInicial,
     totalEfectivo: 0,
     totalCheque: 0,
     totalTarjetaDebito: 0,
     totalTarjetaCredito: 0,
     montoTotal: 0
   })
-
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState("");
-  const [exitoArqueo, setExitoArqueo] = useState(false);
-
-  const [datosCaja, setDatosCaja] = useState<
-    {
-      id: string;
-      numero: number;
-      estaCerrado: boolean;
-      saldo: Decimal;
-      deleted: Date | null;
-      createdAt: Date;
-      updatedAt: Date;
-    }
-  >();
-
-
-
-  const [montoEsperado, setMontoEsperado] = useState<number>();
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setShowModal(true);
     setSelectedId(e.currentTarget.id);
-
-    if(montoEsperado == totales.montoTotal){
-      realizarCierre();
-    }
   };
-
-  const realizarCierre = async () =>{
-    try {
-      const montoEsperado = await crearArqueo({
-        aperturaId: "",
-        montoRegistrado: totales.montoTotal
-      });
-      if (montoEsperado === undefined || typeof montoEsperado === "string") {
-        throw new Error("Error obteniendo las cuentas");
-      }
-      console.log(montoEsperado)
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  useEffect(() => {
-    const fetchCalculo = async () => {
-      try {
-        const montoEsperado = await calcularMontoEsperado(id as string);
-        if (montoEsperado === undefined || typeof montoEsperado === "string") {
-          throw new Error("Error obteniendo las cuentas");
-        }
-        console.log(montoEsperado)
-        setMontoEsperado(montoEsperado);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    const fetchCaja = async () =>{
-      try {
-        const caja = await obtenerCajaPorId(id as string);
-        if (caja === undefined || typeof caja === "string" || !caja) {
-          throw new Error("Error obteniendo las cuentas");
-        }
-        console.log(caja.data)
-        setDatosCaja(caja.data);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    fetchCalculo();
-    fetchCaja();
-  }, [id]);
 
 
   const handleChange = (
@@ -117,7 +47,7 @@ export default function Page() {
     const { name, value } = e.target;
     setDenominaciones({
       ...denominaciones,
-      [name]: value,
+      [name]: Number(value),
     });
   };
 
@@ -129,13 +59,12 @@ export default function Page() {
     const { name, value } = e.target;
     setTotales({
       ...totales,
-      [name]: value,
+      [name]: Number(value),
     });
   };
 
   useEffect(() => {
     let total = 0;
-    let monto = 0;
     total += denominaciones.moneda500 * 500;
     total += denominaciones.moneda1000 * 1000;
     total += denominaciones.billete2000 * 2000;
@@ -144,17 +73,25 @@ export default function Page() {
     total += denominaciones.billete20000 * 20000;
     total += denominaciones.billete50000 * 50000;
     total += denominaciones.billete100000 * 100000;
+    setTotales({
+      ...totales,
+      ["totalEfectivo"] : total
+    })
+    console.log(totales.totalEfectivo)
+  }, [denominaciones]);
 
+  useEffect(() => {
+    let monto = 0;
     monto += totales.totalCheque * 1;
     monto += totales.totalTarjetaCredito * 1;
     monto += totales.totalTarjetaDebito * 1;
-    monto += total * 1;
+    monto += totales.totalEfectivo * 1
+    monto += Number(totales.fondoCaja) * 1
     setTotales({
       ...totales,
-      ["totalEfectivo"] : total,
-      ["montoTotal"]: monto
+      ["montoTotal"] : monto
     })
-  }, [denominaciones]);
+  }, [totales]);
 
   return (
     <div>
@@ -162,7 +99,10 @@ export default function Page() {
         <div className="flex flex-row ">
           <h1 className="text-3xl font-bold mt-2 mb-2">Arqueo de caja</h1>
           <p className="font-bold mt-4 mb-2 ml-auto">
-            N° Caja : {datosCaja?.numero}
+            Cajero : {cajero.nombre}
+          </p>
+          <p className="font-bold mt-4 mb-2 ml-10">
+            N° Caja : {caja.numero}
           </p>
         </div>
       </div>
@@ -172,18 +112,16 @@ export default function Page() {
         <div className="bg-primary-500 flex flex-col p-5 rounded-md mb-auto">
           <h1 className="text-center text-xl">Según Cajero</h1>
           <div className="m-5 flex justify-between">
-            <label>Fondo de Caja</label>
-            <input type="number" value={totales.fondoCaja} 
-              className="ml-10 rounded-md bg-gray-600 text-center"
-              name="fondoCaja" 
-              onChange={handleChangeTotales}
-            />
+            <label>Apertura</label>
+            <div className="ml-10 rounded-md bg-gray-600 min-w-[195px] text-center">
+              {Number(totales.fondoCaja).toLocaleString('de-DE')}
+            </div>
           </div>
-
           <div className="m-5 flex justify-between">
             <label>Efectivo</label>
             <div className="ml-10 rounded-md bg-gray-600 min-w-[195px] text-center">
               {totales.totalEfectivo.toLocaleString('de-DE')}
+              
             </div>
           </div>
 
@@ -197,7 +135,7 @@ export default function Page() {
           </div>
 
           <div className="m-5 flex justify-between">
-            <label>Tarjeta Crédito</label>
+            <label>Tarj. Crédito</label>
             <input type="number" value={totales.totalTarjetaCredito} 
               className="ml-10 rounded-md bg-gray-600 text-center" 
               name="totalTarjetaCredito" 
@@ -206,7 +144,7 @@ export default function Page() {
           </div>
 
           <div className="m-5 flex justify-between">
-            <label>Tarjeta Débito</label>
+            <label>Tarj. Débito</label>
             <input type="number" value={totales.totalTarjetaDebito} 
               className="ml-10 rounded-md  bg-gray-600 text-center" 
               name="totalTarjetaDebito" 
@@ -230,8 +168,8 @@ export default function Page() {
           <table className="text-center text-white min-w-[400px] ml-10">
             <thead className="bg-primary-700 text-black">
               <tr>
-                <th className="px-4 py-2 min-w-[190px]">Denominacion</th>
-                <th className="px-4 py-2 min-w-[190px]">Cantidad</th>
+                <th className="px-4 py-2 ">Denominacion</th>
+                <th className="px-4 py-2">Cantidad</th>
                 <th className="px-4 py-2 min-w-[190px]">Total</th>
               </tr>
             </thead>
@@ -364,7 +302,7 @@ export default function Page() {
         <div className="flex items-center justify-center h-screen">
           <div className="absolute top-1/3 w-full">
             <Modal setShowModal={setShowModal}>
-              <FormArqueo id={selectedId} exitoArqueo={exitoArqueo}/>
+              <FormArqueo id={selectedId} monto={totales.montoTotal}/>
             </Modal>
           </div>
         </div>
