@@ -3,8 +3,17 @@ import InputCalendar from "@/components/global/InputCalendar";
 import React, { useState, useEffect } from "react";
 import { Modal } from "@/components/global/Modal";
 import FormArqueo from "@/components/cajaVentanasEmergentes/FormArqueo";
+import { useParams } from "next/navigation";
+import crearArqueo from "@/lib/arqueoCaja/crearArqueo";
+import actualizarArqueoPorId from "@/lib/arqueoCaja/actualizarArqueo";
+import calcularMontoEsperado from "@/lib/moduloCaja/arqueoCaja/calcularMontoEsperado";
+import obtenerCajaPorId from "@/lib/cajas/obtenerCajaPorId";
+import { ApiResponseData } from "@/lib/definitions";
+import { Decimal } from "@prisma/client/runtime/library";
+
 
 export default function Page() {
+  const { id } = useParams();
   const [denominaciones, setDenominaciones] = useState({
     moneda500 : 0,
     moneda1000 : 0,
@@ -24,24 +33,81 @@ export default function Page() {
     totalTarjetaCredito: 0,
     montoTotal: 0
   })
-  const datos = {
-    caja: {
-      nombreCaja: "Caja1",
-      numeroCaja: 3,
-      esActiva: false,
-    },
-    nombreCuenta: "Pablo Escobar",
-    numeroArqueo: 2,
-    fecha: "23-05-2024",
-  };
 
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState("");
+  const [exitoArqueo, setExitoArqueo] = useState(false);
+
+  const [datosCaja, setDatosCaja] = useState<
+    {
+      id: string;
+      numero: number;
+      estaCerrado: boolean;
+      saldo: Decimal;
+      deleted: Date | null;
+      createdAt: Date;
+      updatedAt: Date;
+    }
+  >();
+
+
+
+  const [montoEsperado, setMontoEsperado] = useState<number>();
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setShowModal(true);
     setSelectedId(e.currentTarget.id);
+
+    if(montoEsperado == totales.montoTotal){
+      realizarCierre();
+    }
   };
+
+  const realizarCierre = async () =>{
+    try {
+      const montoEsperado = await crearArqueo({
+        aperturaId: "",
+        montoRegistrado: totales.montoTotal
+      });
+      if (montoEsperado === undefined || typeof montoEsperado === "string") {
+        throw new Error("Error obteniendo las cuentas");
+      }
+      console.log(montoEsperado)
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  useEffect(() => {
+    const fetchCalculo = async () => {
+      try {
+        const montoEsperado = await calcularMontoEsperado(id as string);
+        if (montoEsperado === undefined || typeof montoEsperado === "string") {
+          throw new Error("Error obteniendo las cuentas");
+        }
+        console.log(montoEsperado)
+        setMontoEsperado(montoEsperado);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const fetchCaja = async () =>{
+      try {
+        const caja = await obtenerCajaPorId(id as string);
+        if (caja === undefined || typeof caja === "string" || !caja) {
+          throw new Error("Error obteniendo las cuentas");
+        }
+        console.log(caja.data)
+        setDatosCaja(caja.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchCalculo();
+    fetchCaja();
+  }, [id]);
+
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -95,38 +161,9 @@ export default function Page() {
       <div className="p-10 -mt-7 bg-primary-800" >
         <div className="flex flex-row ">
           <h1 className="text-3xl font-bold mt-2 mb-2">Arqueo de caja</h1>
-          <p className="ml-auto font-bold mt-4 mb-2">
-            vendedor : {datos.nombreCuenta}
+          <p className="font-bold mt-4 mb-2 ml-auto">
+            N° Caja : {datosCaja?.numero}
           </p>
-          <p className="font-bold mt-4 mb-2 ml-10">
-            N° Caja : {datos.caja.numeroCaja}
-          </p>
-        </div>
-        <div className="flex justify-between mt-5">
-          <div>
-            <h1>Arqueo N° : {datos.numeroArqueo}</h1>
-            <h1 className="mt-3">Fecha del Arqueo : {datos.fecha}</h1>
-          </div>
-          <div>
-            <h1>N° Cajero : 3</h1>
-            <h1 className="mt-3">Estacion :</h1>
-          </div>
-          <div>
-            <div className="flex flex-row">
-              <h1>Fecha desde</h1>
-              <InputCalendar
-                id="fechaMin"
-                className="bg-gray-800 text-white py-1 px-2 rounded-md ml-5"
-              />
-            </div>
-            <div className="flex flex-row">
-              <h1 className="mt-3">Fecha hasta</h1>
-              <InputCalendar
-                id="fechaMin"
-                className="bg-gray-800 text-white py-1 px-2 rounded-md ml-6 mt-3"
-              />
-            </div>
-          </div>
         </div>
       </div>
       <div className={
@@ -327,7 +364,7 @@ export default function Page() {
         <div className="flex items-center justify-center h-screen">
           <div className="absolute top-1/3 w-full">
             <Modal setShowModal={setShowModal}>
-              <FormArqueo id={selectedId} />
+              <FormArqueo id={selectedId} exitoArqueo={exitoArqueo}/>
             </Modal>
           </div>
         </div>
