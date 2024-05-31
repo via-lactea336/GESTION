@@ -6,13 +6,17 @@ interface ResumenDeCajaProps {
   dineroEnCaja: number;
   diferencia: number;
   fecha: string; 
+  caja:string;
 }
 
-const ResumenDeCaja: React.FC<ResumenDeCajaProps> = ({ estado, cajaInicial, dineroEnCaja, diferencia,fecha }) => {
+const ResumenDeCaja: React.FC<ResumenDeCajaProps> = ({ estado, cajaInicial, dineroEnCaja, diferencia,fecha,caja }) => {
   return (
     <div className="mb-6 bg-gray-700 shadow-lg p-6 ">
     <h2 className=" mb-4 font-bold">Resumen de Caja</h2>
-    <p className="mb-2 text-sm text-withe">Fecha: {fecha}</p> {/* Aquí se muestra la fecha */}
+    <div className="flex space-x-8 mb-4">
+        <p className=" text-white">Fecha: {fecha}</p> 
+        <p className=" text-white">Caja: {caja}</p>
+      </div>
       <table className="border-collapse border border-black table-auto mx-auto w-full">
         
         <tbody>
