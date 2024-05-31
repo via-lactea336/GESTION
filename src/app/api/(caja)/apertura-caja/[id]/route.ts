@@ -2,6 +2,8 @@ import prisma from "@/lib/prisma";
 import { AperturaCaja, Caja } from "@prisma/client";
 import { NextRequest } from "next/server";
 import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiResponse";
+import authOptions from "@/lib/auth/options";
+import { getServerSession } from "next-auth";
 
 export async function GET(req:NextRequest, { params }: { params: { id: string } }) {
 

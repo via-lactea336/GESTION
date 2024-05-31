@@ -1,5 +1,6 @@
 import { AperturaCaja } from "@prisma/client";
 import { ApiResponseData } from "../definitions";
+import { fetchPlus } from "../verificarApiResponse";
 
 /**
  * Permite actualizar una apertura de caja
@@ -15,8 +16,9 @@ export default async function actualizarAperturaPorId({
 }: AperturaCaja) {
   const server_url = process.env.URL;
   const url = server_url || "";
-  try {
-    const aperturaCaja = await fetch(`${url}/api/apertura-caja/${id}`, {
+
+  //Return { success, data?, message?, error? }
+  return await fetchPlus(`${url}/api/apertura-caja/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -27,14 +29,5 @@ export default async function actualizarAperturaPorId({
         apertura,
         saldoInicial,
       }),
-    });
-    const data: ApiResponseData = await aperturaCaja.json();
-    if (data.error) throw new Error(data.error);
-    if (!data.data) throw new Error("Error al actualizar la apertura de caja");
-    if (typeof data.data === "undefined")
-      throw new Error("Error al actualizar la apertura de caja");
-    return data;
-  } catch (err) {
-    if (err instanceof Error) return err.message;
-  }
+  })
 }

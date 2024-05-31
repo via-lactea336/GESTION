@@ -12,14 +12,14 @@ export default async function Page() {
         <span>{session ? session.user.nombre : "Desconocido"}</span>
         <span>{new Date().toISOString().split("T")[0]}</span>
       </Header>
-      {session ? (
+      {session?.user.rol === "CAJERO" || session?.user.rol === "ADMIN" ? (
         <ContenedorCajas
           cajeroId={session.user.id}
           cajeroNombre={session.user.nombre}
         />
       ) : (
         <div className="flex justify-center items-center h-96">
-          <p className="text-2xl">Inicia sesión para continuar</p>
+          <p className="text-2xl">Debe ser un cajero para continuar</p>
         </div>
       )}
     </div>

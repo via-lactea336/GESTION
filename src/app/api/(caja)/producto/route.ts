@@ -16,11 +16,13 @@ export async function POST(req: NextRequest) {
    } = body;
 
   if(!nombre || !precio || !codigo ) return generateApiErrorResponse("Faltan datos para el producto", 400)
-
+  if(precio.lessThanOrEqualTo(0)) return generateApiErrorResponse("El precio debe ser mayor a 0", 400)
+  if(iva && iva <= 0) return generateApiErrorResponse("El iva debe ser mayor a 0", 400)
+  
   try{
     const producto = await prisma.producto.create({
       data: {
-        nombre, 
+        nombre:nombre.toUpperCase(), 
         precio,
         iva,
         codigo
