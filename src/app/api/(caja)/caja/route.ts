@@ -30,6 +30,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const cajas = await prisma.caja.findMany()
+  const cajas = await prisma.caja.findMany({
+    orderBy: {
+      numero: 'asc'
+    }
+  })
   return generateApiSuccessResponse(200, "Exito al obtener la lista de cajas", cajas)
 }

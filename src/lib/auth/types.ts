@@ -1,5 +1,6 @@
 // types/next-auth.d.ts
 import NextAuth from "next-auth";
+import { Roles } from "@prisma/client";
 
 declare module "next-auth" {
   /**
@@ -11,12 +12,14 @@ declare module "next-auth" {
       id: string;
       /** The user's name. */
       nombre: string;
+      rol: Roles
     };
   }
 
   interface User {
     id: string;
     nombre: string;
+    rol: Roles
   }
 }
 
@@ -24,5 +27,6 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     nombre: string;
+    rol: Roles
   }
 }
