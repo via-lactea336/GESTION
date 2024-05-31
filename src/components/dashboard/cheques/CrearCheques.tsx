@@ -45,9 +45,7 @@ const CrearCheques = () => {
   const obtenerYMostrarCuentasBancarias = async () => {
     try {
       const cuentasData = await obtenerCuentaBancaria();
-
       if (cuentasData === undefined || typeof cuentasData === "string") return;
-
       setCuentasBancarias(cuentasData.data ?? estadoInicial);
     } catch (error) {
       console.error("Error al obtener los tipos de operacion:", error);
