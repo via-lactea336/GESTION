@@ -4,6 +4,7 @@ import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
 import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiResponse";
 
 import { Movimiento, MovimientoDetalle } from "@prisma/client";
+import reflejarMovimiento from "@/lib/moduloCaja/movimiento/reflejarMovimiento";
 
 export async function POST(req: NextRequest) {
   
@@ -21,6 +22,17 @@ export async function POST(req: NextRequest) {
         monto: mov.monto,
         aperturaId: mov.aperturaId, 
         esIngreso: mov.esIngreso
+      },
+      include:{
+        apertura:{
+          include:{
+            caja:{
+              select:{
+                id:true
+              }
+            }
+          }
+        }
       }
     })
   
@@ -33,10 +45,13 @@ export async function POST(req: NextRequest) {
       )
       if(movimiento.monto.greaterThan(sum)) return generateApiErrorResponse("La suma de los movimientos detalle no coincide con el monto del movimiento", 400)
       await prisma.movimientoDetalle.createMany({
-        data:movsDetalles, 
+        data:movsDetalles.map(m => ({...m, movimientoId:movimiento.id})),
         skipDuplicates: true
       })
     }
+
+    //Reflejar el movimiento en el saldo de la caja
+    await reflejarMovimiento(movimiento.apertura.caja.id, mov.monto, mov.esIngreso)
 
     return generateApiSuccessResponse(200, "El movimiento fue generada correctamente")
   

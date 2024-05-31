@@ -159,6 +159,8 @@ model Caja {
 
   aperturas   AperturaCaja[]
 
+  saldo       Decimal @db.Money @default(0)
+
   deleted     DateTime?
 
   createdAt   DateTime @default(now())
