@@ -34,7 +34,6 @@ export default function FormArqueo({ id, monto }: Params) {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        router.push("/dashboard/caja/1/resumenDiario");
     };
 
     return (
@@ -89,5 +88,5 @@ export default function FormArqueo({ id, monto }: Params) {
                 Finalizar Cierre
             </button>
         </form>
-    );
+    );
 }
