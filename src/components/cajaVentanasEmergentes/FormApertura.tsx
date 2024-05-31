@@ -1,47 +1,62 @@
 "use client";
 import Input from "@/components/global/Input";
-import InputCalendar from "@/components/global/InputCalendar";
 import crearApertura from "@/lib/aperturaCaja/crearApertura";
-import { AperturaCajaData } from "@/lib/definitions";
+import { AperturaCajaData, CajaData } from "@/lib/definitions";
 import verificarApiResponse from "@/lib/verificarApiResponse";
-import { AperturaCaja, Caja } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Toaster, toast } from "sonner";
 import LoadingCirleIcon from "../global/LoadingCirleIcon";
-
+import Cookie from "js-cookie";
+import { AperturaCaja, ArqueoDeCaja, Caja } from "@prisma/client";
 type Params = {
-  id: string;
+  caja: Caja;
   cajeroId: string;
+  cajeroNombre: string;
 };
 
-export default function FormApertura({ id, cajeroId }: Params) {
+export default function FormApertura({ caja, cajeroId, cajeroNombre }: Params) {
   const initialData = {
-    cajaId: id,
+    cajaId: caja.id,
     cajeroId: cajeroId,
     apertura: new Date(),
     saldoInicial: 0,
     observaciones: "",
   };
-  const [data, setData] = useState<AperturaCajaData>(initialData);
+  const [dataApertura, setDataApertura] =
+    useState<AperturaCajaData>(initialData);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    const response = await crearApertura(data);
-    const { success, mensaje } = verificarApiResponse(response);
+    const response = await crearApertura(dataApertura);
+    const { success, mensaje, data } =
+      verificarApiResponse<AperturaCaja>(response);
     if (success) {
       toast.success(mensaje);
       setLoading(false);
-      router.push(`/dashboard/caja/${id}/ingreso`);
+      const cajero = {
+        id: cajeroId,
+        nombre: cajeroNombre,
+      };
+      // crear una cookie con los datos de la caja
+      Cookie.set("cajero", JSON.stringify(cajero), {
+        expires: 100,
+      });
+      caja.estaCerrado = false;
+      Cookie.set("caja", JSON.stringify(caja), { expires: 100 });
+      if (data[0]) {
+        Cookie.set("apertura", JSON.stringify(data[0]), { expires: 100 });
+      }
+      router.push(`/dashboard/caja/${caja.id}/ingreso`);
     } else {
       setLoading(false);
       toast.message(mensaje);
     }
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setData((prev) => ({
+    setDataApertura((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
