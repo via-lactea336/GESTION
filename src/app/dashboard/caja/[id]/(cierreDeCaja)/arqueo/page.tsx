@@ -22,14 +22,13 @@ export default function Page() {
     billete100000: 0,
   });
 
-  const [montoTotal, setMontoTotal] = useState(0);
-
   const [totales, setTotales] = useState({
     fondoCaja: apertura.saldoInicial,
     totalEfectivo: 0,
     totalCheque: 0,
     totalTarjetaDebito: 0,
     totalTarjetaCredito: 0,
+    montoTotal: 0,
   });
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState("");
@@ -87,7 +86,10 @@ export default function Page() {
     monto += totales.totalTarjetaDebito * 1;
     monto += totales.totalEfectivo * 1;
     monto += Number(totales.fondoCaja) * 1;
-    setMontoTotal(monto);
+    setTotales({
+      ...totales,
+      ["montoTotal"]: monto,
+    });
   }, [totales]);
 
   return (
@@ -162,7 +164,7 @@ export default function Page() {
           <div className="m-5 flex justify-between">
             <label>Total Ingresos</label>
             <div className="ml-10 rounded-md bg-gray-600 min-w-[195px] text-center">
-              {montoTotal.toLocaleString("de-DE")}
+              {totales.montoTotal.toLocaleString("de-DE")}
             </div>
           </div>
 
@@ -372,7 +374,7 @@ export default function Page() {
         <div className="flex items-center justify-center h-screen">
           <div className="absolute top-1/3 w-full">
             <Modal setShowModal={setShowModal}>
-              <FormArqueo id={apertura.id} monto={montoTotal} />
+              <FormArqueo id={selectedId} monto={totales.montoTotal} />
             </Modal>
           </div>
         </div>
