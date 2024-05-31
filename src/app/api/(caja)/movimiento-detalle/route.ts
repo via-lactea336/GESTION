@@ -16,6 +16,8 @@ export async function POST(req: NextRequest) {
 
   if(!movimientoId || !monto ) return generateApiErrorResponse("Faltan datos para el movimiento detalle", 400)
 
+  if(monto.lessThanOrEqualTo(0)) return generateApiErrorResponse("El monto debe ser mayor a 0", 400)
+
   try{
     const movimientoDetalle = await prisma.movimientoDetalle.create({
       data: {
