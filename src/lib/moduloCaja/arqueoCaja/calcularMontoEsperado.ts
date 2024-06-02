@@ -21,20 +21,23 @@ export default async function calcularMontoEsperado(aperturaId:string){
   const movs = await prisma.movimiento.findMany({
     where:{
       aperturaId:aperturaId
+    },
+    include:{
+      movimientoDetalles: true
     }
   })
 
   if(!movs) throw new Error("No se pudieron encontrar los movimientos ligados a su apertura de caja")
 
-  //La sumatoria de montos, negativo y positivo
-  const sum = movs.reduce(
-    (total, mov) => {
-      if(mov.esIngreso){
-        return total + (+mov.monto)
-      }else{
-        return total + (-1 * +mov.monto)
-      }
-    }, Number(apertura.saldoInicial))
+  let sum = +apertura.saldoInicial;
+
+  movs.forEach((mov) => {
+    sum += mov.movimientoDetalles.reduce((total, movDet) => {
+      if (movDet.metodoPago === 'EFECTIVO') {
+        return total + (mov.esIngreso ? +movDet.monto : -movDet.monto);
+      }else return total + 0
+    }, 0)
+  })
 
   return sum
 }

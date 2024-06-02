@@ -9,7 +9,7 @@ export default function Page() {
   const caja: Caja = obtenerCookie("caja");
   return (
     <>
-      <Header title="Punto de venta" className="-mt-8">
+      <Header title="Cobro Facturas" className="-mt-8">
         <h3>{cajero.nombre}</h3>
         <h3>Caja N° {caja.numero}</h3>
       </Header>
