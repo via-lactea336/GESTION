@@ -46,6 +46,9 @@ export async function GET(request: NextRequest) {
     where: where as any,
     orderBy:{
       createdAt: "desc"
+    },
+    include: {
+      cliente: true
     }
   });
 
