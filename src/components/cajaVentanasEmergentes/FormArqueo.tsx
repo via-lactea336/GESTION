@@ -1,20 +1,13 @@
 "use client";
-import Input from "@/components/global/Input";
 import cerrarCajaAdmin from "@/lib/aperturaCaja/cerrarCajaAdmin";
 import { login } from "@/lib/auth/login";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import PasswordField from "../auth/PasswordField";
 import { AperturaCaja, Caja } from "@prisma/client";
 import { obtenerCookie } from "@/lib/obtenerCookie";
-import { Cajero } from "@/lib/definitions";
 
-type Params = {
-    exito: boolean,
-    monto: number
-};
 
-export default function FormArqueo({exito, monto}: Params) {
+export default function FormArqueo() {
     const router = useRouter();
     const caja: Caja = obtenerCookie("caja");
     const apertura: AperturaCaja = obtenerCookie("apertura");
@@ -36,16 +29,6 @@ export default function FormArqueo({exito, monto}: Params) {
     };
 
     return (
-        exito? 
-            <div className="mt-20">
-                <h1 className="text-white text-center text-2xl">El Cierre de Caja Fue Exitoso</h1><br />
-                <p className="text-white text-left"></p>
-                <p className="text-white text-left"></p>
-                <p className="text-white text-left">Monto de cierre: {monto} Gs.</p>
-            </div> 
-        :
-
-
         <form className="flex flex-col w-full gap-4" onSubmit={handleSubmit}>
             <h1 className="text-center text-2xl">Hubo un error durante el cierre de caja</h1>
             <p className="text-sm text-center">Para continuar con el cierre ingrese la contraseña de autorizacion del gerente</p>

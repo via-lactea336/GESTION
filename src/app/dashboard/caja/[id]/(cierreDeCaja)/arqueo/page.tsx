@@ -5,14 +5,15 @@ import FormArqueo from "@/components/cajaVentanasEmergentes/FormArqueo";
 import { ArqueoCajaData, Cajero } from "@/lib/definitions";
 import { obtenerCookie } from "@/lib/obtenerCookie";
 import { AperturaCaja, Caja } from "@prisma/client";
+import { useRouter } from "next/navigation";
 import Input from "@/components/global/Input";
 import crearArqueo from "@/lib/arqueoCaja/crearArqueo";
 
 export default function Page() {
+  const router = useRouter();
   const caja: Caja = obtenerCookie("caja");
   const cajero: Cajero = obtenerCookie("cajero");
   const apertura: AperturaCaja = obtenerCookie("apertura");
-  const [exito, setExito]= useState(false);
   const [denominaciones, setDenominaciones] = useState({
     moneda500: 0,
     moneda1000: 0,
@@ -50,11 +51,11 @@ export default function Page() {
           throw new Error("Error obteniendo las cuentas");
       }
       console.log(response);
-      setExito(true);
+      router.push("/dashboard/caja");
     } catch (error) {
         console.error(error);
+        setShowModal(true);
     }
-    setShowModal(true);
   }
 
   useEffect(() => {
@@ -289,7 +290,7 @@ export default function Page() {
           </table>
         </div>
         <div className="-mt-20">
-          <h1 className="mb-5">Total En Efectivo: {totalEfectivo}</h1>
+          <h1 className="mb-5 mt-10">Total En Efectivo: {totalEfectivo}</h1>
           <button className="bg-primary-400 p-3 min-w-[300px]" onClick={verificarCierre}>Realizar Cierre</button>
         </div>
       </div>
@@ -297,10 +298,7 @@ export default function Page() {
         <div className="flex items-center justify-center h-screen">
           <div className="absolute top-20 w-full">
             <Modal setShowModal={setShowModal}>
-              <FormArqueo 
-                exito = {exito} 
-                monto = {totalEfectivo}
-              />
+              <FormArqueo/>
             </Modal>
           </div>
         </div>
