@@ -4,94 +4,52 @@ const prisma = new PrismaClient();
 
 async function main() {
 
-    // productos de ferreteria
-    const productos = await prisma.producto.createMany({
+    const detalleMovimientos = await prisma.movimientoDetalle.createMany({
         data: [
             {
-                nombre:"Martillo de carpintero",
-                precio: 250000,
-                codigo: "001",
+                movimientoId: "579ed428-b2e6-4da4-ae53-ea5b00068137",
+                monto: 100000,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                deleted:null,
+                metodoPago: "EFECTIVO",
             },
             {
-                nombre:"Taladro inalambrico",
-                precio: 750000,
-                codigo: "002",
+                movimientoId:"840eac3b-28d8-4fb2-80c7-053fee78656e",
+                monto: 50000,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                deleted:null,
+                metodoPago: "EFECTIVO",
             },
             {
-                nombre:"Cinta metrica",
-                precio: 50000,
-                codigo: "003",
+                movimientoId: "cdd3b710-48ce-4253-b842-39858fef7dd7",
+                monto: 200000,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                deleted:null,
+                metodoPago: "EFECTIVO",
             },
             {
-                nombre:"Caja de herramientas",
-                precio: 350000,
-                codigo: "004",
+                movimientoId: "be1f3a4b-67e2-4219-b83f-fd4e1e6a5163",
+                monto: 100000,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                deleted:null,
+                metodoPago: "EFECTIVO",
             },
             {
-                nombre:"Sierra electrica",
-                precio: 450000,
-                codigo: "005",
+                movimientoId: "c032da29-bb2c-4254-bf7f-89f5414b0cba",
+                monto: 300000,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                deleted:null,
+                metodoPago: "EFECTIVO",
             },
             {
-                nombre:"Llave de tubo",
-                precio: 150000,
-                codigo: "006",
+                movimientoId: "0dbd3dcb-f5a9-43d3-bfa8-d8754040f111",
+                monto: 150000,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                deleted:null,
-            },
-            {
-                nombre:"Destornillador",
-                precio: 75000,
-                codigo: "007",
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                deleted:null,
-            },
-            {
-                nombre:"Clavos de acero",
-                precio: 20000,
-                codigo: "008",
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                deleted:null,
-            },
-            {
-                nombre:"Tornillos de acero",
-                precio: 25000,
-                codigo: "009",
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                deleted:null,
-            },
-            {
-                nombre:"Pegamento de contacto",
-                precio: 30000,
-                codigo: "010",
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                deleted:null,
-            
-            },
+                metodoPago: "EFECTIVO",
+            },    
         ],
-        skipDuplicates: true,
     });
-
 }
 
 main()

@@ -1,5 +1,7 @@
 import React from "react";
 import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
+import { getCurrentDate } from "@/lib/getCurrentDate";
+import { obtenerCookie } from "@/lib/obtenerCookie";
 
 // Definición de los tipos de los props
 type TransferReceiptProps = {
@@ -14,6 +16,7 @@ type TransferReceiptProps = {
   nombreOrigen: string;
   numCuentaOrigen: string;
   bancoOrigen: string;
+  userName: string;
 };
 
 function TransferReceipt({
@@ -28,6 +31,7 @@ function TransferReceipt({
   nombreOrigen,
   numCuentaOrigen,
   bancoOrigen,
+  userName,
 }: TransferReceiptProps) {
   // Create styles
   const styles = StyleSheet.create({
@@ -46,6 +50,7 @@ function TransferReceipt({
       justifyContent: "space-between",
       alignItems: "center",
       marginBottom: 5,
+      marginTop: 5,
     },
     title: {
       fontSize: 20,
@@ -77,8 +82,18 @@ function TransferReceipt({
           <Text style={styles.title}>
             Comprobante de Transferencia - {tipoOperacion}
           </Text>
+          <View style={styles.view}>
+            <View style={styles.section}>
+              <Text style={styles.subtitle}>Generado por:</Text>
+              <Text style={styles.text}>{userName}</Text>
+            </View>
+            <View style={styles.section}>
+              <Text style={styles.subtitle}>Fecha de Genaración:</Text>
+              <Text style={styles.text}>{getCurrentDate()}</Text>
+            </View>
+          </View>
           <View style={styles.section}>
-            <Text style={styles.subtitle}>Fecha:</Text>
+            <Text style={styles.subtitle}>Fecha de Operación:</Text>
             <Text style={styles.text}>{dateTime}</Text>
           </View>
         </View>

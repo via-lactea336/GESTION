@@ -1,12 +1,12 @@
-import React from "react";
 import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
 import { CuentaBancaria } from "@prisma/client";
 import { OperacionAndTipoOperacion } from "@/lib/definitions";
-
+import { getCurrentDate } from "@/lib/getCurrentDate";
 // Definición de los tipos de los props
 type TransferReceiptProps = {
   operaciones: OperacionAndTipoOperacion[];
   cuenta: CuentaBancaria;
+  userName: string;
 };
 
 const formatDate = (dateString: Date) => {
@@ -20,7 +20,11 @@ const formatDate = (dateString: Date) => {
   return formattedDate;
 };
 
-function detalleCuentaReceipt({ operaciones, cuenta }: TransferReceiptProps) {
+function DetalleCuentaReceipt({
+  operaciones,
+  cuenta,
+  userName,
+}: TransferReceiptProps) {
   // Create styles
   const styles = StyleSheet.create({
     page: {
@@ -113,6 +117,10 @@ function detalleCuentaReceipt({ operaciones, cuenta }: TransferReceiptProps) {
                 <Text style={styles.subtitle}>Número de Cuenta:</Text>
                 <Text style={styles.text}>{cuenta.numeroCuenta}</Text>
               </View>
+              <View style={styles.section}>
+                <Text style={styles.subtitle}>Generado por:</Text>
+                <Text style={styles.text}>{userName}</Text>
+              </View>
             </View>
             <View>
               <View style={styles.section}>
@@ -124,6 +132,10 @@ function detalleCuentaReceipt({ operaciones, cuenta }: TransferReceiptProps) {
                 <Text style={styles.text}>
                   {Number(cuenta.saldoDisponible)}
                 </Text>
+              </View>
+              <View style={styles.section}>
+                <Text style={styles.subtitle}>Fecha de Genaración:</Text>
+                <Text style={styles.text}>{getCurrentDate()}</Text>
               </View>
             </View>
           </View>
@@ -212,4 +224,4 @@ function detalleCuentaReceipt({ operaciones, cuenta }: TransferReceiptProps) {
   );
 }
 
-export default detalleCuentaReceipt;
+export default DetalleCuentaReceipt;

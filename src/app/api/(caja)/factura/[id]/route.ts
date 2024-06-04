@@ -62,7 +62,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         id
       },
       data: newData
-    });
+    })
 
     return generateApiSuccessResponse(200, `La factura fue actualizada`, factura);
   } catch (error) {
