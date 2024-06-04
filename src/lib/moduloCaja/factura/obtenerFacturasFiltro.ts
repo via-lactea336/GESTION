@@ -1,5 +1,8 @@
-import { ApiResponseData } from "@/lib/definitions";
-import { Factura } from "@prisma/client";
+import { ApiResponseData, DatosFiltrados } from "@/lib/definitions";
+import { fetchPlus } from "@/lib/verificarApiResponse";
+import { Cliente, Factura } from "@prisma/client";
+
+export type FacturaCliente = Factura&{cliente:Cliente}
 
 export type Filter = {
   fechaDesde?: string;
@@ -30,21 +33,7 @@ export default async function obtenerFacturasFiltro(
 
   const server_url = process.env.URL;
   const url = server_url || "";
-  try {
-    const aperturasCaja = await fetch(`${url}/api/factura/search?${queryString.trim()}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data: ApiResponseData<Factura[]> = await aperturasCaja.json();
-    if (data.error) throw new Error(data.error);
-    if (!data.data) throw new Error("Error al obtener las facturas");
-    if (data.data.length === 0)
-      throw new Error("No hay facturas con estas caracteristicas");
-    if (typeof data.data === "undefined")
-      throw new Error("Error al obtener las facturas");
-    return data;
-  } catch (err) {
-    if (err instanceof Error) return err.message;
-  }
+
+  
+  return await fetchPlus<DatosFiltrados<FacturaCliente>>(`${url}/api/factura/search?${queryString}`)
 }
