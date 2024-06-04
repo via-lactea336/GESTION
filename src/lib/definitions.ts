@@ -71,3 +71,7 @@ export type Cajero = {
   id: string;
   nombre: string;
 };
+
+export type UserWithName = {
+  name: string;
+};
