@@ -40,23 +40,23 @@ export default function Page() {
     });
   };
 
-  const verificarCierre = async() =>{
+  const verificarCierre = async () => {
     try {
       const arqueo: ArqueoCajaData = {
         aperturaId: apertura.id,
-        montoRegistrado: totalEfectivo
-      }
+        montoRegistrado: totalEfectivo,
+      };
       const response = await crearArqueo(arqueo);
       if (response === undefined || typeof response === "string") {
-          throw new Error("Error obteniendo las cuentas");
+        throw new Error("Error obteniendo las cuentas");
       }
       console.log(response);
       router.push("/dashboard/caja");
     } catch (error) {
-        console.error(error);
-        setShowModal(true);
+      console.error(error);
+      setShowModal(true);
     }
-  }
+  };
 
   useEffect(() => {
     let total = 0;
@@ -70,7 +70,6 @@ export default function Page() {
     total += denominaciones.billete100000 * 100000;
     setTotalEfectivo(total);
   }, [denominaciones]);
-  
 
   return (
     <div>
@@ -291,14 +290,19 @@ export default function Page() {
         </div>
         <div className="-mt-20">
           <h1 className="mb-5 mt-10">Total En Efectivo: {totalEfectivo}</h1>
-          <button className="bg-primary-400 p-3 min-w-[300px]" onClick={verificarCierre}>Realizar Cierre</button>
+          <button
+            className="bg-primary-400 p-3 min-w-[300px]"
+            onClick={verificarCierre}
+          >
+            Realizar Cierre
+          </button>
         </div>
       </div>
       {showModal && (
         <div className="flex items-center justify-center h-screen">
-          <div className="absolute top-20 w-full">
-            <Modal setShowModal={setShowModal}>
-              <FormArqueo/>
+          <div className="absolute top-5">
+            <Modal className="w-full" setShowModal={setShowModal}>
+              <FormArqueo />
             </Modal>
           </div>
         </div>

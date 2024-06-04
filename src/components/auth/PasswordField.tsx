@@ -7,6 +7,7 @@ type PasswordFieldProps = {
   name: "password" | "confirmPassword";
   placeholder: string;
   validate?: boolean;
+  className?: string;
 };
 
 export default function PasswordField({
@@ -14,6 +15,7 @@ export default function PasswordField({
   name,
   placeholder,
   validate,
+  className,
 }: PasswordFieldProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -24,7 +26,9 @@ export default function PasswordField({
       </label>
       <div className="relative">
         <input
-          className="w-full rounded-lg py-[9px] pl-10 pr-9 bg-gray-700"
+          className={
+            "w-full rounded-lg py-[9px] pl-10 pr-9 bg-gray-700 " + className
+          }
           type={showPassword ? "text" : "password"}
           name={name}
           placeholder={placeholder}
