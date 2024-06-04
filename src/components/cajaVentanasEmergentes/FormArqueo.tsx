@@ -1,44 +1,20 @@
 "use client";
 import Input from "@/components/global/Input";
-import crearArqueo from "@/lib/arqueoCaja/crearArqueo";
-import { ArqueoCajaData } from "@/lib/definitions";
-import calcularMontoEsperado from "@/lib/moduloCaja/arqueoCaja/calcularMontoEsperado";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 type Params = {
-    id: string;
-    monto: number;
+    exito: boolean
 };
 
-export default function FormArqueo({ id, monto }: Params) {
-    const [exitoArqueo, setExitoArqueo] = useState(false);
+export default function FormArqueo({exito}: Params) {
     const router = useRouter();
-    console.log(id + "    " + monto)
-    const fetchCalculo = async () => {
-        try {
-            const arqueo: ArqueoCajaData = {
-                aperturaId: id,
-                montoRegistrado: monto
-            }
-            const montoApi = await crearArqueo(arqueo);
-            if (montoApi === undefined || typeof montoApi === "string") {
-                throw new Error("Error obteniendo las cuentas");
-            }
-            console.log(montoApi);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-    fetchCalculo();
-
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
     };
 
     return (
-        exitoArqueo? 
-            <div>
+        exito? 
+            <div className="mt-20">
                 <h1 className="text-white text-center text-2xl">El Cierre de Caja Fue Exitoso</h1><br />
                 <p className="text-white text-left">Fecha: 31-05-2024</p>
                 <p className="text-white text-left">Hora: 14:46 {}</p>
