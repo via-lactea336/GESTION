@@ -297,7 +297,10 @@ export default function Page() {
         <div className="flex items-center justify-center h-screen">
           <div className="absolute top-20 w-full">
             <Modal setShowModal={setShowModal}>
-              <FormArqueo exito = {exito}/>
+              <FormArqueo 
+                exito = {exito} 
+                monto = {totalEfectivo}
+              />
             </Modal>
           </div>
         </div>

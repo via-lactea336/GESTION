@@ -1,24 +1,47 @@
 "use client";
 import Input from "@/components/global/Input";
+import cerrarCajaAdmin from "@/lib/aperturaCaja/cerrarCajaAdmin";
+import { login } from "@/lib/auth/login";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import PasswordField from "../auth/PasswordField";
+import { AperturaCaja, Caja } from "@prisma/client";
+import { obtenerCookie } from "@/lib/obtenerCookie";
+import { Cajero } from "@/lib/definitions";
 
 type Params = {
-    exito: boolean
+    exito: boolean,
+    monto: number
 };
 
-export default function FormArqueo({exito}: Params) {
+export default function FormArqueo({exito, monto}: Params) {
     const router = useRouter();
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const caja: Caja = obtenerCookie("caja");
+    const apertura: AperturaCaja = obtenerCookie("apertura");
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        const target = e.target as typeof e.target & {
+            username: { value: string };
+            password: { value: string };
+        };
+        const username = target.username.value;
+        const password = target.password.value;
+        const error = await login({ username, password });
+        if (!error) {
+            const res = await cerrarCajaAdmin(caja.id, apertura.id);
+            router.push("/dashboard/caja");
+        } else {
+            throw new Error(error);
+        }
     };
 
     return (
         exito? 
             <div className="mt-20">
                 <h1 className="text-white text-center text-2xl">El Cierre de Caja Fue Exitoso</h1><br />
-                <p className="text-white text-left">Fecha: 31-05-2024</p>
-                <p className="text-white text-left">Hora: 14:46 {}</p>
-                <p className="text-white text-left">Monto de cierre: 500.000 Gs.</p>
+                <p className="text-white text-left"></p>
+                <p className="text-white text-left"></p>
+                <p className="text-white text-left">Monto de cierre: {monto} Gs.</p>
             </div> 
         :
 
@@ -29,22 +52,22 @@ export default function FormArqueo({exito}: Params) {
             <div className="flex justify-between items-center gap-4 mt-10">
                 <div className="flex flex-col gap-2">
                     <label htmlFor="monto">Usuario</label>
-                    <Input
-                        className="block [max-width:250px] bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
-                        id="monto"
+                    <input
+                        className="w-full bg-gray-700 rounded-lg py-[9px] pl-10"
+                        id="username"
                         type="text"
-                        placeholder="Usuario Administrador"
-                        required
+                        name="username"
+                        placeholder="Ingrese su nombre"
+                        autoComplete="name"
+                        required    
                     />
                 </div>
                 <div className="flex flex-col gap-2">
-                    <label htmlFor="fecha">Contraseña</label>
-                    <Input
-                        className="block [max-width:250px] bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
-                        id="monto"
-                        type="text"
-                        placeholder="contraseña"
-                        required
+                    <PasswordField
+                        label="Contraseña"
+                        name="password"
+                        placeholder="Contraseña"
+                        validate={false}
                     />
                 </div>
             </div>
