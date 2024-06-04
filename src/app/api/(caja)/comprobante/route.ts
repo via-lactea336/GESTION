@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   
     if(!comprobante) return generateApiErrorResponse("Error generando el comprobante", 400)
 
-    return generateApiSuccessResponse(200, "el comprobante fue generada correctamente")
+    return generateApiSuccessResponse(200, "El comprobante fue generada correctamente")
   
   }catch(err){
     if(err instanceof PrismaClientKnownRequestError && err.code === "P2002") return generateApiErrorResponse("el comprobante ya existe", 400)

@@ -11,15 +11,16 @@ export async function POST(req: NextRequest) {
   const body:{ mov:Movimiento, movsDetalles?:MovimientoDetalle[] }= await req.json();
   const { 
     mov,
-    movsDetalles
+    movsDetalles,
    } = body;
 
-  if(!mov ) return generateApiErrorResponse("Faltan datos para el movimiento", 400)
+  if(!mov) return generateApiErrorResponse("Faltan datos para el movimiento", 400)
 
   try{
     const movimiento = await prisma.movimiento.create({
       data: {
         monto: mov.monto,
+        facturaId: mov.facturaId,
         aperturaId: mov.aperturaId, 
         esIngreso: mov.esIngreso
       },

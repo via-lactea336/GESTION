@@ -7,20 +7,12 @@ export type Props = {
     total:number,
     ivaTotal:number,
     totalSaldoPagado:number
-  },
-  facturaDetalles?:{
-    productoId:string,
-    costoUnit:number,
-    cantidad:number,
-    monto:number,
-    iva:number,
-    ivaPorcent:number|null
-  }[]
+  }
 }
 
 export default async function obtenerReciboFiltro(
   {
-    factura, facturaDetalles
+    factura,
   }:Props
   
 ){
@@ -34,7 +26,6 @@ export default async function obtenerReciboFiltro(
       },
       body: JSON.stringify({
         factura,
-        facturaDetalles
       }),
     }) 
     const data:ApiResponseData = await response.json()
