@@ -4,6 +4,7 @@ import obtenerFacturasFiltro, {
 } from "@/lib/moduloCaja/factura/obtenerFacturasFiltro"; // Asegúrate de ajustar la ruta según la ubicación de tu archivo obtenerFacturasFiltro
 import { Factura } from "@prisma/client";
 import obtenerCliente from "@/lib/moduloCaja/cliente/obtenerCliente";
+import LoadingCirleIcon from "../global/LoadingCirleIcon";
 
 interface FacturaConRuc extends Factura {
   ruc: string;
@@ -17,6 +18,7 @@ const ContenidoIngresos = () => {
 
   const [listaDeFacturas, setListaDeFacturas] = useState<FacturaConRuc[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
@@ -28,6 +30,7 @@ const ContenidoIngresos = () => {
 
   const handleSearch = async () => {
     try {
+      setLoading(true);
       const response = await obtenerFacturasFiltro({
         fechaDesde: filters.fechaDesde,
         fechaHasta: filters.fechaHasta,
@@ -38,7 +41,9 @@ const ContenidoIngresos = () => {
         upTo: filters.upTo ? filters.skip : undefined,
       });
       if (response === undefined || typeof response === "string") {
-        throw new Error("Error al obtener las facturas");
+        setLoading(false);
+        setListaDeFacturas([]);
+        return;
       }
       const { success, data, error } = response;
       if (success == true && data) {
@@ -55,12 +60,15 @@ const ContenidoIngresos = () => {
             return { ...factura, ruc: cliente.docIdentidad };
           })
         );
+        setLoading(false);
         setListaDeFacturas(facturasConRuc);
       } else {
+        setLoading(false);
         setListaDeFacturas([]);
         setError(error || null);
       }
     } catch (err) {
+      setLoading(false);
       if (err instanceof Error) {
         setError(err.message);
       }
@@ -103,6 +111,11 @@ const ContenidoIngresos = () => {
                 value={filters.fechaDesde}
                 onChange={handleChange}
                 className="rounded p-1"
+                max={
+                  filters.fechaHasta
+                    ? filters.fechaHasta
+                    : new Date().toISOString().split("T")[0]
+                }
               />
             </div>
             <div className="flex flex-col flex-grow m-2">
@@ -116,6 +129,7 @@ const ContenidoIngresos = () => {
                 value={filters.fechaHasta}
                 onChange={handleChange}
                 className="rounded p-1"
+                max={new Date().toISOString().split("T")[0]}
               />
             </div>
             <div className="flex flex-col flex-grow m-2">
@@ -162,7 +176,7 @@ const ContenidoIngresos = () => {
         </div>
       </div>
 
-      <div>
+      <div className="relative">
         <h2 className="text-xl font-bold my-4">Listado de Facturas</h2>
         {error && <p className="text-red-500">{error}</p>}
         <table className="min-w-full">
@@ -177,9 +191,20 @@ const ContenidoIngresos = () => {
             </tr>
           </thead>
           <tbody>
-            {listaDeFacturas.length === 0 ? (
+            {loading && (
+              <tr>
+                <td colSpan={6} className="py-2">
+                  <div className="flex justify-center items-center w-full">
+                    <LoadingCirleIcon className="animate-spin" />
+                  </div>
+                </td>
+              </tr>
+            )}
+            {listaDeFacturas.length === 0 && !loading ? (
               <tr className="py-2">
-                <td>No hay facturas</td>
+                <td colSpan={6} className="text-center">
+                  No hay facturas
+                </td>
               </tr>
             ) : (
               listaDeFacturas.map((factura, index) => (
