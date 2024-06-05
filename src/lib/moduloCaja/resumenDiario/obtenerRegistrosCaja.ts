@@ -8,7 +8,7 @@ import { ApiResponseData } from "@/lib/definitions";
 export async function obtenerRegistrosCaja(): Promise<
   ApiResponseData<RegistroCaja[]>
 > {
-  const response = await fetch("/api/caja/registro-caja", {
+  const response = await fetch("/api/registro-caja", {
     method: "GET",
   });
   return await response.json();
