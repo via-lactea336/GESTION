@@ -25,9 +25,7 @@ export async function POST(req: NextRequest) {
     return generateApiErrorResponse("El monto debe ser mayor o igual a 0", 400);
 
   const montoEsperado = await calcularMontoEsperado(aperturaId);
-
   console.log(montoEsperado, aperturaId);
-
   try {
     const arqueoCaja = await prisma.arqueoDeCaja.create({
       data: {
