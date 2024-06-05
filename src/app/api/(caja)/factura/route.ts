@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const factura = await prisma.factura.create({
       data: {
         clienteId,
-        totalSaldoPagado:totalSaldoPagado? totalSaldoPagado : esContado? total : 0, 
+        totalSaldoPagado, 
         esContado,
         total,
         ivaTotal,

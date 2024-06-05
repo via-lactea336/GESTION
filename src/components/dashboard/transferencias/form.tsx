@@ -49,7 +49,7 @@ export default function FormTransferencias() {
     // Ahora fecha tiene la fecha seleccionada con la hora actual
     console.log(fecha);
     const aux = event.target as HTMLFormElement;
-    const data: Operacion = {
+    const operacion: Operacion = {
       tipoOperacionId: form["operacion"].value,
       fechaOperacion: fecha,
       monto: Number(form["monto"].value),
@@ -63,16 +63,16 @@ export default function FormTransferencias() {
     };
 
     const response = await agregarOperacion(
-      data.tipoOperacionId,
-      data.fechaOperacion,
-      data.monto,
-      data.cuentaBancariaOrigenId,
-      data.bancoInvolucrado,
-      data.nombreInvolucrado,
-      data.cuentaInvolucrado,
-      data.rucInvolucrado,
-      data.concepto,
-      data.numeroComprobante,
+      operacion.tipoOperacionId,
+      operacion.fechaOperacion,
+      operacion.monto,
+      operacion.cuentaBancariaOrigenId,
+      operacion.bancoInvolucrado,
+      operacion.nombreInvolucrado,
+      operacion.cuentaInvolucrado,
+      operacion.rucInvolucrado,
+      operacion.concepto,
+      operacion.numeroComprobante,
       cheques,
     );
     if (response !== undefined && typeof response !== "string") {
