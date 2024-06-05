@@ -8,6 +8,8 @@ import { AperturaCaja, Caja } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import Input from "@/components/global/Input";
 import crearArqueo from "@/lib/arqueoCaja/crearArqueo";
+import Header from "@/components/global/Header";
+import { Toaster, toast } from "sonner";
 
 export default function Page() {
   const router = useRouter();
@@ -27,6 +29,7 @@ export default function Page() {
 
   const [totalEfectivo, setTotalEfectivo] = useState(0);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -42,18 +45,26 @@ export default function Page() {
 
   const verificarCierre = async () => {
     try {
+      setLoading(true);
       const arqueo: ArqueoCajaData = {
         aperturaId: apertura.id,
         montoRegistrado: totalEfectivo,
       };
       const response = await crearArqueo(arqueo);
       if (response === undefined || typeof response === "string") {
-        throw new Error("Error obteniendo las cuentas");
+        throw new Error("Error al cerrar la caja");
       }
-      console.log(response);
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      setLoading(false);
+      toast.success("Caja cerrada con éxito");
       router.push("/dashboard/caja");
     } catch (error) {
-      console.error(error);
+      setLoading(false);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
       setShowModal(true);
     }
   };
@@ -73,35 +84,39 @@ export default function Page() {
 
   return (
     <div>
+      <Header
+        title="Arqueo de Caja"
+        className={showModal ? "blur-sm brightness-50" : "-mt-8"}
+      >
+        <h3 className="px-2">{cajero.nombre}</h3>
+        <h3 className="px-2">Caja N°{caja.numero}</h3>
+        <h3 className="px-2">
+          {new Date()
+            .toISOString()
+            .split("T")[0]
+            .split("-")
+            .reverse()
+            .join("-")}
+        </h3>
+      </Header>
       <div
         className={
           showModal
-            ? "blur-sm brightness-50 p-10 -mt-7 bg-primary-800"
-            : "p-10 -mt-7 bg-primary-800"
+            ? "blur-sm brightness-50 text-white mt-7 flex items-start gap-8"
+            : "text-center text-white mt-7 flex items-start gap-8"
         }
       >
-        <div className="flex flex-row ">
-          <h1 className="text-3xl font-bold mt-2 mb-2">Arqueo de caja</h1>
-          <p className="font-bold mt-4 mb-2 ml-auto">
-            Cajero : {cajero.nombre}
-          </p>
-          <p className="font-bold mt-4 mb-2 ml-10">N° Caja : {caja.numero}</p>
-        </div>
-      </div>
-      <div
-        className={
-          showModal
-            ? "blur-sm brightness-50 text-white  mt-10"
-            : "text-center text-white mt-10"
-        }
-      >
-        <div className="flex items-center justify-center min-h-screen -mt-20">
+        <div className="flex items-center justify-center">
           <table className="text-center text-white min-w-[400px]">
-            <thead className="bg-primary-700 text-black">
+            <thead className="bg-gray-800 text-primary-300">
               <tr>
-                <th className="px-4 py-2 min-w-[200px]">Denominacion</th>
-                <th className="px-4 py-2 min-w-[200px]">Cantidad</th>
-                <th className="px-4 py-2 min-w-[200px]">Total</th>
+                <th className="px-4 py-2 min-w-[200px] font-normal">
+                  Denominacion
+                </th>
+                <th className="px-4 py-2 min-w-[200px] font-normal">
+                  Cantidad
+                </th>
+                <th className="px-4 py-2 min-w-[200px] font-normal">Total</th>
               </tr>
             </thead>
             <tbody>
@@ -113,8 +128,12 @@ export default function Page() {
                   <Input
                     type="number"
                     id="moneda500"
-                    placeholder="500.000"
-                    value={denominaciones.moneda500}
+                    placeholder="10"
+                    value={
+                      denominaciones.moneda500 === 0
+                        ? ""
+                        : denominaciones.moneda500
+                    }
                     className="bg-gray-600 max-w-[100px] rounded-md text-center"
                     onChange={handleChange}
                   />
@@ -134,8 +153,12 @@ export default function Page() {
                   <Input
                     type="number"
                     id="moneda1000"
-                    placeholder="1.000.000"
-                    value={denominaciones.moneda1000}
+                    placeholder="15"
+                    value={
+                      denominaciones.moneda1000 === 0
+                        ? ""
+                        : denominaciones.moneda1000
+                    }
                     className="bg-gray-600 max-w-[100px] rounded-md text-center"
                     onChange={handleChange}
                   />
@@ -155,8 +178,12 @@ export default function Page() {
                   <Input
                     type="number"
                     id="billete2000"
-                    placeholder="2.000.000"
-                    value={denominaciones.billete2000}
+                    placeholder="30"
+                    value={
+                      denominaciones.billete2000 === 0
+                        ? ""
+                        : denominaciones.billete2000
+                    }
                     className="bg-gray-600 max-w-[100px] rounded-md text-center"
                     onChange={handleChange}
                   />
@@ -178,8 +205,12 @@ export default function Page() {
                   <Input
                     type="number"
                     id="billete5000"
-                    placeholder="5.000.000"
-                    value={denominaciones.billete5000}
+                    placeholder="50"
+                    value={
+                      denominaciones.billete5000 === 0
+                        ? ""
+                        : denominaciones.billete5000
+                    }
                     className="bg-gray-600 max-w-[100px] rounded-md text-center"
                     onChange={handleChange}
                   />
@@ -201,8 +232,12 @@ export default function Page() {
                   <Input
                     type="number"
                     id="billete10000"
-                    placeholder="10.000.000"
-                    value={denominaciones.billete10000}
+                    placeholder="50"
+                    value={
+                      denominaciones.billete10000 === 0
+                        ? ""
+                        : denominaciones.billete10000
+                    }
                     className="bg-gray-600 max-w-[100px] rounded-md text-center"
                     onChange={handleChange}
                   />
@@ -224,8 +259,12 @@ export default function Page() {
                   <Input
                     type="number"
                     id="billete20000"
-                    placeholder="20.000.000"
-                    value={denominaciones.billete20000}
+                    placeholder="40"
+                    value={
+                      denominaciones.billete20000 === 0
+                        ? ""
+                        : denominaciones.billete20000
+                    }
                     className="bg-gray-600 max-w-[100px] rounded-md text-center"
                     onChange={handleChange}
                   />
@@ -247,8 +286,12 @@ export default function Page() {
                   <Input
                     type="number"
                     id="billete50000"
-                    placeholder="50.000.000"
-                    value={denominaciones.billete50000}
+                    placeholder="25"
+                    value={
+                      denominaciones.billete50000 === 0
+                        ? ""
+                        : denominaciones.billete50000
+                    }
                     className="bg-gray-600 max-w-[100px] rounded-md text-center"
                     onChange={handleChange}
                   />
@@ -270,8 +313,12 @@ export default function Page() {
                   <Input
                     type="number"
                     id="billete100000"
-                    placeholder="100.000.000"
-                    value={denominaciones.billete100000}
+                    placeholder="20"
+                    value={
+                      denominaciones.billete100000 === 0
+                        ? ""
+                        : denominaciones.billete100000
+                    }
                     className="bg-gray-600 max-w-[100px] rounded-md text-center"
                     onChange={handleChange}
                   />
@@ -288,25 +335,28 @@ export default function Page() {
             </tbody>
           </table>
         </div>
-        <div className="-mt-20">
-          <h1 className="mb-5 mt-10">Total En Efectivo: {totalEfectivo}</h1>
+        <div className="">
+          <h1 className="mb-5 mt-10">
+            Total En Efectivo: {totalEfectivo.toLocaleString("de-DE")} Gs.
+          </h1>
           <button
-            className="bg-primary-400 p-3 min-w-[300px]"
+            className="bg-primary-800 p-3 min-w-[300px] rounded-md hover:bg-primary-700 transition-all duration-300 ease-in-out"
             onClick={verificarCierre}
           >
-            Realizar Cierre
+            {loading ? "Cerrando caja..." : "Realizar Cierre"}
           </button>
         </div>
       </div>
       {showModal && (
-        <div className="flex items-center justify-center h-screen">
-          <div className="absolute top-5">
+        <div className="flex items-center justify-center">
+          <div className="absolute top-20">
             <Modal className="w-full" setShowModal={setShowModal}>
               <FormArqueo />
             </Modal>
           </div>
         </div>
       )}
-    </div>
-  );
+      <Toaster richColors />
+    </div>
+  );
 }
