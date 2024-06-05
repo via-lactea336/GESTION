@@ -8,8 +8,10 @@ import { useCalendar } from "@/lib/hooks/useCalendar";
 import agregarOperacion from "@/lib/moduloBanco/operacion/agregarOperacion";
 import obtenerTiposOperacion from "@/lib/moduloBanco/tipoOperacion/obtenerTiposOperacion";
 import { Banco, TipoOperacion } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
+import AgregarCheque from "./AgregarCheque";
+import { ChequeCreate } from "./AgregarCheque";
 
 type Operacion = {
   tipoOperacionId: string;
@@ -70,7 +72,8 @@ export default function FormTransferencias() {
       data.cuentaInvolucrado,
       data.rucInvolucrado,
       data.concepto,
-      data.numeroComprobante
+      data.numeroComprobante,
+      cheques,
     );
     if (response !== undefined && typeof response !== "string") {
       if (response.error) {
@@ -84,6 +87,7 @@ export default function FormTransferencias() {
       }
     }
   };
+  const [nombreOperacion, setNombreOperacion] = useState("");
   const [bancos, setBancos] = useState<Banco[]>([]);
   const [esDebito, setEsDebito] = useState<boolean>(false);
   const [cuentasBancarias, setCuentasBancarias] = useState<
@@ -92,6 +96,8 @@ export default function FormTransferencias() {
   const [operaciones, setOperaciones] = useState<TipoOperacion[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingSend, setLoadingSend] = useState(false);
+
+  const [cheques, setCheques] = useState<ChequeCreate[]>([]);
 
   const fetchDatos = async () => {
     setLoading(true);
@@ -120,8 +126,7 @@ export default function FormTransferencias() {
 
   return (
     <form className="w-full" onSubmit={handleSubmit}>
-      <div className="flex flex-wrap -mx-3 mb-6">
-        <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+      <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
           <label className="mb-2">Tipo de Transacción</label>
           <div className="relative mt-2">
             <select
@@ -133,6 +138,9 @@ export default function FormTransferencias() {
                   operaciones.find((op) => op.id === e.target.value)
                     ?.esDebito || false
                 );
+                setNombreOperacion(
+                  operaciones.find((op) => op.id === e.target.value)?.nombre || ""
+                )
               }}
             >
               {loading ? (
@@ -156,9 +164,19 @@ export default function FormTransferencias() {
             </div>
           </div>
         </div>
+    { 
+      nombreOperacion === "Depósito"? 
+      
+        <AgregarCheque cheques={cheques} setCheques={setCheques} bancos={bancos} cuentasBancarias={cuentasBancarias}/> 
+      
+      :
+      <>
+      <div className="flex flex-wrap -mx-3 mb-6">
         <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
           <label className="mb-2">
-            Cuenta del {!esDebito ? "Beneficiario" : "Remitente"}
+            Cuenta del {
+              !esDebito ? "Beneficiario" : "Remitente"
+            }
           </label>
           <div className="relative mt-2">
             <select
@@ -257,7 +275,7 @@ export default function FormTransferencias() {
         <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
           <label className=" mb-2">Monto</label>
           <Input
-            className={`block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none`}
+            className={'block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none'}
             id="monto"
             type="number"
             required
@@ -295,6 +313,8 @@ export default function FormTransferencias() {
           />
         </div>
       </div>
+      </>
+    }
       <div className="px-3 flex items-center justify-end mb-6 md:mb-0">
         <button
           type="submit"
