@@ -2,8 +2,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import obtenerOperacionPorId from "../../../../../lib/moduloBanco/operacion/obtenerOperacionPorId";
-import TransferReceipt from '../../../../../components/PDF/TransferenciaDetails';
+import TransferReceipt from "../../../../../components/PDF/TransferenciaDetails";
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import { obtenerCookie } from "@/lib/obtenerCookie";
+import { UserWithName } from "@/lib/definitions";
 
 export default function PageComponent() {
   const [dateTime, setDateTime] = useState("undefined");
@@ -11,8 +13,10 @@ export default function PageComponent() {
   const [numComprobante, setNumComprobante] = useState("undefined");
   const [concepto, setConcepto] = useState("undefined");
   const [nombreDestino, setNombreDestino] = useState("undefined");
-  const [numCuentaDestino, setNumCuentaDestino] = useState<string|null>("undefined");
-  const [bancoDestino, setBancoDestino] = useState<string|null>("undefined");
+  const [numCuentaDestino, setNumCuentaDestino] = useState<string | null>(
+    "undefined"
+  );
+  const [bancoDestino, setBancoDestino] = useState<string | null>("undefined");
   const [nombreOrigen, setNombreOrigen] = useState("undefined");
   const [numCuentaOrigen, setNumCuentaOrigen] = useState("undefined");
   const [bancoOrigen, setBancoOrigen] = useState("undefined");
@@ -64,13 +68,14 @@ export default function PageComponent() {
   const handleCloseButtonClick = () => {
     router.back();
   };
+  const user: UserWithName = obtenerCookie("user");
 
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <div className="w-1/2 py-4 border-b border-gray-300">
         <h1 className="text-2xl font-bold pb-4">
           Comprobante de Transferencia - {tipoOperacion}
-        </h1>          
+        </h1>
         <div className="flex items-center ">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -129,7 +134,9 @@ export default function PageComponent() {
             <circle cx="16" cy="9" r="2.9" />
             <circle cx="6" cy="5" r="3" />
           </svg>
-          <p className="text-lg px-2">{tipoOperacion == "Debito"?"Destino": "Origen"}</p>
+          <p className="text-lg px-2">
+            {tipoOperacion == "Debito" ? "Destino" : "Origen"}
+          </p>
         </div>
         <div className="flex justify-between w-full">
           <p className="w-1/3 text-base">Nombre:</p>
@@ -162,7 +169,9 @@ export default function PageComponent() {
             <circle cx="12" cy="12" r="2" />
             <path d="M6 12h.01M18 12h.01" />
           </svg>
-          <p className="text-lg px-2">{tipoOperacion == "Debito"?"Origen":"Destino"}</p>
+          <p className="text-lg px-2">
+            {tipoOperacion == "Debito" ? "Origen" : "Destino"}
+          </p>
         </div>
         <div className="flex justify-between w-full">
           <p className="w-1/3 text-base">Nombre:</p>
@@ -175,7 +184,7 @@ export default function PageComponent() {
         <div className="flex justify-between w-full">
           <p className="w-1/3 text-base">Banco:</p>
           <p className="w-2/3 text-base text-right">{bancoOrigen}</p>
-        </div>        
+        </div>
       </div>
       <div className="w-1/2 py-4 border-gray-300">
         <div className="flex flex-row">
@@ -204,34 +213,34 @@ export default function PageComponent() {
           >
             Cerrar
           </button>
-          <button
-            className="mr-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-          >
+          <button className="mr-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
             <PDFDownloadLink
-              document={<TransferReceipt
-                numComprobante={numComprobante}
-                concepto={concepto}
-                nombreDestino={nombreDestino}
-                numCuentaDestino={numCuentaDestino||""}
-                bancoDestino={bancoDestino||""}
-                nombreOrigen={nombreOrigen}
-                numCuentaOrigen={numCuentaOrigen}
-                tipoOperacion={tipoOperacion}
-                monto={monto}
-                dateTime={dateTime}
-                bancoOrigen={bancoOrigen}
-              />}
+              document={
+                <TransferReceipt
+                  numComprobante={numComprobante}
+                  concepto={concepto}
+                  nombreDestino={nombreDestino}
+                  numCuentaDestino={numCuentaDestino || ""}
+                  bancoDestino={bancoDestino || ""}
+                  nombreOrigen={nombreOrigen}
+                  numCuentaOrigen={numCuentaOrigen}
+                  tipoOperacion={tipoOperacion}
+                  monto={monto}
+                  dateTime={dateTime}
+                  bancoOrigen={bancoOrigen}
+                  userName={user.name}
+                />
+              }
               fileName="transferencia.pdf"
             >
-              {
-                ({loading, url, error, blob}) => 
-                  loading? (
-                    <button> Cargando documento... </button> 
-                    ):(
-                    <button>Descargar</button>
-                    )
+              {({ loading, url, error, blob }) =>
+                loading ? (
+                  <button> Cargando documento... </button>
+                ) : (
+                  <button>Descargar</button>
+                )
               }
-            </PDFDownloadLink> 
+            </PDFDownloadLink>
           </button>
         </div>
       </div>

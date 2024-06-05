@@ -2,12 +2,15 @@
 import React, { useState, useEffect } from "react";
 import { Modal } from "@/components/global/Modal";
 import FormArqueo from "@/components/cajaVentanasEmergentes/FormArqueo";
-import { Cajero } from "@/lib/definitions";
+import { ArqueoCajaData, Cajero } from "@/lib/definitions";
 import { obtenerCookie } from "@/lib/obtenerCookie";
 import { AperturaCaja, Caja } from "@prisma/client";
+import { useRouter } from "next/navigation";
 import Input from "@/components/global/Input";
+import crearArqueo from "@/lib/arqueoCaja/crearArqueo";
 
 export default function Page() {
+  const router = useRouter();
   const caja: Caja = obtenerCookie("caja");
   const cajero: Cajero = obtenerCookie("cajero");
   const apertura: AperturaCaja = obtenerCookie("apertura");
@@ -22,18 +25,8 @@ export default function Page() {
     billete100000: 0,
   });
 
-  const [totales, setTotales] = useState({
-    totalEfectivo: 0,
-    totalCheque: 0,
-    totalTarjetaDebito: 0,
-    totalTarjetaCredito: 0,
-  });
-  const [montoTotal, setMontoTotal] = useState(0);
+  const [totalEfectivo, setTotalEfectivo] = useState(0);
   const [showModal, setShowModal] = useState(false);
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setShowModal(true);
-  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -47,16 +40,22 @@ export default function Page() {
     });
   };
 
-  const handleChangeTotales = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setTotales({
-      ...totales,
-      [name]: Number(value),
-    });
+  const verificarCierre = async () => {
+    try {
+      const arqueo: ArqueoCajaData = {
+        aperturaId: apertura.id,
+        montoRegistrado: totalEfectivo,
+      };
+      const response = await crearArqueo(arqueo);
+      if (response === undefined || typeof response === "string") {
+        throw new Error("Error obteniendo las cuentas");
+      }
+      console.log(response);
+      router.push("/dashboard/caja");
+    } catch (error) {
+      console.error(error);
+      setShowModal(true);
+    }
   };
 
   useEffect(() => {
@@ -69,20 +68,8 @@ export default function Page() {
     total += denominaciones.billete20000 * 20000;
     total += denominaciones.billete50000 * 50000;
     total += denominaciones.billete100000 * 100000;
-    setTotales({
-      ...totales,
-      ["totalEfectivo"]: total,
-    });
+    setTotalEfectivo(total);
   }, [denominaciones]);
-
-  useEffect(() => {
-    let monto = 0;
-    monto += totales.totalCheque * 1;
-    monto += totales.totalTarjetaCredito * 1;
-    monto += totales.totalTarjetaDebito * 1;
-    monto += totales.totalEfectivo * 1;
-    setMontoTotal(monto);
-  }, [totales]);
 
   return (
     <div>
@@ -104,77 +91,17 @@ export default function Page() {
       <div
         className={
           showModal
-            ? "blur-sm brightness-50 text-white flex flex-row mt-10"
-            : "text-center text-white flex flex-row mt-10"
+            ? "blur-sm brightness-50 text-white  mt-10"
+            : "text-center text-white mt-10"
         }
       >
-        <div className="bg-primary-500 flex flex-col p-5 rounded-md mb-auto">
-          <h1 className="text-center text-xl">Según Cajero</h1>
-          <div className="m-5 flex justify-between">
-            <label>Efectivo</label>
-            <div className="ml-10 rounded-md bg-gray-600 min-w-[195px] text-center">
-              {totales.totalEfectivo.toLocaleString("de-DE")}
-            </div>
-          </div>
-
-          <div className="m-5 flex justify-between">
-            <label>Cheque</label>
-            <Input
-              type="number"
-              placeholder="300.000"
-              value={totales.totalCheque}
-              className="ml-10 rounded-md bg-gray-600 text-center"
-              id="totalCheque"
-              onChange={handleChangeTotales}
-            />
-          </div>
-
-          <div className="m-5 flex justify-between">
-            <label>Tarj. Crédito</label>
-            <Input
-              type="number"
-              value={totales.totalTarjetaCredito}
-              className="ml-10 rounded-md bg-gray-600 text-center"
-              id="totalTarjetaCredito"
-              placeholder="200.0000"
-              onChange={handleChangeTotales}
-            />
-          </div>
-
-          <div className="m-5 flex justify-between">
-            <label>Tarj. Débito</label>
-            <Input
-              type="number"
-              value={totales.totalTarjetaDebito}
-              className="ml-10 rounded-md  bg-gray-600 text-center"
-              id="totalTarjetaDebito"
-              placeholder="100.0000"
-              onChange={handleChangeTotales}
-            />
-          </div>
-
-          <div className="m-5 flex justify-between">
-            <label>Total Ingresos</label>
-            <div className="ml-10 rounded-md bg-gray-600 min-w-[195px] text-center">
-              {montoTotal.toLocaleString("de-DE")}
-            </div>
-          </div>
-
-          <button
-            className="bg-gray-800 ml-10 mt-5 mr-10 pt-3 pb-3"
-            onClick={handleClick}
-          >
-            REALIZAR CIERRE
-          </button>
-        </div>
-
-        <div className="ml-auto">
-          <table className="text-center text-white min-w-[400px] ml-10">
+        <div className="flex items-center justify-center min-h-screen -mt-20">
+          <table className="text-center text-white min-w-[400px]">
             <thead className="bg-primary-700 text-black">
               <tr>
-                <th className="px-4 py-2 ">Denominacion</th>
-                <th className="px-4 py-2">Cantidad</th>
-                <th className="px-4 py-2 min-w-[190px]">Total</th>
+                <th className="px-4 py-2 min-w-[200px]">Denominacion</th>
+                <th className="px-4 py-2 min-w-[200px]">Cantidad</th>
+                <th className="px-4 py-2 min-w-[200px]">Total</th>
               </tr>
             </thead>
             <tbody>
@@ -361,12 +288,21 @@ export default function Page() {
             </tbody>
           </table>
         </div>
+        <div className="-mt-20">
+          <h1 className="mb-5 mt-10">Total En Efectivo: {totalEfectivo}</h1>
+          <button
+            className="bg-primary-400 p-3 min-w-[300px]"
+            onClick={verificarCierre}
+          >
+            Realizar Cierre
+          </button>
+        </div>
       </div>
       {showModal && (
         <div className="flex items-center justify-center h-screen">
-          <div className="absolute top-20 w-full">
-            <Modal setShowModal={setShowModal}>
-              <FormArqueo id={apertura.id} monto={120000} />
+          <div className="absolute top-5">
+            <Modal className="w-full" setShowModal={setShowModal}>
+              <FormArqueo />
             </Modal>
           </div>
         </div>

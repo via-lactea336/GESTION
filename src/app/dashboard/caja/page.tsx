@@ -10,7 +10,14 @@ export default async function Page() {
     <div className="relative">
       <Header title="Punto de venta" className="-mt-8">
         <span>{session ? session.user.nombre : "Desconocido"}</span>
-        <span>{new Date().toISOString().split("T")[0]}</span>
+        <span>
+          {new Date()
+            .toISOString()
+            .split("T")[0]
+            .split("-")
+            .reverse()
+            .join("-")}
+        </span>
       </Header>
       {session?.user.rol === "CAJERO" || session?.user.rol === "ADMIN" ? (
         <ContenedorCajas
