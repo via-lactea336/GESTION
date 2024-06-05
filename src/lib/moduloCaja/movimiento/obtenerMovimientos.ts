@@ -8,7 +8,7 @@ import { ApiResponseData } from "@/lib/definitions";
 export async function obtenerMovimientos(): Promise<
   ApiResponseData<Movimiento[]>
 > {
-  const response = await fetch("/api/caja/movimiento", {
+  const response = await fetch("/api/movimiento", {
     method: "GET",
   });
   return await response.json();
