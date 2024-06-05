@@ -78,5 +78,5 @@ export default async function calcularDatosRegistroCaja(aperturaId: string) {
     }
   })
 
-  return registroCaja
+  if(!registroCaja) throw new Error('Error creando el registro de caja')
 }
