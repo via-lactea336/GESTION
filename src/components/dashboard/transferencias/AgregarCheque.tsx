@@ -121,7 +121,7 @@ export default function AgregarCheque({
         <div className="w-full px-3 mb-6 md:mb-0">
             <label className=" mb-2">Efectivo</label>
             <Input
-              className={block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none}
+              className={'block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none'}
               onChange={onChangeMontos}
               id="efectivo"
               type="number"
