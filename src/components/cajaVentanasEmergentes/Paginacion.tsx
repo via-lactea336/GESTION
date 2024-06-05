@@ -46,7 +46,6 @@ const ContenidoIngresos = () => {
   };
 
   useEffect(() => {
-    // Fetch initial data
     handleSearch();
   }, []);
 
