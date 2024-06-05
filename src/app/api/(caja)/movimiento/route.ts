@@ -16,6 +16,8 @@ export async function POST(req: NextRequest) {
 
   if(!mov) return generateApiErrorResponse("Faltan datos para el movimiento", 400)
 
+  if(mov.esIngreso && (!mov.facturaId || mov.facturaId===undefined)) return generateApiErrorResponse("No se puede registrar un ingreso sin una factura", 400)
+
   try{
     const movimiento = await prisma.movimiento.create({
       data: {

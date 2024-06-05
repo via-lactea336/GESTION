@@ -11,6 +11,7 @@ import {
 
 import { ArqueoDeCaja } from "@prisma/client";
 import calcularMontoEsperado from "@/lib/moduloCaja/arqueoCaja/calcularMontoEsperado";
+import cierreDeCaja from "@/lib/moduloCaja/cierreDeCaja";
 
 export async function POST(req: NextRequest) {
   const body: ArqueoDeCaja = await req.json();
@@ -24,8 +25,6 @@ export async function POST(req: NextRequest) {
   if(montoRegistradoDecimal.lessThan(0)) return generateApiErrorResponse("El monto debe ser mayor o igual a 0", 400)
 
   const montoEsperado = await calcularMontoEsperado(aperturaId);
-
-  console.log(montoEsperado, aperturaId)
 
   try {
     const arqueoCaja = await prisma.arqueoDeCaja.create({
@@ -47,23 +46,7 @@ export async function POST(req: NextRequest) {
       return generateApiErrorResponse("Error generando el arqueo de caja", 400);
     
     if(montoRegistradoDecimal.equals(montoEsperado)){
-      const aperturaCaja = await prisma.aperturaCaja.update({
-        where: {
-          id: arqueoCaja.aperturaId
-        },
-        data: {
-          cierreCaja: new Date()
-        }
-      })
-      const caja = await prisma.caja.update({
-        where: {
-          id: arqueoCaja.apertura.cajaId
-        },
-        data: {
-          estaCerrado: true
-        }
-      })
-      if(!aperturaCaja || !caja) return generateApiErrorResponse("Error cerrando la caja y la apertura de caja", 400);
+      await cierreDeCaja(aperturaId)
       return generateApiSuccessResponse(200, "El arqueo fue generada correctamente y la caja fue cerrada", arqueoCaja);
     }
     return generateApiSuccessResponse(

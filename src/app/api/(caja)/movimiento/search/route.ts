@@ -54,14 +54,15 @@ export async function GET(request: NextRequest) {
     },
     include: incluirDocumentacion === "true" ? {
       movimientoDetalles: true,
-      comprobantes: true
+      comprobantes: true,
+      factura:true,
     }:undefined,
     orderBy:{
       createdAt: "desc"
     }
   });
 
-  const count = await prisma.factura.count({ where: {...where}});
+  const count = await prisma.movimiento.count({ where: {...where}});
   if (!values)
     return generateApiErrorResponse("Error intentando buscar Movimientos", 500);
 

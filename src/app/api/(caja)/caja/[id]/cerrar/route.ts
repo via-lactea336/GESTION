@@ -1,6 +1,6 @@
 import { generateApiErrorResponse, generateApiSuccessResponse } from "@/lib/apiResponse";
 import authOptions from "@/lib/auth/options";
-import prisma from "@/lib/prisma";
+import cierreDeCaja from "@/lib/moduloCaja/cierreDeCaja";
 import { getServerSession } from "next-auth";
 import { NextRequest } from "next/server";
 
@@ -21,29 +21,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
   if(!aperturaId) return generateApiErrorResponse("No se puede cerrar la caja sin el identificador de la apertura activa", 400)
 
-  try {
-    const caja = await prisma.caja.update({
-      where: {
-        id
-      },
-      data: {
-        estaCerrado: true,
-        aperturas:{
-        update: {
-            where: {
-              id: aperturaId
-            },
-            data:{
-              cierreCaja: new Date(),
-              observaciones
-            }
-          }
-        }
-      }
-    });
-
-    if(!caja) return generateApiErrorResponse("No se ha podido cerrar la caja", 500)
-    return generateApiSuccessResponse(200, `La caja se ha cerrado exitosamente`, caja);
+  try {    
+    await cierreDeCaja(aperturaId, observaciones)
+    return generateApiSuccessResponse(200, `La caja se ha cerrado exitosamente`);
   } catch (error) {
     // Si hay un error al actualizar, devuelve un mensaje de error
     return generateApiErrorResponse("Error cerrando la caja", 500);
