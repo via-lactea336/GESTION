@@ -3,11 +3,15 @@
 import Header from '@/components/global/Header'
 import InputCalendar from '@/components/global/InputCalendar';
 import LoadingPage from '@/components/global/LoadingPage';
-import obtenerReportes from '@/lib/moduloCaja/obtenerReportes';
 import { fetchPlus } from '@/lib/verificarApiResponse'
 import { Caja } from '@prisma/client';
 import React, { useEffect } from 'react'
-import { ParamsReportes } from '@/lib/moduloCaja/obtenerReportes';
+
+type ReporteParams = {
+  cajaId: string|null,
+  fechaDesde: Date|null,
+  fechaHasta: Date|null,
+}
 
 export default function Reportes() {
 
@@ -15,7 +19,7 @@ export default function Reportes() {
   const [cajas, setCajas] = React.useState<Caja[]>([]);
   const [error, setError] = React.useState<string | null>(null);
 
-  const [reporteParam, setReporteParam] = React.useState<ParamsReportes>({
+  const [reporteParam, setReporteParam] = React.useState<ReporteParams>({
     cajaId: null,
     fechaDesde: null,
     fechaHasta: null
@@ -27,23 +31,17 @@ export default function Reportes() {
     if(data) setCajas(data)
   }
 
-  const handleObtenerReportes = async () => {
-    try{
-      const {data, error} = await obtenerReportes(reporteParam)
-      if(data) console.log(data)
-    }catch(error){
-      if(error instanceof Error) console.error(error.message)
-    }
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const {name, value, id, type} = e.target
+    setReporteParam(prev => {
+      if(type === 'date') return {...prev, [name||id]: new Date(value)}
+      return {...prev, [name||id]: value}
+    })
   }
 
-  const onChange = (e: React.ChangeEvent<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  >) => {
-    const {name, value, type} = e.target
-    setReporteParam(prev => {
-      if(type === 'date') return {...prev, [name]: value}
-      return {...prev, [name]: value}
-    })
+  const onChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const {name, value, id} = e.target
+    setReporteParam(prev => ({...prev, [name||id]: value}))
   }
 
   useEffect(() => {
@@ -64,7 +62,7 @@ export default function Reportes() {
             <select
               name='cajaId'
               value={reporteParam.cajaId || ''}
-              onChange={onChange}
+              onChange={onChangeSelect}
               className='bg-gray-800 text-white py-1 px-2 rounded-md '
             >
               <option value={""}>Seleccione una caja</option>
@@ -95,14 +93,12 @@ export default function Reportes() {
 
           <button 
             className='bg-gray-800 h-12 hover:bg-gray-700 text-white p-2 rounded'
-            onClick={async () => await handleObtenerReportes()}
           >
             Buscar
           </button>
           
           <button 
             className='bg-primary-600 h-12 hover:bg-primary-500 text-white p-2 rounded'
-            onClick={async () => await handleObtenerReportes()}
           >
             Generar
           </button>

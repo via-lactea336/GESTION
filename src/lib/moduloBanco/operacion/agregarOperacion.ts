@@ -15,10 +15,10 @@ export default async function agregarOperacion(
     numeroCheque: string,
     involucrado: string,
     monto: number,
-    fechaEmision: string,
+    fechaEmision: Date,
     esRecibido: boolean,
     bancoChequeId: string,
-  }[]
+  }
 ): Promise<ApiResponseData | string | undefined> {
   try {
     const response = await fetch("/api/operacion", {

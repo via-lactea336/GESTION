@@ -204,8 +204,6 @@ model Cliente {
   facturas     Factura[]
   recibos      Recibos[]
   
-  observaciones String?
-
   deleted      DateTime?
   
   createdAt    DateTime @default(now())
@@ -239,8 +237,8 @@ model Movimiento{
   apertura            AperturaCaja @relation(references: [id], fields: [aperturaId], onDelete: NoAction)
   aperturaId          String
   
-  factura             Factura? @relation(references: [id], fields: [facturaId], onDelete: NoAction)
-  facturaId           String?
+  factura             Factura @relation(references: [id], fields: [facturaId], onDelete: NoAction)
+  facturaId           String
 
   monto               Decimal @db.Money
 
