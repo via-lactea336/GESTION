@@ -126,15 +126,7 @@ export default function FormTransferencias() {
 
   return (
     <form className="w-full" onSubmit={handleSubmit}>
-    { 
-      nombreOperacion === "Depósito"? 
-      
-        <AgregarCheque cheques={cheques} setCheques={setCheques} bancos={bancos} cuentasBancarias={cuentasBancarias}/> 
-      
-      :
-      <>
-      <div className="flex flex-wrap -mx-3 mb-6">
-        <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+      <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
           <label className="mb-2">Tipo de Transacción</label>
           <div className="relative mt-2">
             <select
@@ -172,6 +164,14 @@ export default function FormTransferencias() {
             </div>
           </div>
         </div>
+    { 
+      nombreOperacion === "Depósito"? 
+      
+        <AgregarCheque cheques={cheques} setCheques={setCheques} bancos={bancos} cuentasBancarias={cuentasBancarias}/> 
+      
+      :
+      <>
+      <div className="flex flex-wrap -mx-3 mb-6">
         <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
           <label className="mb-2">
             Cuenta del {
@@ -315,7 +315,6 @@ export default function FormTransferencias() {
       </div>
       </>
     }
-    
       <div className="px-3 flex items-center justify-end mb-6 md:mb-0">
         <button
           type="submit"

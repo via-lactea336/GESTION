@@ -1,8 +1,8 @@
 "use client"
 
 import Input from '@/components/global/Input'
-import { Banco, CuentaBancaria } from '@prisma/client'
-import React, { useState } from 'react'
+import { Banco } from '@prisma/client'
+import React, { useEffect, useState } from 'react'
 import { ChevronDownIcon, TrashIcon } from '@heroicons/react/24/outline'
 import InputCalendar from '@/components/global/InputCalendar'
 import { CuentaBancariaAndBanco } from '@/lib/definitions'
@@ -46,6 +46,11 @@ export default function AgregarCheque({
     monto:0
   })
 
+
+  useEffect(() => {
+    setMontos(prev => ({ ...prev, monto: prev.efectivo + prev.montoCheque }))
+  }, [montos.efectivo, montos.montoCheque])
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target
     setCheque(prev => {
@@ -54,13 +59,15 @@ export default function AgregarCheque({
     })
   }
 
-  const onChangeMontos = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target
+  const onChangeMontos = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setMontos(prev => ({ ...prev, [name]: Number(value) }))
   }
 
   const handleAddChequeToList = (chequeDatos: ChequeCreate) => {
     if (cheques.find(c => c.numeroCheque === chequeDatos.numeroCheque)) return
     setCheques(prev => [...prev, chequeDatos])
+    setMontos(prev => ({ ...prev, montoCheque: [...cheques, chequeDatos].reduce((init, curr) => init + curr.monto, 0) }))
   }
 
   return (
@@ -197,6 +204,7 @@ export default function AgregarCheque({
                   <td>{cheque.involucrado}</td>
                   <td>
                     <button
+                      type='button'
                       className='bg-red-500 hover:bg-red-600 text-white p-1 rounded'
                       onClick={() => setCheques(prev => prev.filter(c => c !== cheque))}
                     >
@@ -240,7 +248,7 @@ export default function AgregarCheque({
                   placeholder='Banco del cheque...'
                   id='involucrado'
                   type='text'
-                  className='bg-gray-800 text-white py-1 px-2 rounded-md'
+                  className='bg-gray-800 text-white py-1 px-2 rounded-md flex-1'
                 />
               </div>
               <div className="flex gap-2">
@@ -265,6 +273,7 @@ export default function AgregarCheque({
               </div>
               <button
                 className="bg-primary-500 hover:bg-primary-600 text-white p-1 rounded"
+                type='button'
                 onClick={() => handleAddChequeToList(cheque)}
               >Agregar
               </button>
