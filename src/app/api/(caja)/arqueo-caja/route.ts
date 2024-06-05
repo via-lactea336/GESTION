@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   const body: ArqueoDeCaja = await req.json();
   const { aperturaId, montoRegistrado } = body;
 
-  if (!aperturaId || !montoRegistrado)
+  if (!aperturaId || (montoRegistrado === undefined || montoRegistrado === null))
     return generateApiErrorResponse("Faltan datos para el arqueo de caja", 400);
 
   const montoRegistradoDecimal = new Decimal(montoRegistrado);
