@@ -22,6 +22,7 @@ export default async function crearArqueo(arqueo: ArqueoCajaData) {
     if (!data.data) throw new Error("Error al crear el arqueo de caja");
     return data;
   } catch (err) {
-    if (err instanceof Error) return err.message;
+    if (err instanceof Error)
+      return { data: undefined, success: false, error: err.message };
   }
 }

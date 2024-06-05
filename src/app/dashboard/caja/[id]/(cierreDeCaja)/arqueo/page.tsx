@@ -357,6 +357,6 @@ export default function Page() {
         </div>
       )}
       <Toaster richColors />
-    </div>
-  );
+    </div>
+  );
 }
