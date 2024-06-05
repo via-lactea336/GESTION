@@ -6,8 +6,9 @@ type Params = {
     aperturaId:string,
     esIngreso:boolean
     monto:number
+    facturaId?:string
   },
-  movsDetalles?:{
+  movsDetalles:{
     metodoPago: medioDePago,
     monto:number 
   }[]
@@ -17,6 +18,9 @@ export default async function crearMovimiento({mov, movsDetalles}:Params) {
   const server_url = process.env.URL;
   const url = server_url || "";
   try {
+
+    if(mov.esIngreso && (!mov.facturaId || mov.facturaId===undefined)) throw new Error("No se puede registrar un ingreso sin una factura")
+
     const aperturaCaja = await fetch(`${url}/api/movimiento`, {
       method: "POST",
       headers: {
