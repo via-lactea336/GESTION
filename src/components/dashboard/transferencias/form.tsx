@@ -275,7 +275,7 @@ export default function FormTransferencias() {
         <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
           <label className=" mb-2">Monto</label>
           <Input
-            className={block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none}
+            className={'block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none'}
             id="monto"
             type="number"
             required
