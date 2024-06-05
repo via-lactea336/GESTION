@@ -1,5 +1,5 @@
 "use client";
-import CheckoutWizard from "@/components/cajaVentanasEmergentes/Paginacion";
+import ContenidoIngresos from "@/components/cajaVentanasEmergentes/Paginacion";
 import Header from "@/components/global/Header";
 import { Cajero } from "@/lib/definitions";
 import { obtenerCookie } from "@/lib/obtenerCookie";
@@ -32,7 +32,7 @@ export default function Page({ params }: { params: { id: string } }) {
         <h3>{cajero.nombre}</h3>
         <h3>Caja N° {caja.numero}</h3>
       </Header>
-      <CheckoutWizard />
+      <ContenidoIngresos />
     </>
   );
 }
