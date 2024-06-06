@@ -11,6 +11,7 @@ import {
 
 import { ArqueoDeCaja } from "@prisma/client";
 import calcularMontoEsperado from "@/lib/moduloCaja/arqueoCaja/calcularMontoEsperado";
+import cerrarCaja from "@/lib/moduloCaja/cerrarCaja";
 
 export async function POST(req: NextRequest) {
   const body: ArqueoDeCaja = await req.json();
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
       return generateApiErrorResponse("Error generando el arqueo de caja", 400);
 
     if (montoRegistradoDecimal.equals(montoEsperado)) {
-      
+      await cerrarCaja(aperturaId);
       return generateApiSuccessResponse(
         200,
         "El arqueo fue generada correctamente y la caja fue cerrada",

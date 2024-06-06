@@ -26,7 +26,7 @@ export default function FormArqueo() {
     const observaciones = e.currentTarget.observaciones.value;
     const error = await login({ username, password });
     if (!error) {
-      const res = await cerrarCajaAdmin(caja.id, apertura.id, observaciones);
+      const res = await cerrarCajaAdmin(caja.id, apertura.id, observaciones, username, password);
       setLoading(false);
       if (res.error) {
         toast.error(res.error);
