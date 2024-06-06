@@ -1,16 +1,14 @@
 "use client";
 import React, { useState } from "react";
 import { login } from "@/lib/auth/login";
-import PasswordField from "@/components/auth/PasswordField";
 import crearMovimiento from "@/lib/moduloCaja/movimiento/crearMovimiento";
 import { AperturaCaja } from "@prisma/client";
 import { obtenerCookie } from "@/lib/obtenerCookie";
-import ComprobanteEgreso, {
-  generatePDF,
-} from "@/components/PDF/ComprobanteEgreso";
+import ComprobanteEgreso, { generatePDF } from "@/components/PDF/ComprobanteEgreso";
 import { Caja } from "@prisma/client";
 import { Cajero } from "@/lib/definitions";
 import { getCurrentDate } from "@/lib/getCurrentDate";
+
 const caja: Caja = obtenerCookie("caja");
 const cajero: Cajero = obtenerCookie("cajero");
 
@@ -26,9 +24,8 @@ const Extraccion: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Cantidad:", cantidad);
-    console.log("Apertura:", apertura);
-    await solicitarExtraccion();
+    setError(""); 
+    await autenticarJefeDeCajas();
   };
 
   const handleUsuarioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,9 +40,7 @@ const Extraccion: React.FC = () => {
     setCantidad(e.target.value);
   };
 
-  const handleObservacionesChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleObservacionesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setObservaciones(e.target.value);
   };
 
@@ -55,13 +50,13 @@ const Extraccion: React.FC = () => {
       if (!error) {
         setAutenticado(true);
         setError("");
-        alert("Usuario y contraseña correctos");
-        console.log(contrasena, usuario);
-        solicitarExtraccion();
+        alert("Autenticacion correcta");
+        await solicitarExtraccion();
+        
       } else {
         setAutenticado(false);
-        setError(error);
-        alert("Autenticación fallida. Por favor, intente nuevamente.");
+        alert("Autenticacion incorrecta");
+        setError("Usuario no autorizado para la extracción");
       }
     } catch (err) {
       setError("Error en la autenticación.");
@@ -70,65 +65,50 @@ const Extraccion: React.FC = () => {
 
   const solicitarExtraccion = async () => {
     try {
-      const error = await login({ username: usuario, password: contrasena });
-      if (!error) {
-        alert("Autenticacion correcta");
-        console.log("Datos a enviar:", {
-          mov: {
-            aperturaId: apertura.id,
-            esIngreso: false,
+      const result = await crearMovimiento({
+        mov: {
+          aperturaId: apertura.id,
+          esIngreso: false,
+          monto: Number(cantidad),
+        },
+        movsDetalles: [
+          {
+            metodoPago: "EFECTIVO",
             monto: Number(cantidad),
           },
-          movsDetalles: [
-            {
-              metodoPago: "EFECTIVO",
-              monto: Number(cantidad),
-            },
-          ],
-        });
-        const result = await crearMovimiento({
-          mov: {
-            aperturaId: apertura.id,
-            esIngreso: false,
-            monto: Number(cantidad),
-          },
-          movsDetalles: [
-            {
-              metodoPago: "EFECTIVO",
-              monto: Number(cantidad),
-            },
-          ],
+        ],
+        username: usuario,
+        password: contrasena,
+        concepto: observaciones,
+      });
+
+      if (typeof result === "string") {
+        setError(result);
+        setMostrarComprobante(false);
+      } else {
+        setMostrarComprobante(true);
+        generatePDF({
+          cajero: cajero.nombre,
+          caja: caja.numero,
+          dateTime: getCurrentDate(),
+          monto: Number(cantidad),
         });
 
-        if (typeof result === "string") {
-          setError(result);
-        } else {
-          setMostrarComprobante(true);
-          generatePDF({
-            cajero: cajero.nombre,
-            caja: caja.numero,
-            dateTime: getCurrentDate(),
-            monto: Number(cantidad),
-          });
-        }
-      } else {
-        alert("Error en la autenticacion");
-        setError(error);
+        setCantidad("");
+        setObservaciones("");
+        setUsuario("");
+        setContrasena("");
       }
     } catch (err) {
       setError("Error en la solicitud de extracción.");
+      setMostrarComprobante(false);
     }
   };
 
   return (
     <div className="flex items-start justify-center min-h-screen bg-gray-800 pt-20">
-      <form
-        className="p-8 bg-gray-700 rounded-md shadow-md w-full max-w-md"
-        onSubmit={handleSubmit}
-      >
-        <h2 className="text-xl font-bold mb-4 text-white">
-          Solicitud de Extracción de Efectivo
-        </h2>
+      <form className="p-8 bg-gray-700 rounded-md shadow-md w-full max-w-md" onSubmit={handleSubmit}>
+        <h2 className="text-xl font-bold mb-4 text-white">Solicitud de Extracción de Efectivo</h2>
         <div className="mb-4">
           <label className="block text-white">Cantidad a extraer:</label>
           <input
@@ -174,15 +154,17 @@ const Extraccion: React.FC = () => {
           </div>
         </div>
         <div>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-primary-800 text-white rounded w-full"
-          >
+          <button type="submit" className="px-4 py-2 bg-primary-800 text-white rounded w-full">
             Solicitar Extracción
           </button>
         </div>
+        {error && (
+          <div className="text-red-500 mt-4">
+            <p>{error}</p>
+          </div>
+        )}
         {mostrarComprobante && (
-          <div>
+          <div className="text-green-500 mt-4">
             <p>Comprobante generado y descargado</p>
           </div>
         )}
