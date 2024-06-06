@@ -34,63 +34,53 @@ const ResumenDeCaja: React.FC<RegistroCaja> = ({
     
     <div className="mb-6 bg-gray-700 shadow-lg p-6">
       <h2 className="mb-4 font-bold">Resumen de Caja</h2>
-      <div className="flex space-x-8 mb-4">
-        <p className="text-white">Fecha: {fecha}</p>
+      <div className="flex justify-between space-x-8 mb-4">
+        <p className="text-white">Fecha: {new Date(createdAt).toLocaleDateString()}</p>
+        <p className="p-2">
+          Hora: {new Date(createdAt).getHours()}:{new Date(createdAt).getMinutes()}
+        </p>
         <p className="text-white">Caja: {caja.numero}</p>
         <p className="text-white">Cajero: {cajero.nombre}</p>
       </div>
       <table className="border-collapse border border-black table-fixed mx-auto w-full">
         <tbody>
           <tr>
-            <td className="p-2">Estado</td>
-            <td className="p-2">{aperturaId}</td>
-          </tr>
-          <tr>
             <td className="p-2">Caja Inicial</td>
-            <td className="p-2">{Number(apertura?.saldoInicial)}</td>
+            <td className="p-2">{Number(apertura?.saldoInicial).toLocaleString()} Gs.</td>
           </tr>
           <tr>
             <td className="p-2">Dinero en Caja</td>
-            <td className="p-2">{Number(montoRegistrado)}</td>
+            <td className="p-2">{Number(montoRegistrado).toLocaleString()} Gs.</td>
           </tr>
         </tbody>
       </table>
-    <div className="mb-6 bg-gray-700 shadow-lg p-6">
-      <h2 className=" mb-4 font-bold">Resumen de ingresos y egresos por forma de pago</h2>
+
+
+      <h2 className=" mb-4 font-bold mt-10">Resumen de ingresos y egresos por forma de pago</h2>
 
       <table className="border-collapse border border-black table-auto mx-auto text-center w-full">
         <thead>
           <tr>
             <th className="p-2 w-1/5">Forma de Pago</th>
             <th className="p-2 w-1/5">Ingreso</th>
-            <th className="p-2 w-1/5">Egreso</th>
-            <th className="p-2 w-1/5">Total</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td className="p-2">Efectivo</td>
-            <td className="p-2">{Number(montoIngreso)}</td>
-            <td className="p-2">{Number(montoEgreso)}</td> 
-            <td className="p-2">{Number(montoIngreso)}</td>
+            <td className="p-2">{Number(montoIngreso).toLocaleString()} Gs.</td>
           </tr>
           <tr>
             <td className="p-2">Cheque</td>
-            <td className="p-2">{Number(montoIngresoCheque)}</td>
-            <td className="p-2">{Number(montoEgresoCheque)}</td> 
-            <td className="p-2">0</td>
+            <td className="p-2">{Number(montoIngresoCheque).toLocaleString()} Gs.</td>
           </tr>
           <tr>
             <td className="p-2">Tarjetas</td>
-            <td className="p-2">{Number(montoIngresoTarjeta)}</td>
-            <td className="p-2">{Number(montoEgresoTarjeta)}</td> 
-            <td className="p-2">0</td>
+            <td className="p-2">{Number(montoIngresoTarjeta).toLocaleString()} Gs.</td>
           </tr>
         </tbody>
       </table>
     </div>
-    </div>
-    
   );
 }
 
