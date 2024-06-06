@@ -12,37 +12,37 @@ export default function Page() {
   const [registros, setRegistros] = useState<RegistroCaja>();
 
 
-useEffect(() =>{
-  const fetchRegistro = async() =>{
-    try{
-      const registros = await obtenerRegistrosCaja();
-      if(!registros || typeof registros == "string") return;
-      const registroActual = registros.data.filter(registro => registro.aperturaId ==apertura.id);
-      setRegistros(registroActual[0])
+  useEffect(() =>{
+    const fetchRegistro = async() =>{
+      try{
+        const registros = await obtenerRegistrosCaja();
+        if(!registros || typeof registros == "string") return;
+        const registroActual = registros.data.filter(registro => registro.aperturaId ==apertura.id);
+        setRegistros(registroActual[0])
 
-      const movimientos = await obtenerMovimientos();
-      if(!movimientos || typeof movimientos == "string") return;
-      
-    }catch(error){
-      console.log(error)
+        const movimientos = await obtenerMovimientos();
+        if(!movimientos || typeof movimientos == "string") return;
+        
+      }catch(error){
+        console.log(error)
+      }
     }
-  }
-  fetchRegistro();
-}, [])
+    fetchRegistro();
+  }, [])
 
-return (
-  !registros? <div>Loading.....</div> : 
-  <div className="flex flex-col h-full -mt-8">
-    <Header title="Resumen diario" />
-    <div className="bg-gray-800 py-6 px-4 rounded-md shadow-md "> 
-      <div className="flex justify-center gap-8" >
-        <div className="w-full">
-          <ResumenDeCaja
-            {...registros}
-          />
+  return (
+    !registros? <div>Loading.....</div> : 
+    <div className="flex flex-col h-full -mt-8">
+      <Header title="Resumen diario" />
+      <div className="bg-gray-800 py-6 px-4 rounded-md shadow-md "> 
+        <div className="flex justify-center gap-8" >
+          <div className="w-full">
+            <ResumenDeCaja
+              {...registros}
+            />
+          </div>
         </div>
       </div>
-    </div>
-  </div> 
-);
+    </div> 
+  );
 }
