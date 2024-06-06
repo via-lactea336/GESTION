@@ -1,8 +1,8 @@
 import { ApiResponseData } from "../../definitions";
 
-export default async function agregarOperacion(
+export type CrearOperacionFields = {
   tipoOperacionId: string,
-  fechaOperacion: Date,
+  fechaOperacion: string,
   monto: number,
   cuentaBancariaOrigenId: string,
   nombreInvolucrado: string,
@@ -19,6 +19,22 @@ export default async function agregarOperacion(
     esRecibido: boolean,
     bancoChequeId: string,
   }[]
+}
+
+export default async function agregarOperacion(
+  {
+    tipoOperacionId,
+    fechaOperacion,
+    monto,
+    cuentaBancariaOrigenId,
+    nombreInvolucrado,
+    concepto,
+    numeroComprobante,
+    cuentaInvolucrado,
+    rucInvolucrado,
+    bancoInvolucrado,
+    cheques
+  }: CrearOperacionFields
 ): Promise<ApiResponseData | string | undefined> {
   try {
     const response = await fetch("/api/operacion", {
