@@ -4,28 +4,33 @@ import {Decimal, PrismaClientKnownRequestError} from "@prisma/client/runtime/lib
 import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiResponse";
 
 import { Comprobante } from "@prisma/client";
+import verifyUser from "@/lib/auth/verifyUser";
 
 export async function POST(req: NextRequest) {
   
-  const body:Comprobante= await req.json();
+  const body:Comprobante & {username:string, password:string}= await req.json();
   
   const { 
     concepto,
     monto, 
-    userId,
-    movimientoId
+    movimientoId,
+    username,
+    password
    } = body;
   
-  if( !monto || !concepto || !userId || !movimientoId ) return generateApiErrorResponse("Faltan datos para la creacion de el comprobante", 400)
+  if( !monto || !concepto || !username || !password || !movimientoId ) return generateApiErrorResponse("Faltan datos para la creacion de el comprobante", 400)
 
   if(new Decimal(monto).lessThanOrEqualTo(0)) return generateApiErrorResponse("El monto debe ser mayor a 0", 400)
 
   try{
+
+    const user = await verifyUser(username, password, "ADMIN")
+
     const comprobante = await prisma.comprobante.create({
       data: {
         concepto,
         monto, 
-        userId,
+        userId: user.id,
         movimientoId
       }
     })
@@ -36,6 +41,7 @@ export async function POST(req: NextRequest) {
   
   }catch(err){
     if(err instanceof PrismaClientKnownRequestError && err.code === "P2002") return generateApiErrorResponse("el comprobante ya existe", 400)
+    else if(err instanceof Error) return generateApiErrorResponse(err.message, 500)
     else return generateApiErrorResponse("Hubo un error en la creacion de el comprobante", 500)
   }  
 }

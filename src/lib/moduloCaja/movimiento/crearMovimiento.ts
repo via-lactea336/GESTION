@@ -11,13 +11,17 @@ type Params = {
   movsDetalles:{
     metodoPago: medioDePago,
     monto:number 
-  }[]
+  }[],
+  username?:string,
+  password?:string,
+  concepto?:string,
 }
 
-export default async function crearMovimiento({mov, movsDetalles}:Params) {
+export default async function crearMovimiento({mov, movsDetalles, username, password, concepto}:Params) {
   const server_url = process.env.URL;
   const url = server_url || "";
   try {
+    if(!mov.esIngreso && !(username && password && concepto)) throw new Error("Si el movimiento es de egreso debe de enviar las credenciales y un concepto")
     const aperturaCaja = await fetchPlus(`${url}/api/movimiento`, {
       method: "POST",
       headers: {
