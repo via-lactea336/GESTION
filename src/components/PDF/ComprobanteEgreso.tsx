@@ -54,16 +54,20 @@ const ComprobantePDF: React.FC<ComprobanteProps> = ({
       <View style={styles.section}>
         <Text style={styles.header}>Comprobante de Extracción</Text>
         <Text style={styles.text}>
-          <Text style={styles.bold}>Caja: </Text>{caja}
+          <Text style={styles.bold}>Caja: </Text>
+          {caja}
         </Text>
         <Text style={styles.text}>
-          <Text style={styles.bold}>Cajero: </Text>{cajero}
+          <Text style={styles.bold}>Cajero: </Text>
+          {cajero}
         </Text>
         <Text style={styles.text}>
-          <Text style={styles.bold}>Fecha y Hora: </Text>{dateTime}
+          <Text style={styles.bold}>Fecha y Hora: </Text>
+          {dateTime}
         </Text>
         <Text style={styles.text}>
-          <Text style={styles.bold}>Monto: </Text>{monto} Gs.
+          <Text style={styles.bold}>Monto: </Text>
+          {monto} Gs.
         </Text>
       </View>
     </Page>
