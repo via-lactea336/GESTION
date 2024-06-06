@@ -1,4 +1,4 @@
-import { ApiResponseData } from "@/lib/definitions";
+import { fetchPlus } from "@/lib/verificarApiResponse";
 import { medioDePago } from "@prisma/client";
 
 type Params = {
@@ -6,34 +6,37 @@ type Params = {
     aperturaId:string,
     esIngreso:boolean
     monto:number
+    facturaId?:string
   },
-  movsDetalles?:{
+  movsDetalles:{
     metodoPago: medioDePago,
     monto:number 
-  }[]
+  }[],
+  username?:string,
+  password?:string,
+  concepto?:string,
 }
 
-export default async function crearMovimiento({mov, movsDetalles}:Params) {
+export default async function crearMovimiento({mov, movsDetalles, username, password, concepto}:Params) {
   const server_url = process.env.URL;
   const url = server_url || "";
   try {
-    const aperturaCaja = await fetch(`${url}/api/movimiento`, {
+    if(!mov.esIngreso && !(username && password && concepto)) throw new Error("Si el movimiento es de egreso debe de enviar las credenciales y un concepto")
+    const aperturaCaja = await fetchPlus(`${url}/api/movimiento`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        apertura: {
+        mov: {
           aperturaId: mov.aperturaId,
           esIngreso: mov.esIngreso,
           monto: mov.monto,
         },
-        movsDetalles: movsDetalles || null,
+        movsDetalles: movsDetalles,
       }),
     });
-    const data: ApiResponseData = await aperturaCaja.json();
-    if (data.error) throw new Error(data.error);
-    return data;
+    return aperturaCaja
   } catch (err) {
     if (err instanceof Error) return err.message;
   }

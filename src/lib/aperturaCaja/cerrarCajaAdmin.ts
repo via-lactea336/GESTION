@@ -3,7 +3,9 @@ import { fetchPlus } from "../verificarApiResponse";
 const cerrarCajaAdmin = async (
   cajaId: string,
   aperturaId: string,
-  observaciones: string
+  observaciones: string,
+  username: string,
+  password: string
 ) => {
   const server_url = process.env.URL;
   const url = server_url || "";
@@ -14,6 +16,8 @@ const cerrarCajaAdmin = async (
     body: JSON.stringify({
       aperturaId,
       observaciones,
+      username,
+      password
     }),
     method: "PUT",
   });

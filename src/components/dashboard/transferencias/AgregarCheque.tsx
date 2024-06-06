@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react'
 import { ChevronDownIcon, TrashIcon } from '@heroicons/react/24/outline'
 import InputCalendar from '@/components/global/InputCalendar'
 import { CuentaBancariaAndBanco } from '@/lib/definitions'
+import { CrearOperacionFields } from '@/lib/moduloBanco/operacion/agregarOperacion'
 
 export type ChequeCreate = {
   numeroCheque: string,
@@ -17,6 +18,8 @@ export type ChequeCreate = {
 }
 
 type Props = {
+  monto:number
+  setOperacion: React.Dispatch<React.SetStateAction<CrearOperacionFields>>
   cheques: ChequeCreate[]
   setCheques: React.Dispatch<React.SetStateAction<ChequeCreate[]>>
   bancos: Banco[]
@@ -27,7 +30,9 @@ export default function AgregarCheque({
   cheques,
   setCheques,
   bancos,
-  cuentasBancarias
+  cuentasBancarias,
+  setOperacion,
+  monto
 }: Props) {
 
   const [display, setDisplay] = useState(false)
@@ -74,8 +79,8 @@ export default function AgregarCheque({
 
     <>
     <div className="grid grid-rows-2 grid-flow-col gap-4">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="w-full px-3 mb-6 md:mb-0">
+      <div className="grid grid-cols-1 content-center lg:grid-cols-4 gap-6">
+        <div className="w-full mb-6 md:mb-0">
           <label className="mb-2">
             Cuenta del Beneficiario
           </label>
@@ -105,7 +110,7 @@ export default function AgregarCheque({
           </div>
         </div>
 
-          <div className="w-full px-3 mb-6 md:mb-0">
+          <div className="w-full  mb-6 md:mb-0">
             <label className=" mb-2">
               Nombre del Remitente
             </label>
@@ -118,7 +123,7 @@ export default function AgregarCheque({
             />
           </div>
 
-        <div className="w-full px-3 mb-6 md:mb-0">
+        <div className="w-full  mb-6 md:mb-0">
             <label className=" mb-2">Efectivo</label>
             <Input
               className={'block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none'}
@@ -130,7 +135,7 @@ export default function AgregarCheque({
             />
           </div>
           
-        <div className="w-full px-3 mb-6 md:mb-0">
+        <div className="w-full  mb-6 md:mb-0">
             <label className="mb-2">Número de Comprobante</label>
             <Input
               className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
@@ -142,9 +147,9 @@ export default function AgregarCheque({
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         
-        <div className="w-full px-3 mb-6 md:mb-0">
+        <div className="w-full  mb-6 md:mb-0">
             <label className="mb-2">Fecha de la Transacción</label>
             <InputCalendar
               className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
@@ -152,7 +157,7 @@ export default function AgregarCheque({
               required
             />
         </div>
-        <div className="px-3 mb-6 col-span-2 md:mb-0">
+        <div className=" mb-6 col-span-1 md:col-span-2 md:mb-0">
             <label className="mb-2">Concepto</label>
             <Input
               className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
@@ -162,7 +167,7 @@ export default function AgregarCheque({
               placeholder="Pago de servicios básicos"
             />
         </div>
-        <div className="w-full px-3 mb-6 md:mb-0">
+        <div className="w-full  mb-6 md:mb-0">
             <label className="mb-2">Monto Total</label>
             <input 
               value={montos.monto} 

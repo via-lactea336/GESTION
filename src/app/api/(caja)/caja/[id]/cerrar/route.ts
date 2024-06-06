@@ -1,51 +1,46 @@
 import { generateApiErrorResponse, generateApiSuccessResponse } from "@/lib/apiResponse";
-import authOptions from "@/lib/auth/options";
+import { comparePasswords } from "@/lib/bcrypt";
+import cerrarCaja from "@/lib/moduloCaja/cerrarCaja";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
 import { NextRequest } from "next/server";
 
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
 
-  const session = await getServerSession(authOptions)
-  if (session && session.user.rol !== "ADMIN") return generateApiErrorResponse("Acceso no autorizado, no eres administrador", 401)
-
   const id = params.id;
   const {
+    username,
+    password,
     aperturaId,
     observaciones,
   }: {
+    username: string,
+    password: string,
     aperturaId:string,
     observaciones?:string
   } = await req.json();
 
+  if(!username || !password) return generateApiErrorResponse("Es necesario un usuario y una contraseña del administrador", 400)
   if(!aperturaId) return generateApiErrorResponse("No se puede cerrar la caja sin el identificador de la apertura activa", 400)
 
-  try {
-    const caja = await prisma.caja.update({
-      where: {
-        id
-      },
-      data: {
-        estaCerrado: true,
-        aperturas:{
-        update: {
-            where: {
-              id: aperturaId
-            },
-            data:{
-              cierreCaja: new Date(),
-              observaciones
-            }
-          }
-        }
-      }
-    });
+  const user = await prisma.user.findUnique({
+    where: {
+      username
+    },
+    select: {
+      password: true,
+      rol: true
+    }
+  })
 
-    if(!caja) return generateApiErrorResponse("No se ha podido cerrar la caja", 500)
-    return generateApiSuccessResponse(200, `La caja se ha cerrado exitosamente`, caja);
+  if(!user || !await comparePasswords(password, user.password)) return generateApiErrorResponse("El usuario o la contraseña son incorrectos", 400)
+  if(user.rol !== "ADMIN") return generateApiErrorResponse("Acceso no autorizado, no eres administrador", 401)
+
+  try {
+    await cerrarCaja(aperturaId, observaciones);
+    return generateApiSuccessResponse(200, `La caja se ha cerrado exitosamente`);
   } catch (error) {
-    // Si hay un error al actualizar, devuelve un mensaje de error
+    if(error instanceof Error) return generateApiErrorResponse(error.message, 500)
     return generateApiErrorResponse("Error cerrando la caja", 500);
   }
 }

@@ -4,7 +4,36 @@ const prisma = new PrismaClient();
 
 async function main() {
 
-    /*const facturas = await prisma.factura.createMany({
+    const apertura = await prisma.aperturaCaja.create({
+        data: {
+            id:"29a5265c-eb44-432f-9564-d92280cbbd2e",
+            cajaId: "db639420-1db5-4cee-8f1e-c27435baba47",
+            cajeroId: "422b3dd6-01b9-4d98-ad72-2953bfb8b3f5",
+            saldoInicial: 10000,
+        }
+    });
+
+    const clienteId = await prisma.cliente.createMany({
+        data: [
+            {
+                id: "1a461332-9a14-4d60-9ac6-70b77fc863cb",
+                nombre: "David Martinez",
+                docIdentidad: "82132341-0",
+            },
+            {
+                id: "9a569332-0710-42c6-99bc-039a0b14b9cc",
+                nombre: "Juan Perez",
+                docIdentidad: "80012241-0",
+            },
+            {
+                id: "57909003-563c-4d3d-bca7-f4a7e63d8e01",
+                nombre: "Pedro Lopez",
+                docIdentidad: "80017252-0",
+            },
+        ]
+    });
+
+    const facturas = await prisma.factura.createMany({
         data: [
             {
                 clienteId: "1a461332-9a14-4d60-9ac6-70b77fc863cb",
@@ -49,9 +78,8 @@ async function main() {
                 ivaTotal: 13635,
             },
         ],
-    });*/
+    });
 
-    const facturas = await prisma.factura.findMany({});
    const movimientos = await prisma.movimiento.createMany({
         data: [
             {

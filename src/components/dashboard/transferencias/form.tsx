@@ -5,7 +5,7 @@ import obtenerBancos from "@/lib/moduloBanco/banco/obtenerBancos";
 import obtenerCuentaBancaria from "@/lib/moduloBanco/cuentaBancaria/obtenerCuentaBancaria";
 import { CuentaBancariaAndBanco } from "@/lib/definitions";
 import { useCalendar } from "@/lib/hooks/useCalendar";
-import agregarOperacion from "@/lib/moduloBanco/operacion/agregarOperacion";
+import agregarOperacion, { CrearOperacionFields } from "@/lib/moduloBanco/operacion/agregarOperacion";
 import obtenerTiposOperacion from "@/lib/moduloBanco/tipoOperacion/obtenerTiposOperacion";
 import { Banco, TipoOperacion } from "@prisma/client";
 import { SetStateAction, useEffect, useState } from "react";
@@ -30,50 +30,51 @@ export default function FormTransferencias() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     setLoadingSend(true);
     event.preventDefault();
-    const form = event.currentTarget;
-    console.log(form["fechaOperacion"].value);
-    const dateValue = form["fechaOperacion"].value;
-    // Desglosar manualmente la fecha seleccionada
-    const [year, month, day] = dateValue.split("-").map(Number);
-    const fecha = new Date(year, month - 1, day); // Nota: los meses en JavaScript son 0-indexados
+    // const form = event.currentTarget;
+    // console.log(form["fechaOperacion"].value);
+    // const dateValue = form["fechaOperacion"].value;
+    // // Desglosar manualmente la fecha seleccionada
+    // const [year, month, day] = dateValue.split("-").map(Number);
+    // const fecha = new Date(year, month - 1, day); // Nota: los meses en JavaScript son 0-indexados
 
-    // Obtener la fecha y hora actuales
-    const fechaActual = new Date();
+    // // Obtener la fecha y hora actuales
+    // const fechaActual = new Date();
 
-    // Establecer los componentes de tiempo actuales en el objeto fecha
-    fecha.setHours(fechaActual.getHours());
-    fecha.setMinutes(fechaActual.getMinutes());
-    fecha.setSeconds(fechaActual.getSeconds());
-    fecha.setMilliseconds(fechaActual.getMilliseconds());
+    // // Establecer los componentes de tiempo actuales en el objeto fecha
+    // fecha.setHours(fechaActual.getHours());
+    // fecha.setMinutes(fechaActual.getMinutes());
+    // fecha.setSeconds(fechaActual.getSeconds());
+    // fecha.setMilliseconds(fechaActual.getMilliseconds());
 
-    // Ahora fecha tiene la fecha seleccionada con la hora actual
-    console.log(fecha);
-    const aux = event.target as HTMLFormElement;
-    const data: Operacion = {
-      tipoOperacionId: form["operacion"].value,
-      fechaOperacion: fecha,
-      monto: Number(form["monto"].value),
-      cuentaBancariaOrigenId: form["cuentaBancariaOrigenId"].value,
-      bancoInvolucrado: form["bancoInvolucrado"].value,
-      nombreInvolucrado: form["nombreInvolucrado"].value,
-      cuentaInvolucrado: form["cuentaInvolucrado"].value,
-      rucInvolucrado: form["rucInvolucrado"].value,
-      concepto: form["concepto"].value,
-      numeroComprobante: form["comprobante"].value,
-    };
+    // // Ahora fecha tiene la fecha seleccionada con la hora actual
+    // console.log(fecha);
+    // const aux = event.target as HTMLFormElement;
+    // const operacion: Operacion = {
+    //   tipoOperacionId: form["operacion"].value,
+    //   fechaOperacion: fecha,
+    //   monto: Number(form["monto"].value),
+    //   cuentaBancariaOrigenId: form["cuentaBancariaOrigenId"].value,
+    //   bancoInvolucrado: form["bancoInvolucrado"].value,
+    //   nombreInvolucrado: form["nombreInvolucrado"].value,
+    //   cuentaInvolucrado: form["cuentaInvolucrado"].value,
+    //   rucInvolucrado: form["rucInvolucrado"].value,
+    //   concepto: form["concepto"].value,
+    //   numeroComprobante: form["comprobante"].value,
+    // };
 
-    const response = await agregarOperacion(
-      data.tipoOperacionId,
-      data.fechaOperacion,
-      data.monto,
-      data.cuentaBancariaOrigenId,
-      data.bancoInvolucrado,
-      data.nombreInvolucrado,
-      data.cuentaInvolucrado,
-      data.rucInvolucrado,
-      data.concepto,
-      data.numeroComprobante,
-      cheques,
+    const response = await agregarOperacion({
+      tipoOperacionId:operacion.tipoOperacionId,
+      fechaOperacion: operacion.fechaOperacion,
+      monto: operacion.monto,
+      cuentaBancariaOrigenId:operacion.cuentaBancariaOrigenId,
+      bancoInvolucrado: operacion.bancoInvolucrado,
+      nombreInvolucrado: operacion.nombreInvolucrado,
+      cuentaInvolucrado: operacion.cuentaInvolucrado,
+      rucInvolucrado: operacion.rucInvolucrado,
+      concepto: operacion.concepto,
+      numeroComprobante: operacion.numeroComprobante,
+      cheques:cheques
+    }
     );
     if (response !== undefined && typeof response !== "string") {
       if (response.error) {
@@ -83,22 +84,49 @@ export default function FormTransferencias() {
         setLoadingSend(false);
         toast.success("Operación registrada correctamente");
         // Limpiar formulario
-        form.reset();
+        // form.reset();
       }
     }
   };
+
+  //Estado de la operacion a ser creada
+  const initialValues = {
+    tipoOperacionId: "",
+    fechaOperacion: "",
+    monto: 0,
+    cuentaBancariaOrigenId: "",
+    nombreInvolucrado: "",
+    concepto: "",
+    numeroComprobante: "",
+    cuentaInvolucrado: undefined,
+    rucInvolucrado: undefined,
+    bancoInvolucrado: undefined,
+  }
+  const [operacion, setOperacion] = useState<CrearOperacionFields>(initialValues);
+  
+  //Naturaleza de la operacion
   const [nombreOperacion, setNombreOperacion] = useState("");
-  const [bancos, setBancos] = useState<Banco[]>([]);
   const [esDebito, setEsDebito] = useState<boolean>(false);
-  const [cuentasBancarias, setCuentasBancarias] = useState<
-    CuentaBancariaAndBanco[]
-  >([]);
+  
+  //Estados para manejar opciones 
+  const [bancos, setBancos] = useState<Banco[]>([]);
+  const [cuentasBancarias, setCuentasBancarias] = useState<CuentaBancariaAndBanco[]>([]);
   const [operaciones, setOperaciones] = useState<TipoOperacion[]>([]);
+
+  //Estados para el manejo de estados de carga/error
   const [loading, setLoading] = useState(false);
   const [loadingSend, setLoadingSend] = useState(false);
 
+  //Manejo de cheques
   const [cheques, setCheques] = useState<ChequeCreate[]>([]);
 
+  //Handle onChange of the inputs
+  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement| HTMLSelectElement>) => {
+    const { name, value, id } = event.target;
+    setOperacion({ ...operacion, [name||id]: value });
+  };
+
+  //Fetch data for the form
   const fetchDatos = async () => {
     setLoading(true);
     const bancos = await obtenerBancos();
@@ -116,6 +144,13 @@ export default function FormTransferencias() {
       setCuentasBancarias(cuentasBancarias.data);
       setOperaciones(operaciones.data);
       setEsDebito(operaciones.data[0].esDebito);
+      setNombreOperacion(operaciones.data[0].nombre);
+      setOperacion({
+        ...operacion,
+        tipoOperacionId: operaciones.data[0].id,
+        cuentaBancariaOrigenId: cuentasBancarias.data[0].id,
+        bancoInvolucrado: bancos.data[0].id,
+      })
     }
     setLoading(false);
   };
@@ -124,16 +159,29 @@ export default function FormTransferencias() {
     fetchDatos();
   }, []);
 
+  useEffect(() => {
+    setOperacion({
+      ...operacion,
+      cuentaBancariaOrigenId: initialValues.cuentaBancariaOrigenId,
+      nombreInvolucrado: initialValues.nombreInvolucrado,
+      bancoInvolucrado: initialValues.bancoInvolucrado,
+      rucInvolucrado: initialValues.rucInvolucrado,
+      cuentaInvolucrado: initialValues.cuentaInvolucrado,
+    })
+    setCheques([])
+  }, [operacion.tipoOperacionId])
+
   return (
     <form className="w-full" onSubmit={handleSubmit}>
-      <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+      <div className="w-full mb-6">
           <label className="mb-2">Tipo de Transacción</label>
           <div className="relative mt-2">
             <select
               className="block appearance-none w-full bg-gray-800 py-3 px-4 pr-8 rounded leading-tight focus:outline-none"
-              id="operacion"
+              id="tipoOperacionId"
               required
               onChange={(e) => {
+                handleOnChange(e);
                 setEsDebito(
                   operaciones.find((op) => op.id === e.target.value)
                     ?.esDebito || false
@@ -167,7 +215,7 @@ export default function FormTransferencias() {
     { 
       nombreOperacion === "Depósito"? 
       
-        <AgregarCheque cheques={cheques} setCheques={setCheques} bancos={bancos} cuentasBancarias={cuentasBancarias}/> 
+        <AgregarCheque monto={operacion.monto} setOperacion={setOperacion} cheques={cheques} setCheques={setCheques} bancos={bancos} cuentasBancarias={cuentasBancarias}/> 
       
       :
       <>
@@ -181,6 +229,7 @@ export default function FormTransferencias() {
           <div className="relative mt-2">
             <select
               className="block appearance-none w-full bg-gray-800 py-3 px-4 pr-8 rounded leading-tight focus:outline-none"
+              onChange={handleOnChange}
               id="cuentaBancariaOrigenId"
               required
             >
@@ -212,6 +261,7 @@ export default function FormTransferencias() {
           </label>
           <div className="relative mt-2">
             <select
+              onChange={handleOnChange}
               className="block appearance-none w-full bg-gray-800 py-3 px-4 pr-8 rounded leading-tight focus:outline-none"
               id="bancoInvolucrado"
               required
@@ -242,6 +292,7 @@ export default function FormTransferencias() {
           <Input
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="cuentaInvolucrado"
+            onChange={handleOnChange}
             required
             type="text"
             placeholder="22-187805"
@@ -257,6 +308,7 @@ export default function FormTransferencias() {
           <Input
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="nombreInvolucrado"
+            onChange={handleOnChange}
             type="text"
             required
             placeholder="Pedro Meza"
@@ -267,6 +319,7 @@ export default function FormTransferencias() {
           <Input
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="rucInvolucrado"
+            onChange={handleOnChange}
             type="text"
             required
             placeholder="123456-1"
@@ -277,6 +330,7 @@ export default function FormTransferencias() {
           <Input
             className={'block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none'}
             id="monto"
+            onChange={handleOnChange}
             type="number"
             required
             placeholder="150000"
@@ -286,8 +340,9 @@ export default function FormTransferencias() {
           <label className="mb-2">Número de Comprobante</label>
           <Input
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
-            id="comprobante"
+            id="numeroComprobante"
             type="text"
+            onChange={handleOnChange}
             required
             placeholder="012345"
           />
@@ -299,6 +354,7 @@ export default function FormTransferencias() {
           <InputCalendar
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="fechaOperacion"
+            handleChange={handleOnChange}
             required
           />
         </div>
@@ -308,6 +364,7 @@ export default function FormTransferencias() {
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="concepto"
             type="text"
+            onChange={handleOnChange}
             required
             placeholder="Pago de servicios básicos"
           />
