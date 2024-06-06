@@ -13,7 +13,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
   const links = [
     { href: `/dashboard/caja/${id}/arqueo`, text: "Arqueo" },
-    { href: `/dashboard/caja/${id}/resumenDiario`, text: "Resumen Diario" },
+    { href: `/dashboard/caja/reportes`, text: "Reportes" },
     { href: `/dashboard/caja/${id}/egreso`, text: "Egreso" },
   ];
 
@@ -24,12 +24,12 @@ export default function Page({ params }: { params: { id: string } }) {
           <Link
             key={index}
             href={link.href}
-            className="bg-gray-800 p-1 rounded-md hover:text-primary-100"
+            className="bg-gray-800 py-1 px-2 rounded-md hover:text-primary-100 hover:bg-gray-900 mx-2"
           >
             {link.text}
           </Link>
         ))}
-        <h3>{cajero.nombre}</h3>
+        <h3 className="ml-8">{cajero.nombre}</h3>
         <h3>Caja N° {caja.numero}</h3>
       </Header>
       <ContenidoIngresos />
