@@ -6,7 +6,7 @@ type Params = {
     aperturaId:string,
     esIngreso:boolean
     monto:number
-    facturaId:string
+    facturaId?:string
   },
   movsDetalles:{
     metodoPago: medioDePago,
