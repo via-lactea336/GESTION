@@ -3,11 +3,12 @@ import { fetchPlus } from "@/lib/verificarApiResponse";
 export type ComprobanteCreate = {
   concepto: string;
   monto: number;
-  userId:string;
+  username:string;
+  password:string;
   movimientoId: string;
 }
 
-export default async function crearComprobante({ concepto, monto, userId, movimientoId }: ComprobanteCreate) {
+export default async function crearComprobante({ concepto, monto, username, password, movimientoId }: ComprobanteCreate) {
   
   const server_url = process.env.URL;
   const url = server_url || "";
@@ -19,7 +20,8 @@ export default async function crearComprobante({ concepto, monto, userId, movimi
     body: JSON.stringify({
       concepto,
       monto,
-      userId,
+      username,
+      password,
       movimientoId
     }),
     method: "POST",
