@@ -34,6 +34,9 @@ export default async function crearMovimiento({mov, movsDetalles, username, pass
           monto: mov.monto,
         },
         movsDetalles: movsDetalles,
+        username: username, 
+        password: password, 
+        concepto: concepto, 
       }),
     });
     return aperturaCaja

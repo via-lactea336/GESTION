@@ -40,6 +40,7 @@ type ComprobanteProps = {
   caja: number;
   dateTime: string;
   monto: number;
+  observaciones?: string;
 };
 
 // Componente del Comprobante PDF
@@ -48,6 +49,7 @@ const ComprobantePDF: React.FC<ComprobanteProps> = ({
   caja,
   dateTime,
   monto,
+  observaciones
 }) => (
   <Document>
     <Page size="A4" style={styles.page}>
@@ -68,6 +70,10 @@ const ComprobantePDF: React.FC<ComprobanteProps> = ({
         <Text style={styles.text}>
           <Text style={styles.bold}>Monto: </Text>
           {monto} Gs.
+        </Text>
+        <Text style={styles.text}>
+          <Text style={styles.bold}>Observaciones: </Text>
+          {observaciones} 
         </Text>
       </View>
     </Page>
