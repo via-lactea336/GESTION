@@ -143,6 +143,7 @@ model User {
   rol           Roles @default(EMPLOYEES)
 
   aperturas     AperturaCaja[]	
+  comprobantes  Comprobante[]
 
   deleted       DateTime?
   
@@ -221,6 +222,8 @@ model ArqueoDeCaja {
 
   deleted   DateTime?
 
+  observaciones String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -237,8 +240,8 @@ model Movimiento{
   apertura            AperturaCaja @relation(references: [id], fields: [aperturaId], onDelete: NoAction)
   aperturaId          String
   
-  factura             Factura @relation(references: [id], fields: [facturaId], onDelete: NoAction)
-  facturaId           String
+  factura             Factura? @relation(references: [id], fields: [facturaId], onDelete: NoAction)
+  facturaId           String?
 
   monto               Decimal @db.Money
 
@@ -318,8 +321,8 @@ model Comprobante {
   concepto      String
   monto         Decimal @db.Money
 
-  docIdentidad  String @db.VarChar(128)
-  nombre        String @db.VarChar(128)
+  user          User @relation(references: [id], fields: [userId], onDelete: NoAction)
+  userId        String
   
   movimiento    Movimiento @relation(references: [id], fields: [movimientoId], onDelete: NoAction)
   movimientoId  String

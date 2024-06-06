@@ -243,6 +243,21 @@ async function main() {
         "id": "fc103569-4d29-47b6-a43d-786d600c8008",
         "numero": 3,
         "estaCerrado": true,
+      },
+      {
+        "id": "fc103569-4d29-47b6-a43d-786d600c8007",
+        "numero": 4,
+        "estaCerrado": true,
+      },
+      {
+        "id": "fc103569-4d29-47b6-a43d-786d600c8001",
+        "numero": 5,
+        "estaCerrado": true,
+      },
+      {
+        "id": "fc103569-4d29-47b6-a43d-786d600c8006",
+        "numero": 316,
+        "estaCerrado": true,
       }
     ]
   })
