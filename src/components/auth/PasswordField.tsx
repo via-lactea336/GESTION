@@ -8,6 +8,8 @@ type PasswordFieldProps = {
   placeholder: string;
   validate?: boolean;
   className?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export default function PasswordField({
@@ -16,6 +18,8 @@ export default function PasswordField({
   placeholder,
   validate,
   className,
+  value,
+  onChange,
 }: PasswordFieldProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -33,6 +37,8 @@ export default function PasswordField({
           name={name}
           placeholder={placeholder}
           required
+          onChange={onChange}
+          value={value}
           minLength={8}
           id={name}
           pattern={
