@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   
   if( !nombre || !apellido || !docIdentidad || !username || !password) return generateApiErrorResponse("No hay informacion suficiente para la creacion del nuevo usuario", 400) //Validate credentials
 
-  if(rol && rol in Roles) return generateApiErrorResponse("El Rol ingresado es invalido", 400)
+  if(rol && !(rol in Roles)) return generateApiErrorResponse("El Rol ingresado es invalido", 400)
 
   const hashedPassword = await hashPassword(password) //Hash the password of the new user 
 
