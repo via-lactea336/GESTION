@@ -7,8 +7,8 @@ export type Filter = {
   ruc?: string;
   pagado?: boolean;
   esContado?: boolean;
-  skip?: number;
-  upTo?: number;
+  skip: number;
+  upTo: number;
 };
 
 export type ResponseData = {

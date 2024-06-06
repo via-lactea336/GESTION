@@ -68,14 +68,14 @@ export default function Pagination({ changeIndicePagina, indiceActual, indicesPa
         </div>
         <div className="gap-2 flex">
           <button
-            onClick={async () => await changeIndicePagina(current + 1)}
+            onClick={async () => changeIndicePagina(current + 1)}
             disabled={current + 1 === totalIndices}
             className="w-8 bg-gray-700 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed rounded"
           >
             <ChevronRightIcon />
           </button>
           <button
-            onClick={async () => await changeIndicePagina(totalIndices - 1)}
+            onClick={async () => changeIndicePagina(totalIndices - 1)}
             disabled={current + 1 === totalIndices}
             className="w-8 bg-gray-700 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed rounded"
           >
