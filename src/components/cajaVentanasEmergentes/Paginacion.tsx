@@ -1,34 +1,45 @@
 import { useState, useEffect } from "react";
-import obtenerFacturasFiltro, {
-  Filter,
-} from "@/lib/moduloCaja/factura/obtenerFacturasFiltro"; // Asegúrate de ajustar la ruta según la ubicación de tu archivo obtenerFacturasFiltro
+import obtenerFacturasFiltro, { Filter } from "@/lib/moduloCaja/factura/obtenerFacturasFiltro"; // Asegúrate de ajustar la ruta según la ubicación de tu archivo obtenerFacturasFiltro
 import { Factura } from "@prisma/client";
 import obtenerCliente from "@/lib/moduloCaja/cliente/obtenerCliente";
 import LoadingCirleIcon from "../global/LoadingCirleIcon";
+import Pagination from "../global/Pagination";
 
 interface FacturaConRuc extends Factura {
   ruc: string;
 }
 
 const ContenidoIngresos = () => {
-  const [filters, setFilters] = useState<Filter>({
+  const initialFilters: Filter = {
     skip: 0,
     upTo: 10,
-  });
+  };
 
+  const [tempFilters, setTempFilters] = useState<Filter>(initialFilters);
+  const [filters, setFilters] = useState<Filter>(initialFilters);
   const [listaDeFacturas, setListaDeFacturas] = useState<FacturaConRuc[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [indiceActual, setIndiceActual] = useState(0);
+  const [totalPaginas, setTotalPaginas] = useState(0);
 
   const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
-    setFilters((prevFilters) => ({
+    setTempFilters((prevFilters) => ({
       ...prevFilters,
       [name]: value,
     }));
   };
 
-  const handleSearch = async () => {
+  const handleSearch = () => {
+    setFilters(tempFilters);
+  };
+
+  const handleClearFilters = () => {
+    setTempFilters(initialFilters);
+  };
+
+  const fetchData = async () => {
     try {
       setLoading(true);
       const response = await obtenerFacturasFiltro({
@@ -37,8 +48,8 @@ const ContenidoIngresos = () => {
         ruc: filters.ruc,
         pagado: filters.pagado,
         esContado: filters.esContado,
-        skip: filters.skip ? filters.skip : undefined,
-        upTo: filters.upTo ? filters.skip : undefined,
+        skip: filters.skip,
+        upTo: filters.upTo,
       });
       if (response === undefined || typeof response === "string") {
         setLoading(false);
@@ -60,13 +71,13 @@ const ContenidoIngresos = () => {
             return { ...factura, ruc: cliente.docIdentidad };
           })
         );
-        setLoading(false);
         setListaDeFacturas(facturasConRuc);
+        setTotalPaginas(Math.ceil(data.totalQuantity / filters.upTo));
       } else {
-        setLoading(false);
         setListaDeFacturas([]);
         setError(error || null);
       }
+      setLoading(false);
     } catch (err) {
       setLoading(false);
       if (err instanceof Error) {
@@ -75,10 +86,17 @@ const ContenidoIngresos = () => {
     }
   };
 
+  const changeIndicePagina = (indice: number) => {
+    setIndiceActual(indice);
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      skip: indice * filters.upTo,
+    }));
+  };
+
   useEffect(() => {
-    // Fetch initial data
-    handleSearch();
-  }, []);
+    fetchData();
+  }, [filters]);
 
   return (
     <>
@@ -94,7 +112,7 @@ const ContenidoIngresos = () => {
                 type="text"
                 id="ruc"
                 name="ruc"
-                value={filters.ruc}
+                value={tempFilters.ruc || ""}
                 onChange={handleChange}
                 className="rounded p-2"
                 required
@@ -108,12 +126,12 @@ const ContenidoIngresos = () => {
                 type="date"
                 id="fechaDesde"
                 name="fechaDesde"
-                value={filters.fechaDesde}
+                value={tempFilters.fechaDesde || ""}
                 onChange={handleChange}
                 className="rounded p-1"
                 max={
-                  filters.fechaHasta
-                    ? filters.fechaHasta
+                  tempFilters.fechaHasta
+                    ? tempFilters.fechaHasta
                     : new Date().toISOString().split("T")[0]
                 }
               />
@@ -126,7 +144,7 @@ const ContenidoIngresos = () => {
                 type="date"
                 id="fechaHasta"
                 name="fechaHasta"
-                value={filters.fechaHasta}
+                value={tempFilters.fechaHasta || ""}
                 onChange={handleChange}
                 className="rounded p-1"
                 max={new Date().toISOString().split("T")[0]}
@@ -139,7 +157,7 @@ const ContenidoIngresos = () => {
               <select
                 id="pagado"
                 name="pagado"
-                value={"true"}
+                value={tempFilters.pagado ? tempFilters.pagado.toString() : ""}
                 onChange={handleChange}
                 className="rounded p-2"
               >
@@ -155,7 +173,7 @@ const ContenidoIngresos = () => {
               <select
                 id="esContado"
                 name="esContado"
-                value={""}
+                value={tempFilters.esContado ? tempFilters.esContado.toString() : ""}
                 onChange={handleChange}
                 className="rounded p-2"
               >
@@ -164,14 +182,23 @@ const ContenidoIngresos = () => {
                 <option value="false">No</option>
               </select>
             </div>
-            <div className="flex flex-col flex-grow m-2 justify-end">
-              <button
-                onClick={handleSearch}
-                className="p-2 bg-primary-700 text-white rounded h-auto"
-              >
-                Buscar
-              </button>
-            </div>
+            <div className="flex flex-col">
+              <div className="flex flex-col flex-grow m-2 justify-end">
+                <button
+                  onClick={handleClearFilters}
+                  className="p-2 bg-gray-500 text-white rounded h-auto"
+                >
+                  Limpiar Filtros
+                </button>
+              </div>
+              <div className="flex flex-col flex-grow m-2 justify-end">
+                <button
+                  onClick={handleSearch}
+                  className="p-2 bg-primary-700 text-white rounded h-auto"
+                >
+                  Buscar
+                </button>
+              </div></div>
           </div>
         </div>
       </div>
@@ -179,21 +206,22 @@ const ContenidoIngresos = () => {
       <div className="relative">
         <h2 className="text-xl font-bold my-4">Listado de Facturas</h2>
         {error && <p className="text-red-500">{error}</p>}
-        <table className="min-w-full">
-          <thead className="w-full text-start">
+        <table className="min-w-full border-collapse border border-white">
+          <thead className="w-full text-start border border-white">
             <tr>
-              <th className="py-2">RUC</th>
-              <th className="py-2">Fecha</th>
-              <th className="py-2">Es Contado</th>
-              <th className="py-2">IVA</th>
-              <th className="py-2">Monto Pagado</th>
-              <th className="py-2">Total</th>
+              <th className="py-2 border border-white">RUC</th>
+              <th className="py-2 border border-white">Fecha</th>
+              <th className="py-2 border border-white">Es Contado</th>
+              <th className="py-2 border border-white">IVA</th>
+              <th className="py-2 border border-white">Monto Pagado</th>
+              <th className="py-2 border border-white">Total</th>
+              <th className="py-2 border border-white">Acciones</th>
             </tr>
           </thead>
           <tbody>
             {loading && (
               <tr>
-                <td colSpan={6} className="py-2">
+                <td colSpan={7} className="py-2 border border-white">
                   <div className="flex justify-center items-center w-full">
                     <LoadingCirleIcon className="animate-spin" />
                   </div>
@@ -201,27 +229,35 @@ const ContenidoIngresos = () => {
               </tr>
             )}
             {listaDeFacturas.length === 0 && !loading ? (
-              <tr className="py-2">
-                <td colSpan={6} className="text-center">
+              <tr className="py-2 border border-white">
+                <td colSpan={7} className="text-center border border-white">
                   No hay facturas
                 </td>
               </tr>
             ) : (
               listaDeFacturas.map((factura, index) => (
-                <tr key={index} className="border-t">
-                  <td className="py-2">{factura.ruc}</td>
-                  <td className="py-2">
+                <tr key={index} className="border-t border-white">
+                  <td className="py-2 px-1 border border-white">{factura.ruc}</td>
+                  <td className="py-2 px-1 border border-white">
                     {new Date(factura.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="py-2">{factura.esContado ? "Sí" : "No"}</td>
-                  <td className="py-2">{+factura.ivaTotal}</td>
-                  <td className="py-2">{+factura.totalSaldoPagado}</td>
-                  <td className="py-2">{+factura.total}</td>
+                  <td className="py-2 px-1 border border-white">
+                    {factura.esContado ? "Sí" : "No"}
+                  </td>
+                  <td className="py-2 px-1 border border-white">{+factura.ivaTotal}</td>
+                  <td className="py-2 px-1 border border-white">{+factura.totalSaldoPagado}</td>
+                  <td className="py-2 px-1 border border-white">{+factura.total}</td>
+                  <td className="py-2 px-1 border border-white"><div className="flex justify-center"><button className="p-2 bg-primary-700 text-white rounded disabled:opacity-10" {...(factura.total === factura.totalSaldoPagado) ? {disabled: true} : {disabled: false}}>Pagar</button></div></td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
+        <Pagination
+          changeIndicePagina={changeIndicePagina}
+          indiceActual={indiceActual}
+          indicesPagina={totalPaginas}
+        />
       </div>
     </>
   );

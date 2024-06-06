@@ -1,3 +1,12 @@
-export default async function Page() {
-  return <h1>Egreso</h1>;
+import Header from "@/components/operaciones/egreso/Header";
+import EgresoForm from "@/components/operaciones/egreso/EgresoForm";
+
+export default function Page() {
+  return (
+    <div>
+      <Header />
+      <EgresoForm/>
+      
+    </div>
+  );
 }

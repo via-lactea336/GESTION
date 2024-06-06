@@ -26,23 +26,24 @@ export async function POST(req: NextRequest) {
       data: {
         monto: mov.monto,
         facturaId: mov.facturaId,
-        aperturaId: mov.aperturaId, 
-        esIngreso: mov.esIngreso
+        aperturaId: mov.aperturaId,
+        esIngreso: mov.esIngreso,
       },
-      include:{
-        apertura:{
-          include:{
-            caja:{
-              select:{
-                id:true
-              }
-            }
-          }
-        }
-      }
-    })
-  
-    if(!movimiento) return generateApiErrorResponse("Error generando el movimiento", 400) 
+      include: {
+        apertura: {
+          include: {
+            caja: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!movimiento)
+      return generateApiErrorResponse("Error generando el movimiento", 400);
 
     if(movsDetalles){
       const sum = movsDetalles.reduce(
@@ -51,25 +52,40 @@ export async function POST(req: NextRequest) {
       )
       if(movimiento.monto.greaterThan(sum)) return generateApiErrorResponse("La suma de los movimientos detalle no coincide con el monto del movimiento", 400)
       await prisma.movimientoDetalle.createMany({
-        data:movsDetalles.map(m => ({...m, movimientoId:movimiento.id})),
-        skipDuplicates: true
-      })
+        data: movsDetalles.map((m) => ({ ...m, movimientoId: movimiento.id })),
+        skipDuplicates: true,
+      });
     }
 
     if(movimiento.facturaId) await pagarFactura(movimiento.facturaId, mov.monto)
 
     //Reflejar el movimiento en el saldo de la caja
-    await reflejarMovimiento(movimiento.apertura.caja.id, mov.monto, mov.esIngreso)
+    await reflejarMovimiento(
+      movimiento.apertura.caja.id,
+      mov.monto,
+      mov.esIngreso
+    );
 
-    return generateApiSuccessResponse(200, "El movimiento fue generada correctamente")
-  
-  }catch(err){
-    if(err instanceof PrismaClientKnownRequestError && err.code === "P2002") return generateApiErrorResponse("El movimiento ya existe", 400)
-    else return generateApiErrorResponse("Hubo un error en la creacion del movimiento", 500)
-  }  
+    return generateApiSuccessResponse(
+      200,
+      "El movimiento fue generada correctamente"
+    );
+  } catch (err) {
+    if (err instanceof PrismaClientKnownRequestError && err.code === "P2002")
+      return generateApiErrorResponse("El movimiento ya existe", 400);
+    else if (err instanceof Error) console.log(err.message);
+    return generateApiErrorResponse(
+      "Hubo un error en la creacion del movimiento",
+      500
+    );
+  }
 }
 
 export async function GET() {
-  const movimiento = await prisma.movimiento.findMany()
-  return generateApiSuccessResponse(200, "Exito al obtener los movimientos", movimiento)
+  const movimiento = await prisma.movimiento.findMany();
+  return generateApiSuccessResponse(
+    200,
+    "Exito al obtener los movimientos",
+    movimiento
+  );
 }
