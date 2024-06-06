@@ -4,12 +4,14 @@ import { Factura } from "@prisma/client";
 import obtenerCliente from "@/lib/moduloCaja/cliente/obtenerCliente";
 import LoadingCirleIcon from "../global/LoadingCirleIcon";
 import Pagination from "../global/Pagination";
+import { useRouter } from 'next/navigation';
 
 interface FacturaConRuc extends Factura {
   ruc: string;
 }
 
 const ContenidoIngresos = () => {
+  const router = useRouter()
   const initialFilters: Filter = {
     skip: 0,
     upTo: 10,
@@ -21,7 +23,7 @@ const ContenidoIngresos = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [indiceActual, setIndiceActual] = useState(0);
-  const [totalPaginas, setTotalPaginas] = useState(0);
+  const [totalPaginas, setTotalPaginas] = useState(1);
 
   const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
@@ -247,7 +249,13 @@ const ContenidoIngresos = () => {
                   <td className="py-2 px-1 border border-white">{+factura.ivaTotal}</td>
                   <td className="py-2 px-1 border border-white">{+factura.totalSaldoPagado}</td>
                   <td className="py-2 px-1 border border-white">{+factura.total}</td>
-                  <td className="py-2 px-1 border border-white"><div className="flex justify-center"><button className="p-2 bg-primary-700 text-white rounded disabled:opacity-10" {...(factura.total === factura.totalSaldoPagado) ? {disabled: true} : {disabled: false}}>Pagar</button></div></td>
+                  <td className="py-2 px-1 border border-white">
+                    <div className="flex justify-center">
+                      <button className="p-2 bg-primary-700 text-white rounded disabled:opacity-10" onClick={() => router.push(`ingreso/${factura.id}`)} {...(factura.total === factura.totalSaldoPagado) ? {disabled: true} : {disabled: false}}>
+                        Pagar
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))
             )}
