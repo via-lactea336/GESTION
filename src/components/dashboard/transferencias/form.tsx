@@ -88,16 +88,18 @@ export default function FormTransferencias() {
     }
   };
   const [nombreOperacion, setNombreOperacion] = useState("");
-  const [bancos, setBancos] = useState<Banco[]>([]);
+  
   const [esDebito, setEsDebito] = useState<boolean>(false);
-  const [cuentasBancarias, setCuentasBancarias] = useState<
-    CuentaBancariaAndBanco[]
-  >([]);
+  const [cheques, setCheques] = useState<ChequeCreate[]>([]);
+  
+  //Estados para manejar opciones 
+  const [bancos, setBancos] = useState<Banco[]>([]);
+  const [cuentasBancarias, setCuentasBancarias] = useState<CuentaBancariaAndBanco[]>([]);
   const [operaciones, setOperaciones] = useState<TipoOperacion[]>([]);
+
+  //Estados para el manejo de estados de carga/error
   const [loading, setLoading] = useState(false);
   const [loadingSend, setLoadingSend] = useState(false);
-
-  const [cheques, setCheques] = useState<ChequeCreate[]>([]);
 
   const fetchDatos = async () => {
     setLoading(true);

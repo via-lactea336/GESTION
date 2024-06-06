@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
-import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
+import {Decimal, PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
 import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiResponse";
 
 import { Comprobante } from "@prisma/client";
@@ -12,20 +12,20 @@ export async function POST(req: NextRequest) {
   const { 
     concepto,
     monto, 
-    docIdentidad,
-    nombre,
+    userId,
     movimientoId
    } = body;
   
-  if( !monto || !concepto || !docIdentidad || !nombre || !movimientoId ) return generateApiErrorResponse("Faltan datos para la creacion de el comprobante", 400)
+  if( !monto || !concepto || !userId || !movimientoId ) return generateApiErrorResponse("Faltan datos para la creacion de el comprobante", 400)
+
+  if(new Decimal(monto).lessThanOrEqualTo(0)) return generateApiErrorResponse("El monto debe ser mayor a 0", 400)
 
   try{
     const comprobante = await prisma.comprobante.create({
       data: {
         concepto,
         monto, 
-        docIdentidad,
-        nombre,
+        userId,
         movimientoId
       }
     })

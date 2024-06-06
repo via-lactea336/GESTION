@@ -1,10 +1,11 @@
 import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
-import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
+import {Decimal, PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
 import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiResponse";
 
 import { Movimiento, MovimientoDetalle } from "@prisma/client";
 import reflejarMovimiento from "@/lib/moduloCaja/movimiento/reflejarMovimiento";
+import pagarFactura from "@/lib/moduloCaja/factura/pagarFactura";
 
 export async function POST(req: NextRequest) {
   
@@ -13,9 +14,13 @@ export async function POST(req: NextRequest) {
     mov,
     movsDetalles,
    } = body;
-
-  if(!mov) return generateApiErrorResponse("Faltan datos para el movimiento", 400)
-
+  if(!mov || !movsDetalles) return generateApiErrorResponse("Faltan datos para el movimiento", 400)
+  if(movsDetalles.length === 0) return generateApiErrorResponse("Faltan los detalles del movimiento", 400)
+  
+  const montoDecimal = new Decimal(mov.monto)
+  
+  if(montoDecimal.lessThanOrEqualTo(0)) return generateApiErrorResponse("El monto debe ser mayor a 0", 400)
+  
   try{
     const movimiento = await prisma.movimiento.create({
       data: {
@@ -39,7 +44,7 @@ export async function POST(req: NextRequest) {
   
     if(!movimiento) return generateApiErrorResponse("Error generando el movimiento", 400) 
 
-    if(movsDetalles && movsDetalles.length > 0){
+    if(movsDetalles){
       const sum = movsDetalles.reduce(
         (total, m) => total + (+m.monto),
         0
@@ -50,6 +55,8 @@ export async function POST(req: NextRequest) {
         skipDuplicates: true
       })
     }
+
+    if(movimiento.facturaId) await pagarFactura(movimiento.facturaId, mov.monto)
 
     //Reflejar el movimiento en el saldo de la caja
     await reflejarMovimiento(movimiento.apertura.caja.id, mov.monto, mov.esIngreso)
