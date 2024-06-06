@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { logout } from "@/lib/auth/logout";
 import { Loading } from "../global/Loading";
+import Cookies from "js-cookie";
 export default function SignOutButton() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -14,6 +15,9 @@ export default function SignOutButton() {
     e.preventDefault();
     setLoading(true);
     await logout();
+    Cookies.remove("caja");
+    Cookies.remove("cajero");
+    Cookies.remove("apertura");
     router.push("/login");
   };
   return (
