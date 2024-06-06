@@ -13,7 +13,7 @@ export async function middleware(req: NextRequest) {
 
   // Verificar el rol del usuario para rutas específicas
   if (pathname.startsWith("/dashboard/caja")) {
-    if (token.role !== "CAJERO" && token.role !== "ADMIN") {
+    if (token.rol !== "CAJERO" && token.rol !== "ADMIN") {
       return NextResponse.redirect(new URL("/dashboard/unauthorized", req.url));
     }
   }
