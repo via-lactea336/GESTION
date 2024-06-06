@@ -59,7 +59,7 @@ export default function Page() {
       }
       setLoading(false);
       toast.success("Caja cerrada con éxito");
-      router.push("/dashboard/caja");
+      router.push(`/dashboard/caja/${caja.id}/resumenDiario`);
     } catch (error) {
       setLoading(false);
       if (error instanceof Error) {
