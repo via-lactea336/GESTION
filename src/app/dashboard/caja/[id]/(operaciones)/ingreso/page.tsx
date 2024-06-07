@@ -1,14 +1,11 @@
 "use client";
 import ContenidoIngresos from "@/components/cajaVentanasEmergentes/TablaFacturasFiltro";
 import Header from "@/components/global/Header";
-import { Cajero } from "@/lib/definitions";
-import { obtenerCookie } from "@/lib/obtenerCookie";
-import { Caja } from "@prisma/client";
+import useCookies from "@/lib/hooks/useCookies";
 import Link from "next/link";
 
 export default function Page({ params }: { params: { id: string } }) {
-  const cajero: Cajero = obtenerCookie("cajero");
-  const caja: Caja = obtenerCookie("caja");
+  const { cajero, caja } = useCookies();
   const { id } = params;
 
   const links = [
@@ -29,8 +26,16 @@ export default function Page({ params }: { params: { id: string } }) {
             {link.text}
           </Link>
         ))}
-        <h3 className="ml-8">{cajero.nombre}</h3>
-        <h3>Caja N° {caja.numero}</h3>
+        {!cajero ? (
+          <div className="animate-pulse bg-gray-300 py-2 px-10 rounded-md mx-2" />
+        ) : (
+          <h3 className="ml-8">{cajero.nombre}</h3>
+        )}
+        {!caja ? (
+          <div className="animate-pulse bg-gray-300 py-2 px-10 rounded-md mx-2" />
+        ) : (
+          <h3>Caja N° {caja.numero}</h3>
+        )}
       </Header>
       <ContenidoIngresos />
     </>
