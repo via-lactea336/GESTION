@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from 'next/navigation';
+import { useParams } from "next/navigation";
 import obtenerFacturaPorId from "@/lib/moduloCaja/factura/obtenerFacturaPorId";
 import { obtenerCookie } from "@/lib/obtenerCookie";
 import { AperturaCaja, Factura, medioDePago } from "@prisma/client";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import ModalTarjeta from "./ModalTarjeta";
 import obtenerCliente from "@/lib/moduloCaja/cliente/obtenerCliente";
-import crearMovimiento from "@/lib/moduloCaja/movimiento/crearMovimiento"; 
+import crearMovimiento from "@/lib/moduloCaja/movimiento/crearMovimiento";
 import { useRouter } from "next/navigation";
+import { Toaster, toast } from "sonner";
 
 export default function PagoFacturas({ idFactura }: { idFactura: string }) {
   const apertura: AperturaCaja = obtenerCookie("apertura");
@@ -38,7 +39,10 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
 
       if (success && data) {
         const responseCliente = await obtenerCliente(data.clienteId);
-        if (typeof responseCliente === "string" || responseCliente === undefined) {
+        if (
+          typeof responseCliente === "string" ||
+          responseCliente === undefined
+        ) {
           throw new Error("Error al obtener el cliente");
         }
 
@@ -59,8 +63,8 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
 
   useEffect(() => {
     if (idFactura) {
-      fetchData();          
-    }   
+      fetchData();
+    }
   }, [idFactura]);
 
   const agregarMetodoPago = () => {
@@ -74,40 +78,49 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
     } else {
       setMetodosPago([...metodosPago, metodo]);
       setTotalPagado(totalPagado + importe);
-      setDetalle("");
-      setImporte(0);
+      setDetalle(detalle);
+      setImporte(importe);
     }
   };
 
   const pagarFactura = async () => {
     const movsDetalles = metodosPago.map((metodo) => ({
       metodoPago: metodo,
-      monto: importe,
+      monto: totalPagado,
     }));
-
-    const response = await crearMovimiento({
-      mov: {
-        aperturaId: apertura.id,
-        esIngreso: true, 
-        monto: totalPagado,
-        facturaId: idFactura,
-      },
-      movsDetalles,
-    });
-
-    if (response instanceof Error) {
-      alert(response.message);
-    } else {
-      alert("Factura pagada exitosamente!");
-      router.push("");
+    console.log(movsDetalles);
+    try {
+      const response = await crearMovimiento({
+        mov: {
+          aperturaId: apertura.id,
+          esIngreso: true,
+          monto: totalPagado,
+          facturaId: idFactura,
+        },
+        movsDetalles,
+      });
+      if (response === undefined || typeof response === "string") {
+        throw new Error(response || "Error al pagar la factura");
+      }
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      toast.success("Factura pagada exitosamente!");
+      router.push("./");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
     }
   };
 
-  const guardarDatosTarjeta = (tarjeta: { tipo: string; nombreTitular: string; banco: string; }) => {
+  const guardarDatosTarjeta = (tarjeta: {
+    tipo: string;
+    nombreTitular: string;
+    banco: string;
+  }) => {
     setMetodosPago([...metodosPago, medioDePago.TARJETA]);
     setTotalPagado(totalPagado + importe);
-    setDetalle("");
-    setImporte(0);
   };
 
   const eliminarMetodoPago = (id: number) => {
@@ -151,7 +164,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
                 value={importe}
                 onChange={(e) => setImporte(Number(e.target.value))}
                 className="mt
--1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"               
+-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
               />
             </div>
           </div>
@@ -171,8 +184,12 @@ focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
 
           <div className="flex mb-3 items-end flex-col justify-around">
             <div className="w-full">
-              <h2 className="text-xl font-semibold mb-4">Total: {+factura.total}</h2>
-              <h3 className="text-xl font-semibold mb-4">Falta: {+factura.total - totalPagado}</h3>
+              <h2 className="text-xl font-semibold mb-4">
+                Total: {+factura.total}
+              </h2>
+              <h3 className="text-xl font-semibold mb-4">
+                Falta: {+factura.total - totalPagado}
+              </h3>
             </div>
             <button
               onClick={agregarMetodoPago}
@@ -210,9 +227,13 @@ focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
                 <td className="border border-gray-300 px-4 py-2">{index}</td>
                 <td className="border border-gray-300 px-4 py-2">{metodo}</td>
                 <td className="border border-gray-300 px-4 py-2">{detalle}</td>
-                <td className="border border-gray-300 px-4 py-2">{importe.toLocaleString()}</td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {importe.toLocaleString()}
+                </td>
                 <td className="border border-gray-300 px-4 py-2 flex justify-center items-center">
-                  <button onClick={() => eliminarMetodoPago(index)}><TrashIcon className="h-6 w-6 hover:text-red-600 text-gray-500" /></button>
+                  <button onClick={() => eliminarMetodoPago(index)}>
+                    <TrashIcon className="h-6 w-6 hover:text-red-600 text-gray-500" />
+                  </button>
                 </td>
               </tr>
             ))}
@@ -220,7 +241,9 @@ focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
               <td className="border border-gray-300 px-4 py-2" colSpan={3}>
                 Total
               </td>
-              <td className="border border-gray-300 px-4 py-2">{totalPagado.toLocaleString()}</td>
+              <td className="border border-gray-300 px-4 py-2">
+                {totalPagado.toLocaleString()}
+              </td>
               <td className="border border-gray-300 px-4 py-2"></td>
             </tr>
           </tbody>
@@ -228,19 +251,20 @@ focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
         <div className="mt-4 text-xl font-semibold">
           <span>Total: {totalPagado.toLocaleString()}</span>
         </div>
-        <button 
+        <button
           className="bg-primary-500 text-white py-2 px-4 rounded-md shadow-sm hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 "
           onClick={() => {
             if (factura.esContado && totalPagado !== +factura.total) {
               alert("El importe total no coincide con el total de la factura.");
               return;
+            } else {
+              pagarFactura();
             }
-            else{
-              pagarFactura()
-            }}}
-          >
+          }}
+        >
           Terminar
         </button>
+        <Toaster richColors />
       </div>
     </>
   );

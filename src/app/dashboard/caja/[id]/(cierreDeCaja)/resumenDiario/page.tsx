@@ -21,33 +21,6 @@ export default function Page() {
   const cajero = obtenerCookie("cajero") as Cajero;
   const [registros, setRegistros] = useState<RegistroCaja>();
   const [movimientos, setMovimientos] = useState<Movimiento[]>();
-  const hardcodedData = {
-    createdAt: new Date(),
-    caja: { numero: 123 },
-    cajero: { nombre: "Juan Pérez" },
-    apertura: {
-      saldoInicial: 1000000,
-      createdAt: new Date(),
-    },
-    montoRegistrado: 2000000,
-    montoIngreso: 1500000,
-    montoIngresoCheque: 500000,
-    montoIngresoTarjeta: 300000,
-    movimientos: [
-      {
-        id: 1,
-        esIngreso: true,
-        monto: 500000,
-        createdAt: new Date(),
-      },
-      {
-        id: 2,
-        esIngreso: false,
-        monto: 200000,
-        createdAt: new Date(),
-      },
-    ],
-  };
 
   useEffect(() => {
     const fetchRegistro = async () => {
@@ -57,6 +30,7 @@ export default function Page() {
         const registroActual = registros.data.filter(
           (registro) => registro.aperturaId == apertura.id
         );
+        console.log(registroActual[0]);
         setRegistros(registroActual[0]);
 
         const movimientos = await obtenerMovimientos();

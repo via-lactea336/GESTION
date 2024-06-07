@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react";
-import obtenerFacturasFiltro, { Filter } from "@/lib/moduloCaja/factura/obtenerFacturasFiltro"; // Asegúrate de ajustar la ruta según la ubicación de tu archivo obtenerFacturasFiltro
+import obtenerFacturasFiltro, {
+  Filter,
+} from "@/lib/moduloCaja/factura/obtenerFacturasFiltro"; // Asegúrate de ajustar la ruta según la ubicación de tu archivo obtenerFacturasFiltro
 import { Factura } from "@prisma/client";
 import obtenerCliente from "@/lib/moduloCaja/cliente/obtenerCliente";
 import LoadingCirleIcon from "../global/LoadingCirleIcon";
 import Pagination from "../global/Pagination";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
+import { MagnifyingGlassIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 interface FacturaConRuc extends Factura {
   ruc: string;
 }
 
 const ContenidoIngresos = () => {
-  const router = useRouter()
+  const router = useRouter();
   const initialFilters: Filter = {
     skip: 0,
     upTo: 10,
@@ -102,11 +105,11 @@ const ContenidoIngresos = () => {
 
   return (
     <>
-      <div className="flex flex-row rounded my-2 p-4 bg-neutral-700">
+      <div className="flex flex-row rounded my-2 p-4 bg-gray-800">
         <div className="flex flex-col w-full">
           <h1 className="text-2xl font-bold">Ingresos</h1>
-          <div className="flex flex-row flex-wrap justify-between my-2">
-            <div className="flex flex-col flex-grow m-2">
+          <div className="flex flex-row flex-wrap justify-start gap-4 items-center my-2">
+            <div className="flex flex-col my-2">
               <label htmlFor="ruc" className="my-2">
                 Ingrese el RUC sin puntos:
               </label>
@@ -116,11 +119,11 @@ const ContenidoIngresos = () => {
                 name="ruc"
                 value={tempFilters.ruc || ""}
                 onChange={handleChange}
-                className="rounded p-2"
+                className="rounded px-2 py-1 "
                 required
               />
             </div>
-            <div className="flex flex-col flex-grow m-2">
+            <div className="flex flex-col">
               <label htmlFor="fechaDesde" className="my-2">
                 Fecha Desde:
               </label>
@@ -130,7 +133,7 @@ const ContenidoIngresos = () => {
                 name="fechaDesde"
                 value={tempFilters.fechaDesde || ""}
                 onChange={handleChange}
-                className="rounded p-1"
+                className="rounded p-1 w-36"
                 max={
                   tempFilters.fechaHasta
                     ? tempFilters.fechaHasta
@@ -138,7 +141,7 @@ const ContenidoIngresos = () => {
                 }
               />
             </div>
-            <div className="flex flex-col flex-grow m-2">
+            <div className="flex flex-col">
               <label htmlFor="fechaHasta" className="my-2">
                 Fecha Hasta:
               </label>
@@ -148,11 +151,12 @@ const ContenidoIngresos = () => {
                 name="fechaHasta"
                 value={tempFilters.fechaHasta || ""}
                 onChange={handleChange}
-                className="rounded p-1"
+                className="rounded p-1 w-36"
+                min={tempFilters.fechaDesde || ""}
                 max={new Date().toISOString().split("T")[0]}
               />
             </div>
-            <div className="flex flex-col flex-grow m-2">
+            <div className="flex flex-col">
               <label htmlFor="pagado" className="my-2">
                 Pagado:
               </label>
@@ -161,23 +165,7 @@ const ContenidoIngresos = () => {
                 name="pagado"
                 value={tempFilters.pagado ? tempFilters.pagado.toString() : ""}
                 onChange={handleChange}
-                className="rounded p-2"
-              >
-                <option value="">Seleccione</option>
-                <option value="true">Sí</option>
-                <option value="false">No</option>
-              </select>
-            </div>
-            <div className="flex flex-col flex-grow m-2">
-              <label htmlFor="esContado" className="my-2">
-                Es Contado:
-              </label>
-              <select
-                id="esContado"
-                name="esContado"
-                value={tempFilters.esContado ? tempFilters.esContado.toString() : ""}
-                onChange={handleChange}
-                className="rounded p-2"
+                className="rounded p-2 w-32"
               >
                 <option value="">Seleccione</option>
                 <option value="true">Sí</option>
@@ -185,22 +173,41 @@ const ContenidoIngresos = () => {
               </select>
             </div>
             <div className="flex flex-col">
-              <div className="flex flex-col flex-grow m-2 justify-end">
+              <label htmlFor="esContado" className="my-2">
+                Es Contado:
+              </label>
+              <select
+                id="esContado"
+                name="esContado"
+                value={
+                  tempFilters.esContado ? tempFilters.esContado.toString() : ""
+                }
+                onChange={handleChange}
+                className="rounded p-2 w-32"
+              >
+                <option value="">Seleccione</option>
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+              </select>
+            </div>
+            <div className="flex items-end gap-4">
+              <div className="">
                 <button
                   onClick={handleClearFilters}
-                  className="p-2 bg-gray-500 text-white rounded h-auto"
+                  className="p-2 bg-gray-700 text-white rounded h-auto hover:bg-gray-600"
                 >
-                  Limpiar Filtros
+                  <TrashIcon className="h-5 w-5" />
                 </button>
               </div>
-              <div className="flex flex-col flex-grow m-2 justify-end">
+              <div className="">
                 <button
                   onClick={handleSearch}
-                  className="p-2 bg-primary-700 text-white rounded h-auto"
+                  className="p-2 bg-primary-700 text-white rounded h-auto hover:bg-primary-800"
                 >
-                  Buscar
+                  <MagnifyingGlassIcon className="h-5 w-5" />
                 </button>
-              </div></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -239,19 +246,33 @@ const ContenidoIngresos = () => {
             ) : (
               listaDeFacturas.map((factura, index) => (
                 <tr key={index} className="border-t border-white">
-                  <td className="py-2 px-1 border border-white">{factura.ruc}</td>
+                  <td className="py-2 px-1 border border-white">
+                    {factura.ruc}
+                  </td>
                   <td className="py-2 px-1 border border-white">
                     {new Date(factura.createdAt).toLocaleDateString()}
                   </td>
                   <td className="py-2 px-1 border border-white">
                     {factura.esContado ? "Sí" : "No"}
                   </td>
-                  <td className="py-2 px-1 border border-white">{+factura.ivaTotal}</td>
-                  <td className="py-2 px-1 border border-white">{+factura.totalSaldoPagado}</td>
-                  <td className="py-2 px-1 border border-white">{+factura.total}</td>
+                  <td className="py-2 px-1 border border-white">
+                    {+factura.ivaTotal}
+                  </td>
+                  <td className="py-2 px-1 border border-white">
+                    {+factura.totalSaldoPagado}
+                  </td>
+                  <td className="py-2 px-1 border border-white">
+                    {+factura.total}
+                  </td>
                   <td className="py-2 px-1 border border-white">
                     <div className="flex justify-center">
-                      <button className="p-2 bg-primary-700 text-white rounded disabled:opacity-10" onClick={() => router.push(`ingreso/${factura.id}`)} {...(factura.total === factura.totalSaldoPagado) ? {disabled: true} : {disabled: false}}>
+                      <button
+                        className="p-2 bg-primary-700 text-white rounded disabled:opacity-10"
+                        onClick={() => router.push(`ingreso/${factura.id}`)}
+                        {...(factura.total === factura.totalSaldoPagado
+                          ? { disabled: true }
+                          : { disabled: false })}
+                      >
                         Pagar
                       </button>
                     </div>
