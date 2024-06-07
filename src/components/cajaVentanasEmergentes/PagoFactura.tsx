@@ -9,6 +9,7 @@ import obtenerCliente from "@/lib/moduloCaja/cliente/obtenerCliente";
 import crearMovimiento from "@/lib/moduloCaja/movimiento/crearMovimiento";
 import { useRouter } from "next/navigation";
 import { Toaster, toast } from "sonner";
+import Input from "../global/Input";
 
 export default function PagoFacturas({ idFactura }: { idFactura: string }) {
   const apertura: AperturaCaja = obtenerCookie("apertura");
@@ -25,6 +26,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
   const [tarjetaTipo, setTarjetaTipo] = useState<string>("Crédito");
   const [nombreTitular, setNombreTitular] = useState<string>("");
   const [banco, setBanco] = useState<string>("Banco Itaú");
+  const [loading, setLoading] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -90,6 +92,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
     }));
     console.log(movsDetalles);
     try {
+      setLoading(true);
       const response = await crearMovimiento({
         mov: {
           aperturaId: apertura.id,
@@ -105,9 +108,11 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
       if (response.error) {
         throw new Error(response.error);
       }
+      setLoading(false);
       toast.success("Factura pagada exitosamente!");
       router.push("./");
     } catch (error) {
+      setLoading(false);
       if (error instanceof Error) {
         toast.error(error.message);
       }
@@ -136,19 +141,32 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
 
   return (
     <>
-      <div className="p-6 shadow-md rounded-md flex flex-col mx-auto mt-8">
+      <div className="px-6 rounded-md flex flex-col mx-auto mt-4">
         <h2 className="text-xl font-semibold mb-4">Agregar Método de Pago</h2>
-
-        <div className="flex">
-          <div className="mr-4 w-2/6">
+        <div className="flex gap-4 items-center">
+          <h2 className="text-md font-semibold mb-4 text-white">
+            Monto de la Factura:{" "}
+            <span className="text-primary-300">
+              {Number(factura.total).toLocaleString()}
+            </span>
+          </h2>
+          <h3 className="text-md font-semibold mb-4">
+            Falta:{" "}
+            <span className="text-primary-300">
+              {(Number(factura.total) - totalPagado).toLocaleString()}
+            </span>
+          </h3>
+        </div>
+        <div className="flex flex-col">
+          <div className="mr-4 w-full flex justify-start items-center gap-4">
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-white mb-2">
                 Método:
               </label>
               <select
                 value={metodo}
                 onChange={(e) => setMetodo(e.target.value as medioDePago)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 sm:text-sm"
               >
                 <option value={medioDePago.EFECTIVO}>Efectivo</option>
                 <option value={medioDePago.TARJETA}>Tarjeta de Crédito</option>
@@ -156,44 +174,38 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
               </select>
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-white mb-2">
                 Importe:
               </label>
-              <input
+              <Input
+                id="importe"
+                placeholder="100000"
                 type="number"
-                value={importe}
+                value={importe === 0 ? "" : importe}
                 onChange={(e) => setImporte(Number(e.target.value))}
                 className="mt
--1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
+-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+              />
+            </div>
+            <div className="mr-4 w-full flex justify-center flex-col mb-4">
+              <label className="block text-sm font-medium text-white mb-2">
+                Detalle:
+              </label>
+              <input
+                type="text"
+                value={detalle}
+                placeholder="Pago de factura al contado por productos"
+                onChange={(e) => setDetalle(e.target.value)}
+                className="mt-1 block h-3/4 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none
+focus:ring-yellow-500 focus:border-primary-600 sm:text-sm"
               />
             </div>
           </div>
 
-          <div className="mr-4 w-1/2">
-            <label className="block text-sm font-medium text-gray-700">
-              Detalle:
-            </label>
-            <input
-              type="text"
-              value={detalle}
-              onChange={(e) => setDetalle(e.target.value)}
-              className="mt-1 block h-3/4 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none
-focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
-            />
-          </div>
-
-          <div className="flex mb-3 items-end flex-col justify-around">
-            <div className="w-full">
-              <h2 className="text-xl font-semibold mb-4">
-                Total: {+factura.total}
-              </h2>
-              <h3 className="text-xl font-semibold mb-4">
-                Falta: {+factura.total - totalPagado}
-              </h3>
-            </div>
+          <div className="w-full flex justify-end items-center gap-4 mb-4">
             <button
               onClick={agregarMetodoPago}
-              className="bg-primary-500 text-white py-2 px-4 rounded-md shadow-sm hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+              className="bg-primary-800 text-white py-2 px-4 rounded-md shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-900"
             >
               Agregar
             </button>
@@ -209,7 +221,7 @@ focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
         />
       )}
 
-      <div className="p-6 shadow-md rounded-md mx-auto mt-8">
+      <div className="px-6 rounded-md mx-auto">
         <h2 className="text-xl font-semibold mb-4">Métodos de Pago</h2>
         <table className="w-full border-collapse border border-gray-300">
           <thead>
@@ -248,22 +260,29 @@ focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
             </tr>
           </tbody>
         </table>
-        <div className="mt-4 text-xl font-semibold">
-          <span>Total: {totalPagado.toLocaleString()}</span>
-        </div>
-        <button
-          className="bg-primary-500 text-white py-2 px-4 rounded-md shadow-sm hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 "
-          onClick={() => {
-            if (factura.esContado && totalPagado !== +factura.total) {
-              alert("El importe total no coincide con el total de la factura.");
-              return;
-            } else {
-              pagarFactura();
+        <div className="w-full flex justify-center items-end flex-col">
+          <div className="my-4 text-xl font-semibold">
+            <span>Total: {totalPagado.toLocaleString()}</span>
+          </div>
+          <button
+            className={
+              "bg-primary-800 text-white py-2 px-4 rounded-md shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-900 " +
+              (loading ? "cursor-not-allowed" : "")
             }
-          }}
-        >
-          Terminar
-        </button>
+            onClick={() => {
+              if (factura.esContado && totalPagado !== +factura.total) {
+                alert(
+                  "El importe total no coincide con el total de la factura."
+                );
+                return;
+              } else {
+                pagarFactura();
+              }
+            }}
+          >
+            {loading ? "Procesando..." : "Realizar Pago"}
+          </button>
+        </div>
         <Toaster richColors />
       </div>
     </>
