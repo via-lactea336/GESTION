@@ -372,39 +372,48 @@ export default function Cheque({ params }: { params: { id: string } }) {
                     </td>
                     <td>{Number(cheque.monto).toLocaleString()}</td>
                     <td className="flex justify-center">
-                      {(!cheque.esRecibido ||
-                        cheque.bancoChequeId !=
-                          cheque.cuentaAfectada.bancoId) &&
-                      cheque.estado === estadoCheque.EMITIDO ? (
-                        <div className="flex gap-2">
-                          <button
-                            onClick={async () =>
-                              await handleConciliar(
-                                cheque.id,
-                                cheque.cuentaAfectada.bancoId
-                              )
-                            }
-                            className="disabled:opacity-50 disabled:cursor-not-allowed border-gray-700 border-2 hover:bg-green-900 p-1 rounded"
-                          >
-                            Conciliar
-                          </button>
-                          {cheque.esRecibido && (
+                      {
+                        (cheque.esRecibido && cheque.bancoChequeId === cheque.cuentaAfectada.bancoId)
+                        ?
+                        <span>-</span>
+                        :
+                        (
+                          <div className="flex gap-2">
+
+                          { 
+                            !cheque.esRecibido &&
                             <button
                               onClick={async () =>
-                                await handleAnular(
+                                await handleConciliar(
                                   cheque.id,
                                   cheque.cuentaAfectada.bancoId
                                 )
                               }
-                              className="border-gray-700 border-2 hover:bg-red-900 p-1 rounded"
+                              className="disabled:opacity-50 disabled:cursor-not-allowed border-gray-700 border-2 hover:bg-green-900 p-1 rounded"
                             >
-                              Anular
+                              Conciliar
                             </button>
-                          )}
-                        </div>
-                      ) : (
-                        <span>-</span>
-                      )}
+                          }
+                          
+                          {
+                            cheque.esRecibido 
+                            && cheque.estado === estadoCheque.PAGADO
+                            && cheque.bancoChequeId !== cheque.cuentaAfectada.bancoId
+                            && (
+                              <button
+                                onClick={async () =>
+                                  await handleAnular(
+                                    cheque.id,
+                                    cheque.cuentaAfectada.bancoId
+                                  )
+                                }
+                                className="border-gray-700 border-2 hover:bg-red-900 p-1 rounded"
+                              >
+                                Anular
+                              </button>
+                            )}
+                        </div>)
+                      }
                     </td>
                   </tr>
                 ))}

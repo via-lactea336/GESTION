@@ -4,6 +4,7 @@ import { useState } from "react";
 
 type InputCalendarProps = {
   id: string;
+  withTime?:boolean;
   required?: boolean;
   className?: string;
   value?: string;
@@ -20,11 +21,46 @@ export default function InputCalendar({
   setValue,
   handleChange,
   placeholder,
+  withTime
 }: InputCalendarProps) {
-  const { maxDate } = useCalendar();
+  const { maxDate, maxDateTime } = useCalendar();
   const [error, setError] = useState<string>("");
-
-  return (
+ 
+  return withTime?
+  (
+    <div>
+      <input
+        className={`${className} ${error && "border border-red-500"}`}
+        id={id}
+        name={id}
+        type="datetime-local"
+        required={required || false}
+        max={maxDate}
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => {
+          if(
+            e.target.value.length < 0 
+            || e.target.value.split("-").length < 3
+          ) return
+          if (new Date(e.currentTarget.value).toISOString() > maxDateTime) {
+            setError(`Por favor, seleccione una fecha válida.`);
+          } else {
+            setError("");
+            setValue && setValue(e.currentTarget.value);
+            handleChange && handleChange(e);
+          }
+        }}
+      />
+      {error && (
+        <p title="mensaje de error" className="text-gray-200 text-sm">
+          {error}
+        </p>
+      )}
+    </div>
+  )
+  :
+  (
     <div>
       <input
         className={`${className} ${error && "border border-red-500"}`}
