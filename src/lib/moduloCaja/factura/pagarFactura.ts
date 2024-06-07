@@ -18,7 +18,7 @@ export default async function pagarFactura(facturaId:string, monto:Decimal){
 
     if(!facturas) throw new Error("Error al pagar la factura")
     
-    if(facturas.totalSaldoPagado.greaterThan(facturas.total)) throw new Error("Lo pagado no peude superar el total de la factura")
+    if(facturas.totalSaldoPagado.greaterThan(facturas.total)) throw new Error("Lo pagado no puede superar el total de la factura")
 
     return facturas
     

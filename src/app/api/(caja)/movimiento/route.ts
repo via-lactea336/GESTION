@@ -61,14 +61,8 @@ export async function POST(req: NextRequest) {
         throw new Error("La suma de los movimientos detalle no coincide con el monto del movimiento");
       }
 
-      if(movimientoTx.apertura.caja.saldo.lessThan(sum)) throw new Error("La suma de los movimientos detalle excede el saldo de la caja");
-
-      await tx.movimientoDetalle.createMany({
-        data: movsDetalles.map((m) => ({ ...m, movimientoId: movimientoTx.id })),
-        skipDuplicates: true,
-      });
-
       if (!movimientoTx.esIngreso) {
+        if(movimientoTx.apertura.caja.saldo.lessThan(sum)) throw new Error("La suma de los movimientos detalle excede el saldo de la caja");
         if (!username || !password) throw new Error("Faltan credenciales para crear el comprobante");
         if (!concepto) throw new Error("Falta el concepto para crear el comprobante");
 
@@ -84,8 +78,14 @@ export async function POST(req: NextRequest) {
         });
       }
 
+      await tx.movimientoDetalle.createMany({
+        data: movsDetalles.map((m) => ({ ...m, movimientoId: movimientoTx.id })),
+        skipDuplicates: true,
+      });
+
       return movimientoTx;
     });
+    
     if (movimiento.facturaId) {
       await pagarFactura(movimiento.facturaId, mov.monto);
     }
