@@ -14,7 +14,11 @@ export async function POST(req: NextRequest) {
     esContado,
     total,
     ivaTotal,
-    totalSaldoPagado
+    totalSaldoPagado,
+    fechaEmision,
+    fechaVencimiento,
+    pagado,
+    numeroFactura
    } = body.factura;
   
 
@@ -23,6 +27,10 @@ export async function POST(req: NextRequest) {
   try{
     const factura = await prisma.factura.create({
       data: {
+        numeroFactura,
+        pagado,
+        fechaEmision: fechaEmision || new Date(),
+        fechaVencimiento: new Date(fechaVencimiento),
         clienteId,
         totalSaldoPagado, 
         esContado,
@@ -36,7 +44,8 @@ export async function POST(req: NextRequest) {
     return generateApiSuccessResponse(200, "La factura fue generada correctamente")
   
   }catch(err){
-    if(err instanceof PrismaClientKnownRequestError && err.code === "P2002") return generateApiErrorResponse("La factura ya existe", 400)
+    if(err instanceof PrismaClientKnownRequestError && err.code === "P2002") return generateApiErrorResponse("Una factura con el mismo numero ya existe", 400)
+    if(err instanceof Error) return generateApiErrorResponse(err.message, 500)
     else return generateApiErrorResponse("Hubo un error en la creacion de la factura", 500)
   }  
 }

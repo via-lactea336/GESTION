@@ -1,4 +1,5 @@
-import { ApiResponseData } from "@/lib/definitions";
+import { DatosFiltrados } from "@/lib/definitions";
+import { fetchPlus } from "@/lib/verificarApiResponse";
 import { Factura } from "@prisma/client";
 
 export type Filter = {
@@ -11,10 +12,7 @@ export type Filter = {
   upTo: number;
 };
 
-export type ResponseData = {
-  values: Factura[];
-  totalQuantity: number;
-};
+export type FacturaAndClient = Factura & {cliente: {docIdentidad: string, nombre: string}};
 
 export default async function obtenerFacturasFiltro({
   fechaDesde,
@@ -41,24 +39,13 @@ export default async function obtenerFacturasFiltro({
 
   const server_url = process.env.URL;
   const url = server_url || "";
-  try {
-    const aperturasCaja = await fetch(
+  return await fetchPlus<DatosFiltrados<FacturaAndClient>>(
       `${url}/api/factura/search?${queryString.trim()}`,
       {
         headers: {
           "Content-Type": "application/json",
         },
       }
-    );
-    const data: ApiResponseData<ResponseData> = await aperturasCaja.json();
-    if (data.error) throw new Error(data.error);
-    if (!data.data) throw new Error("Error al obtener las facturas");
-    if (data.data.values.length === 0)
-      throw new Error("No hay facturas con estas caracteristicas");
-    if (typeof data.data === "undefined")
-      throw new Error("Error al obtener las facturas");
-    return data;
-  } catch (err) {
-    if (err instanceof Error) return err.message;
-  }
+  )
+  
 }

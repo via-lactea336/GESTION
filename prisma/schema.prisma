@@ -276,21 +276,28 @@ model MovimientoDetalle {
 }
 
 model Factura {
-  id        String @id @default(uuid())
+  id              String @id @default(uuid())
   
-  cliente   Cliente @relation(references: [id], fields: [clienteId], onDelete: NoAction)
-  clienteId String
+  cliente         Cliente @relation(references: [id], fields: [clienteId], onDelete: NoAction)
+  clienteId       String
 
-  movimientos Movimiento[]
+  numeroFactura   String @unique
 
-  esContado Boolean
+  fechaEmision     DateTime
+  fechaVencimiento DateTime
+
+  movimientos     Movimiento[]
+
+  esContado       Boolean
+
+  pagado           Boolean
 
   total            Decimal @db.Money
   totalSaldoPagado Decimal @db.Money
 
-  ivaTotal    Decimal  @db.Money
+  ivaTotal         Decimal @db.Money
 
-  recibos         Recibos[]
+  recibos          Recibos[]
 
   deleted   DateTime?
 
@@ -300,6 +307,8 @@ model Factura {
 
 model Recibos {
   id          String @id @default(uuid())
+
+  fechaEmision DateTime
   
   cliente     Cliente @relation(references: [id], fields: [clienteId], onDelete: NoAction)
   clienteId   String
@@ -317,6 +326,8 @@ model Recibos {
 
 model Comprobante {
   id            String @id @default(uuid())
+
+  fechaEmision  DateTime
 
   concepto      String
   monto         Decimal @db.Money
@@ -394,3 +405,5 @@ model RegistroCaja {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+//ASIENTOS

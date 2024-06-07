@@ -2,6 +2,19 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+function getNextMonthDate(date) {
+    const nextMonthDate = new Date(date);
+    nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+  
+    // Ajustar el día del mes si la fecha del próximo mes no es válida
+    // (por ejemplo, de enero 31 a marzo 3, ya que febrero 31 no es válido)
+    if (nextMonthDate.getDate() !== date.getDate()) {
+      nextMonthDate.setDate(0); // Configurar al último día del mes anterior
+    }
+  
+    return nextMonthDate;
+}
+
 async function main() {
 
     const apertura = await prisma.aperturaCaja.create({
@@ -37,43 +50,67 @@ async function main() {
         data: [
             {
                 clienteId: "1a461332-9a14-4d60-9ac6-70b77fc863cb",
+                numeroFactura: "00000389",
                 esContado: true,
                 totalSaldoPagado: 100000,
+                fechaEmision: new Date(),
+                pagado:false,
+                fechaVencimiento: getNextMonthDate(new Date()),
                 total: 100000,
                 ivaTotal: 9090,
             },
             {
                 clienteId: "9a569332-0710-42c6-99bc-039a0b14b9cc",
-                esContado: true,
+                numeroFactura: "00000388",
+                pagado:false,
+                esContado: true,    
                 totalSaldoPagado: 50000,
+                fechaEmision: new Date(),
+                fechaVencimiento: getNextMonthDate(new Date()),
                 total: 50000,
                 ivaTotal: 4545,
             },
             {
                 clienteId: "9a569332-0710-42c6-99bc-039a0b14b9cc",
+                numeroFactura: "00000387",
+                pagado:false,
                 esContado: true,
                 totalSaldoPagado: 200000,
+                fechaEmision: new Date(),
+                fechaVencimiento: getNextMonthDate(new Date()),
                 total: 200000,
                 ivaTotal: 18180,
             },
             {
+                numeroFactura: "00000386",
                 clienteId: "57909003-563c-4d3d-bca7-f4a7e63d8e01",
                 esContado: true,
+                pagado:false,
                 totalSaldoPagado: 100000,
+                fechaEmision: new Date(),
+                fechaVencimiento: getNextMonthDate(new Date()),
                 total: 100000,
                 ivaTotal: 9090,
             },
             {
+                numeroFactura: "00000385",
                 clienteId: "57909003-563c-4d3d-bca7-f4a7e63d8e01",
                 esContado: true,
+                pagado:false,
                 totalSaldoPagado: 300000,
+                fechaEmision: new Date(),
+                fechaVencimiento: getNextMonthDate(new Date()),
                 total: 300000,
                 ivaTotal: 27270,
             },
             {
+                numeroFactura: "00000384",
                 clienteId: "9a569332-0710-42c6-99bc-039a0b14b9cc",
                 esContado: true,
+                pagado:false,
                 totalSaldoPagado: 150000,
+                fechaEmision: new Date(),
+                fechaVencimiento: getNextMonthDate(new Date()),
                 total: 150000,
                 ivaTotal: 13635,
             },
