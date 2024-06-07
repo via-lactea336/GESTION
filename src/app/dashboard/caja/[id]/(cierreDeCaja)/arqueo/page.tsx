@@ -10,12 +10,12 @@ import Input from "@/components/global/Input";
 import crearArqueo from "@/lib/arqueoCaja/crearArqueo";
 import Header from "@/components/global/Header";
 import { Toaster, toast } from "sonner";
+import useCookies from "@/lib/hooks/useCookies";
+import LoadingCirleIcon from "@/components/global/LoadingCirleIcon";
 
 export default function Page() {
   const router = useRouter();
-  const caja: Caja = obtenerCookie("caja");
-  const cajero: Cajero = obtenerCookie("cajero");
-  const apertura: AperturaCaja = obtenerCookie("apertura");
+  const { cajero, caja, apertura } = useCookies();
   const [denominaciones, setDenominaciones] = useState({
     moneda500: 0,
     moneda1000: 0,
@@ -44,6 +44,8 @@ export default function Page() {
   };
 
   const verificarCierre = async () => {
+    if (!caja || !apertura || !cajero)
+      return toast.error("Datos de caja incompletos");
     try {
       setLoading(true);
       const arqueo: ArqueoCajaData = {
@@ -81,6 +83,14 @@ export default function Page() {
     total += denominaciones.billete100000 * 100000;
     setTotalEfectivo(total);
   }, [denominaciones]);
+
+  if (!cajero || !caja || !apertura) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <LoadingCirleIcon className="w-10 h-10 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div>
