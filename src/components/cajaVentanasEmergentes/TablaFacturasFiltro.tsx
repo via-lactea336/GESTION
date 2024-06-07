@@ -1,17 +1,12 @@
 import { useState, useEffect } from "react";
 import obtenerFacturasFiltro, {
+  FacturaAndClient,
   Filter,
 } from "@/lib/moduloCaja/factura/obtenerFacturasFiltro"; // Asegúrate de ajustar la ruta según la ubicación de tu archivo obtenerFacturasFiltro
-import { Factura } from "@prisma/client";
-import obtenerCliente from "@/lib/moduloCaja/cliente/obtenerCliente";
 import LoadingCirleIcon from "../global/LoadingCirleIcon";
 import Pagination from "../global/Pagination";
 import { useRouter } from "next/navigation";
-import { MagnifyingGlassIcon, TrashIcon } from "@heroicons/react/24/outline";
-
-interface FacturaConRuc extends Factura {
-  ruc: string;
-}
+import { CheckIcon, MagnifyingGlassIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 const ContenidoIngresos = () => {
   const router = useRouter();
@@ -22,9 +17,9 @@ const ContenidoIngresos = () => {
 
   const [tempFilters, setTempFilters] = useState<Filter>(initialFilters);
   const [filters, setFilters] = useState<Filter>(initialFilters);
-  const [listaDeFacturas, setListaDeFacturas] = useState<FacturaConRuc[]>([]);
+  const [listaDeFacturas, setListaDeFacturas] = useState<FacturaAndClient[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [indiceActual, setIndiceActual] = useState(0);
   const [totalPaginas, setTotalPaginas] = useState(1);
 
@@ -47,7 +42,7 @@ const ContenidoIngresos = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await obtenerFacturasFiltro({
+      const { success, data, error, message } = await obtenerFacturasFiltro({
         fechaDesde: filters.fechaDesde,
         fechaHasta: filters.fechaHasta,
         ruc: filters.ruc,
@@ -56,27 +51,13 @@ const ContenidoIngresos = () => {
         skip: filters.skip,
         upTo: filters.upTo,
       });
-      if (response === undefined || typeof response === "string") {
+      if (!success) {
         setLoading(false);
         setListaDeFacturas([]);
         return;
       }
-      const { success, data, error } = response;
       if (success == true && data) {
-        const facturasConRuc = await Promise.all(
-          data.values.map(async (factura) => {
-            const responseCliente = await obtenerCliente(factura.clienteId);
-            if (
-              typeof responseCliente === "string" ||
-              responseCliente === undefined
-            ) {
-              throw new Error("Error al obtener el cliente");
-            }
-            const cliente = responseCliente.data;
-            return { ...factura, ruc: cliente.docIdentidad };
-          })
-        );
-        setListaDeFacturas(facturasConRuc);
+        setListaDeFacturas(data.values);
         setTotalPaginas(Math.ceil(data.totalQuantity / filters.upTo));
       } else {
         setListaDeFacturas([]);
@@ -218,45 +199,62 @@ const ContenidoIngresos = () => {
       <div className="relative">
         <h2 className="text-xl font-bold my-4">Listado de Facturas</h2>
         {error && <p className="text-red-500">{error}</p>}
-        <table className="min-w-full border-collapse border border-white">
+        {
+          loading?
+            <div className="h-64 flex items-center justify-center w-full">
+              <LoadingCirleIcon className="w-12 h-12 animate-spin m-auto" />
+            </div>
+        :
+          <table className="min-w-full border-collapse border border-white">
           <thead className="w-full text-start border border-white">
             <tr>
+              <th className="py-2 border border-white">N° Factura</th>
               <th className="py-2 border border-white">RUC</th>
-              <th className="py-2 border border-white">Fecha</th>
-              <th className="py-2 border border-white">Es Contado</th>
+              <th className="py-2 border border-white">Cliente</th>
+              <th className="py-2 border border-white">Fecha de Emision</th>
+              <th className="py-2 border border-white">Fecha de Vencimiento</th>
+              <th className="py-2 border border-white">Pagado</th>
+              <th className="py-2 border border-white">Tipo</th>
               <th className="py-2 border border-white">IVA</th>
               <th className="py-2 border border-white">Monto Pagado</th>
-              <th className="py-2 border border-white">Total</th>
+              <th className="py-2 border border-white">Monto Factura</th>
               <th className="py-2 border border-white">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {loading && (
+            
+          {
+            listaDeFacturas.length === 0 && !loading?
               <tr>
-                <td colSpan={7} className="py-2 border border-white">
-                  <div className="flex justify-center items-center w-full">
-                    <LoadingCirleIcon className="animate-spin" />
-                  </div>
-                </td>
+                <td colSpan={10} className="border border-white py-2 px-1 text-center">No hay facturas</td>
               </tr>
-            )}
-            {listaDeFacturas.length === 0 && !loading ? (
-              <tr className="py-2 border border-white">
-                <td colSpan={7} className="text-center border border-white">
-                  No hay facturas
-                </td>
-              </tr>
-            ) : (
-              listaDeFacturas.map((factura, index) => (
-                <tr key={index} className="border-t border-white">
+            :
+            listaDeFacturas.map((factura) => {
+              return(
+                <tr key={factura.id} className="border-t border-white">
                   <td className="py-2 px-1 border border-white">
-                    {factura.ruc}
+                    {factura.numeroFactura}
+                  </td>
+                  <td className="py-2 px-1 border border-white">
+                    {factura.cliente.docIdentidad}
+                  </td>
+                  <td className="py-2 px-1 border border-white">
+                    {factura.cliente.nombre}
                   </td>
                   <td className="py-2 px-1 border border-white">
                     {new Date(factura.createdAt).toLocaleDateString()}
                   </td>
                   <td className="py-2 px-1 border border-white">
-                    {factura.esContado ? "Sí" : "No"}
+                    {new Date(factura.fechaVencimiento).toLocaleDateString()}
+                  </td>
+                  <td className="py-2 px-1 border border-white text-center">
+                    {factura.pagado ? 
+                      <CheckIcon className="w-5 h-5 text-green-500 m-auto"  /> 
+                      : 
+                      <XMarkIcon className="w-10 h-10 text-red-500 m-auto" />}
+                  </td>
+                  <td className="py-2 px-1 border border-white">
+                    {factura.esContado ? "Contado" : "Credito"}
                   </td>
                   <td className="py-2 px-1 border border-white">
                     {+factura.ivaTotal}
@@ -281,15 +279,21 @@ const ContenidoIngresos = () => {
                     </div>
                   </td>
                 </tr>
-              ))
-            )}
+              )
+            })
+          }
+          
           </tbody>
         </table>
-        <Pagination
-          changeIndicePagina={changeIndicePagina}
-          indiceActual={indiceActual}
-          indicesPagina={totalPaginas}
-        />
+        }
+        {
+          !loading && listaDeFacturas.length !== 0 &&
+          <Pagination
+            changeIndicePagina={changeIndicePagina}
+            indiceActual={indiceActual}
+            indicesPagina={totalPaginas}
+          />
+        }
       </div>
     </>
   );

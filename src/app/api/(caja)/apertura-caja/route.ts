@@ -19,32 +19,41 @@ export async function POST(req: NextRequest) {
     );
 
   try {
-    const aperturaCaja = await prisma.aperturaCaja.create({
-      data: {
-        cajaId,
-        cajeroId,
-        apertura,
-        saldoInicial,
-      },
+
+    const aperturaCaja = await prisma.$transaction(async (tx) => {
+      const aperturaTx = await tx.aperturaCaja.create({
+        data: {
+          cajaId,
+          cajeroId,
+          apertura,
+          saldoInicial,
+        },
+        include:{
+          caja:{
+            select:{
+              id:true,
+              estaCerrado:true
+            }
+          }
+        }
+      })
+
+      if(!aperturaTx.caja.estaCerrado) throw new Error("La caja no esta cerrada")
+
+      const caja = await tx.caja.update({
+        where: {
+          id: cajaId,
+        },
+        data: {
+          saldo: aperturaTx.saldoInicial,
+          estaCerrado: false,
+        },
+      });
+
+      if(!caja) throw new Error("Error actualizando la caja posterior a la apertura")
+      
+      return aperturaTx
     });
-
-    if (!aperturaCaja)
-      return generateApiErrorResponse(
-        "Error generando la apertura de caja",
-        400
-      );
-
-    const caja = await prisma.caja.update({
-      where: {
-        id: cajaId,
-      },
-      data: {
-        saldo: aperturaCaja.saldoInicial,
-        estaCerrado: false,
-      },
-    });
-
-    if(!caja) return generateApiErrorResponse("Error actualizando la caja posterior a la apertura", 400)
 
     return generateApiSuccessResponse(
       200,

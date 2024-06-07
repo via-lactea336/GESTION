@@ -21,14 +21,25 @@ async function main() {
 
   // Delete banco
   await prisma.banco.deleteMany({});
+  
+  //CAJA
+  await prisma.registroCaja.deleteMany({});
 
-  await prisma.cliente.deleteMany({});
+  await prisma.arqueoDeCaja.deleteMany({});
+
+  await prisma.aperturaCaja.deleteMany({});
+
+  await prisma.recibos.deleteMany({});
+
+  await prisma.comprobante.deleteMany({});
 
   await prisma.movimientoDetalle.deleteMany({});
 
   await prisma.movimiento.deleteMany({});
 
   await prisma.factura.deleteMany({});
+ 
+  await prisma.cliente.deleteMany({});
 
   console.log("All records have been deleted.");
 }
