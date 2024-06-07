@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
             numeroCheque: cheque.numeroCheque,
             involucrado: cheque.involucrado,
             monto: cheque.monto,
-            fechaEmision: cheque.fechaEmision,
+            fechaEmision: !cheque.esRecibido? operacion.fechaOperacion : cheque.fechaEmision,
             esRecibido: cheque.esRecibido,
             cuentaBancariaAfectadaId: operacion.cuentaBancariaOrigenId,
             bancoChequeId: cheque.bancoChequeId,
@@ -123,7 +123,6 @@ export async function POST(req: NextRequest) {
     return generateApiSuccessResponse(200, "La operacion se genero correctamente")
   
   }catch(err){
-    if(err instanceof PrismaClientKnownRequestError && err.code === "P2002") return generateApiErrorResponse("operation already exists", 400)
     if(err instanceof Error) return generateApiErrorResponse(err.message, 400)
     else return generateApiErrorResponse("Something went wrong", 500)
   }  

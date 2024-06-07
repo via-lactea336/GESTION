@@ -12,6 +12,7 @@ import { SetStateAction, useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
 import AgregarCheque from "./AgregarCheque";
 import { ChequeCreate } from "./AgregarCheque";
+import EmitirCheque from "./EmitirCheque";
 
 type Operacion = {
   tipoOperacionId: string;
@@ -62,9 +63,11 @@ export default function FormTransferencias() {
     //   numeroComprobante: form["comprobante"].value,
     // };
 
+    console.log("Operacion:", operacion,"\n Cheques:", cheques)
+
     const response = await agregarOperacion({
       tipoOperacionId:operacion.tipoOperacionId,
-      fechaOperacion: operacion.fechaOperacion,
+      fechaOperacion: new Date(operacion.fechaOperacion),
       monto: operacion.monto,
       cuentaBancariaOrigenId:operacion.cuentaBancariaOrigenId,
       bancoInvolucrado: operacion.bancoInvolucrado,
@@ -83,8 +86,8 @@ export default function FormTransferencias() {
       } else {
         setLoadingSend(false);
         toast.success("Operación registrada correctamente");
-        // Limpiar formulario
-        // form.reset();
+        setOperacion(initialValues);
+        setCheques([]);
       }
     }
   };
@@ -92,7 +95,7 @@ export default function FormTransferencias() {
   //Estado de la operacion a ser creada
   const initialValues = {
     tipoOperacionId: "",
-    fechaOperacion: "",
+    fechaOperacion: new Date(),
     monto: 0,
     cuentaBancariaOrigenId: "",
     nombreInvolucrado: "",
@@ -122,7 +125,8 @@ export default function FormTransferencias() {
 
   //Handle onChange of the inputs
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement| HTMLSelectElement>) => {
-    const { name, value, id } = event.target;
+    const { name, value, id, type } = event.target;
+    if(type === "datetime-local") setOperacion({...operacion, [name||id]: new Date(value).toISOString()});
     setOperacion({ ...operacion, [name||id]: value });
   };
 
@@ -162,7 +166,7 @@ export default function FormTransferencias() {
   useEffect(() => {
     setOperacion({
       ...operacion,
-      cuentaBancariaOrigenId: initialValues.cuentaBancariaOrigenId,
+      cuentaBancariaOrigenId: cuentasBancarias.length > 0 ? cuentasBancarias[0].id : "",
       nombreInvolucrado: initialValues.nombreInvolucrado,
       bancoInvolucrado: initialValues.bancoInvolucrado,
       rucInvolucrado: initialValues.rucInvolucrado,
@@ -170,6 +174,8 @@ export default function FormTransferencias() {
     })
     setCheques([])
   }, [operacion.tipoOperacionId])
+
+  console.log(operacion)
 
   return (
     <form className="w-full" onSubmit={handleSubmit}>
@@ -215,8 +221,27 @@ export default function FormTransferencias() {
     { 
       nombreOperacion === "Depósito"? 
       
-        <AgregarCheque monto={operacion.monto} setOperacion={setOperacion} cheques={cheques} setCheques={setCheques} bancos={bancos} cuentasBancarias={cuentasBancarias}/> 
+        <AgregarCheque 
+          monto={operacion.monto} 
+          setOperacion={setOperacion} 
+          cheques={cheques} 
+          setCheques={setCheques} 
+          bancos={bancos} 
+          cuentasBancarias={cuentasBancarias}
+          handleOnChangeOperacion={handleOnChange}
+        /> 
       
+      :
+
+      nombreOperacion === "Emitir Cheque"?
+
+        <EmitirCheque 
+          setOperacion={setOperacion}
+          cheques={cheques}
+          setCheques={setCheques}
+          cuentasBancarias={cuentasBancarias}
+          handleOnChangeOperacion={handleOnChange}
+        />
       :
       <>
       <div className="flex flex-wrap -mx-3 mb-6">
@@ -270,7 +295,7 @@ export default function FormTransferencias() {
                 <option>Cargando...</option>
               ) : (
                 bancos.map((banco) => (
-                  <option key={banco.id}>{banco.nombre}</option>
+                  <option key={banco.id} value={banco.nombre}>{banco.nombre}</option>
                 ))
               )}
             </select>
@@ -352,6 +377,7 @@ export default function FormTransferencias() {
         <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
           <label className="mb-2">Fecha de la Transacción</label>
           <InputCalendar
+            withTime={true}
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="fechaOperacion"
             handleChange={handleOnChange}

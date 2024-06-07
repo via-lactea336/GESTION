@@ -65,6 +65,7 @@ export async function POST(
         cheque
       );
   }catch(err){
+    console.error(err)
     if(err instanceof PrismaClientKnownRequestError) return generateApiErrorResponse(err.message, 500);
     if(err instanceof Error) return generateApiErrorResponse(err.message, 500);
     return generateApiErrorResponse("Error al conciliar el cheque", 500);

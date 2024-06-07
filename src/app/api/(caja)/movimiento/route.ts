@@ -15,6 +15,8 @@ export async function POST(req: NextRequest) {
     const body: { mov: Movimiento, movsDetalles?: MovimientoDetalle[], username?: string, password?: string, concepto?: string } = await req.json();
     const { mov, movsDetalles, username, password, concepto } = body;
 
+    if(!mov.esIngreso || !mov.monto || !mov.aperturaId) return generateApiErrorResponse("Faltan datos para el movimiento", 400)
+
     if (!mov || !movsDetalles) {
       return generateApiErrorResponse("Faltan datos para el movimiento", 400);
     }
@@ -54,7 +56,9 @@ export async function POST(req: NextRequest) {
 
       const sum = movsDetalles.reduce((total, m) => total + (+m.monto), 0);
 
-      if (montoDecimal.greaterThan(sum)) {
+      if(movimientoTx)
+
+      if (!montoDecimal.equals(sum)) {
         throw new Error("La suma de los movimientos detalle no coincide con el monto del movimiento");
       }
 
@@ -81,7 +85,6 @@ export async function POST(req: NextRequest) {
 
       return movimientoTx;
     });
-
     if (movimiento.facturaId) {
       await pagarFactura(movimiento.facturaId, mov.monto);
     }

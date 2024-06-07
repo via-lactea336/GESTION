@@ -13,13 +13,15 @@ export type ChequeCreate = {
   involucrado: string,
   monto: number,
   fechaEmision: string,
-  esRecibido: true,
+  esRecibido: boolean,
   bancoChequeId: string,
+
 }
 
 type Props = {
   monto:number
   setOperacion: React.Dispatch<React.SetStateAction<CrearOperacionFields>>
+  handleOnChangeOperacion : (event: React.ChangeEvent<HTMLInputElement|HTMLSelectElement>) => void
   cheques: ChequeCreate[]
   setCheques: React.Dispatch<React.SetStateAction<ChequeCreate[]>>
   bancos: Banco[]
@@ -31,8 +33,8 @@ export default function AgregarCheque({
   setCheques,
   bancos,
   cuentasBancarias,
+  handleOnChangeOperacion,
   setOperacion,
-  monto
 }: Props) {
 
   const [display, setDisplay] = useState(false)
@@ -54,13 +56,14 @@ export default function AgregarCheque({
 
   useEffect(() => {
     setMontos(prev => ({ ...prev, monto: prev.efectivo + prev.montoCheque }))
+    setOperacion(prev => ({ ...prev, ["monto"]: montos.efectivo + montos.montoCheque  }))
   }, [montos.efectivo, montos.montoCheque])
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target
+    const { name, value, id } = e.target
     setCheque(prev => {
       if (name === "montoCheque") return { ...prev, ["monto"]: Number(value) }
-      return { ...prev, [name]: value }
+      return { ...prev, [name || id]: value }
     })
   }
 
@@ -71,8 +74,9 @@ export default function AgregarCheque({
 
   const handleAddChequeToList = (chequeDatos: ChequeCreate) => {
     if (cheques.find(c => c.numeroCheque === chequeDatos.numeroCheque)) return
-    setCheques(prev => [...prev, chequeDatos])
+    setCheques(prev => [...prev, {...chequeDatos, fechaEmision: new Date(chequeDatos.fechaEmision).toISOString()}])
     setMontos(prev => ({ ...prev, montoCheque: [...cheques, chequeDatos].reduce((init, curr) => init + curr.monto, 0) }))
+    console.log(cheques)
   }
 
   return (
@@ -86,6 +90,7 @@ export default function AgregarCheque({
           </label>
           <div className="relative mt-2">
             <select
+              onChange={handleOnChangeOperacion}
               className="block appearance-none w-full bg-gray-800 py-3 px-4 pr-8 rounded leading-tight focus:outline-none"
               id="cuentaBancariaOrigenId"
               required
@@ -116,6 +121,7 @@ export default function AgregarCheque({
             </label>
             <Input
               className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
+              onChange={handleOnChangeOperacion}
               id="nombreInvolucrado"
               type="text"
               required
@@ -139,7 +145,8 @@ export default function AgregarCheque({
             <label className="mb-2">Número de Comprobante</label>
             <Input
               className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
-              id="comprobante"
+              onChange={handleOnChangeOperacion}
+              id="numeroComprobante"
               type="text"
               required
               placeholder="012345"
@@ -152,6 +159,8 @@ export default function AgregarCheque({
         <div className="w-full  mb-6 md:mb-0">
             <label className="mb-2">Fecha de la Transacción</label>
             <InputCalendar
+              withTime={true}
+              handleChange={handleOnChangeOperacion}
               className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
               id="fechaOperacion"
               required
@@ -161,6 +170,7 @@ export default function AgregarCheque({
             <label className="mb-2">Concepto</label>
             <Input
               className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
+              onChange={handleOnChangeOperacion}
               id="concepto"
               type="text"
               required
@@ -184,6 +194,7 @@ export default function AgregarCheque({
           <p>Cheques</p>
           <hr className="flex-1"></hr>
           <button
+            type="button"
             className="bg-primary-500 hover:bg-primary-600 text-white w-6 h-6 rounded-full"
             onClick={() => setDisplay(prev => !prev)}
           >
@@ -228,6 +239,7 @@ export default function AgregarCheque({
                 <select
                   className='bg-gray-800 text-white py-1 px-2 rounded-md '
                   onChange={onChange}
+                  id='bancoChequeId'
                 >
                   <option>Selecciona el banco del cheque</option>
                   {

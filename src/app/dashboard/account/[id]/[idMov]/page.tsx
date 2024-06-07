@@ -235,9 +235,9 @@ export default function PageComponent() {
             >
               {({ loading, url, error, blob }) =>
                 loading ? (
-                  <button> Cargando documento... </button>
+                  <p> Cargando documento... </p>
                 ) : (
-                  <button>Descargar</button>
+                  <p>Descargar</p>
                 )
               }
             </PDFDownloadLink>

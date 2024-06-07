@@ -2,7 +2,7 @@ import { ApiResponseData } from "../../definitions";
 
 export type CrearOperacionFields = {
   tipoOperacionId: string,
-  fechaOperacion: string,
+  fechaOperacion: Date,
   monto: number,
   cuentaBancariaOrigenId: string,
   nombreInvolucrado: string,
