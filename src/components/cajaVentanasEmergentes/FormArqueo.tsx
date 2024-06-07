@@ -33,7 +33,7 @@ export default function FormArqueo() {
       } else {
         toast.success(res.message);
         setTimeout(() => {
-          router.push("/dashboard/caja");
+          router.push(`/dashboard/caja/${caja.id}/resumenDiario`);
         }, 2000);
       }
     } else {

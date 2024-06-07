@@ -19,7 +19,7 @@ export default async function crearArqueo(arqueo: ArqueoCajaData) {
     });
     const data: ApiResponseData = await arqueoCaja.json();
     if (data.error) throw new Error(data.error);
-    if (!data.data) throw new Error("Error al crear el arqueo de caja");
+    if (!data.data) throw new Error(data.message);
     return data;
   } catch (err) {
     if (err instanceof Error)
