@@ -168,7 +168,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
         </div>
         <div className="flex flex-col">
           <div className="mr-4 w-full flex justify-start items-center gap-4">
-            <div className="mb-4">
+            <div className="mb-4 w-1/2">
               <label className="block text-sm font-medium text-white mb-2">
                 Método:
               </label>
@@ -182,7 +182,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
                 <option value={medioDePago.CHEQUE}>Cheque</option>
               </select>
             </div>
-            <div className="mb-4">
+            <div className="mb-4 w-1/2">
               <label className="block text-sm font-medium text-white mb-2">
                 Importe:
               </label>
