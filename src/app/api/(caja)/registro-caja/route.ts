@@ -17,10 +17,7 @@ export async function POST(req: NextRequest) {
   if( !aperturaId ) return generateApiErrorResponse("Faltan datos para la creacion del registro", 400)
 
   try{
-    const registroCaja = calcularDatosRegistroCaja(aperturaId)
-
-    if(!registroCaja) return generateApiErrorResponse("Error generando el registro de la caja", 400)
-
+     await calcularDatosRegistroCaja(aperturaId)
     return generateApiSuccessResponse(200, "El registro fue generada correctamente")
   
   }catch(err){
