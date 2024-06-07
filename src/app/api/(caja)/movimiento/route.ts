@@ -52,6 +52,13 @@ export async function POST(req: NextRequest) {
           esIngreso: mov.esIngreso,
         },
         include: {
+          factura:{
+            select:{
+              id:true,
+              clienteId:true,
+              esContado: true
+            }
+          },
           apertura: {
             include: {
               caja: {
@@ -68,27 +75,17 @@ export async function POST(req: NextRequest) {
       if (!movimientoTx) throw new Error("Error generando el movimiento");
 
       const sum = movsDetalles.reduce((total, m) => total + +m.monto, 0);
-      console.log(sum, montoDecimal);
+
       if (sum !== +mov.monto) {
         throw new Error(
           "La suma de los movimientos detalle no coincide con el monto del movimiento"
         );
       }
 
-      if (movimientoTx.apertura.caja.saldo.lessThan(sum) && !mov.esIngreso)
-        throw new Error(
-          "La suma de los movimientos detalle excede el saldo de la caja"
-        );
-
-      await tx.movimientoDetalle.createMany({
-        data: movsDetalles.map((m) => ({
-          ...m,
-          movimientoId: movimientoTx.id,
-        })),
-        skipDuplicates: true,
-      });
-
+      //Si es egreso, crear un comprobante
       if (!movimientoTx.esIngreso) {
+        if (movimientoTx.apertura.caja.saldo.lessThan(sum))
+          throw new Error("La suma de los movimientos detalle excede el saldo de la caja");
         if (!username || !password)
           throw new Error("Faltan credenciales para crear el comprobante");
         if (!concepto)
@@ -106,11 +103,29 @@ export async function POST(req: NextRequest) {
         });
       }
 
+      //Si es egreso, pagar la factura
+      if (movimientoTx.facturaId) await pagarFactura(movimientoTx.facturaId, mov.monto);
+      
+      //Si la factura es a credito, entonces se genera un recibo
+      if(movimientoTx.factura && !movimientoTx.factura.esContado){
+          await tx.recibos.create({
+            data: {
+              clienteId: movimientoTx.factura.clienteId,
+              totalPagado: mov.monto,
+              facturaId: movimientoTx.factura.id,               
+            }
+          })
+      }
+
+    
+      //Se generan los movimientos detalles
+      await tx.movimientoDetalle.createMany({
+        data: movsDetalles.map((m) => ({ ...m, movimientoId: movimientoTx.id })),
+        skipDuplicates: true,
+      });
+
       return movimientoTx;
     });
-    if (movimiento.facturaId) {
-      await pagarFactura(movimiento.facturaId, mov.monto);
-    }
 
     await reflejarMovimiento(
       movimiento.apertura.caja.id,
