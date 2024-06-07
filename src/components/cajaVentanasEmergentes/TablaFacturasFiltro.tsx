@@ -107,14 +107,35 @@ const ContenidoIngresos = () => {
     <>
       <div className="flex flex-row rounded my-2 p-4 bg-gray-800">
         <div className="flex flex-col w-full">
-          <h1 className="text-2xl font-bold">Ingresos</h1>
-          <div className="flex flex-row flex-wrap justify-start gap-4 items-center my-2">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold">Ingresos</h1>
+            <div className="flex flex-row-reverse ml-4 items-center gap-4">
+              <div className="">
+                <button
+                  onClick={handleClearFilters}
+                  className="p-2 bg-gray-700 text-white rounded h-auto hover:bg-gray-600"
+                >
+                  <TrashIcon title="limpiar filtros" className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="">
+                <button
+                  onClick={handleSearch}
+                  className="p-2 bg-primary-700 text-white rounded h-auto hover:bg-primary-800"
+                >
+                  <MagnifyingGlassIcon title="buscar" className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-row flex-wrap justify-around gap-4 items-center my-2">
             <div className="flex flex-col my-2">
               <label htmlFor="ruc" className="my-2">
-                Ingrese el RUC sin puntos:
+                Ingrese el RUC:
               </label>
               <input
                 type="text"
+                placeholder="82132341-0"
                 id="ruc"
                 name="ruc"
                 value={tempFilters.ruc || ""}
@@ -133,7 +154,7 @@ const ContenidoIngresos = () => {
                 name="fechaDesde"
                 value={tempFilters.fechaDesde || ""}
                 onChange={handleChange}
-                className="rounded p-1 w-36"
+                className="rounded p-1"
                 max={
                   tempFilters.fechaHasta
                     ? tempFilters.fechaHasta
@@ -151,7 +172,7 @@ const ContenidoIngresos = () => {
                 name="fechaHasta"
                 value={tempFilters.fechaHasta || ""}
                 onChange={handleChange}
-                className="rounded p-1 w-36"
+                className="rounded p-1"
                 min={tempFilters.fechaDesde || ""}
                 max={new Date().toISOString().split("T")[0]}
               />
@@ -165,7 +186,7 @@ const ContenidoIngresos = () => {
                 name="pagado"
                 value={tempFilters.pagado ? tempFilters.pagado.toString() : ""}
                 onChange={handleChange}
-                className="rounded p-2 w-32"
+                className="rounded p-2"
               >
                 <option value="">Seleccione</option>
                 <option value="true">Sí</option>
@@ -183,30 +204,12 @@ const ContenidoIngresos = () => {
                   tempFilters.esContado ? tempFilters.esContado.toString() : ""
                 }
                 onChange={handleChange}
-                className="rounded p-2 w-32"
+                className="rounded p-2"
               >
                 <option value="">Seleccione</option>
                 <option value="true">Sí</option>
                 <option value="false">No</option>
               </select>
-            </div>
-            <div className="flex items-end gap-4">
-              <div className="">
-                <button
-                  onClick={handleClearFilters}
-                  className="p-2 bg-gray-700 text-white rounded h-auto hover:bg-gray-600"
-                >
-                  <TrashIcon className="h-5 w-5" />
-                </button>
-              </div>
-              <div className="">
-                <button
-                  onClick={handleSearch}
-                  className="p-2 bg-primary-700 text-white rounded h-auto hover:bg-primary-800"
-                >
-                  <MagnifyingGlassIcon className="h-5 w-5" />
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -259,10 +262,10 @@ const ContenidoIngresos = () => {
                     {+factura.ivaTotal}
                   </td>
                   <td className="py-2 px-1 border border-white">
-                    {+factura.totalSaldoPagado}
+                    {Number(factura.totalSaldoPagado).toLocaleString()}
                   </td>
                   <td className="py-2 px-1 border border-white">
-                    {+factura.total}
+                    {Number(factura.total).toLocaleString()}
                   </td>
                   <td className="py-2 px-1 border border-white">
                     <div className="flex justify-center">
