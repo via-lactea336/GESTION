@@ -12,7 +12,7 @@ interface MetodoPago {
   importe: number;
 }
 
-export default function PagoFacturas() {
+export default function PagoFacturas({ idFactura }: { idFactura: string }) {
   const cajero: Cajero = obtenerCookie("cajero");
   const caja: Caja = obtenerCookie("caja");
 
@@ -56,7 +56,9 @@ export default function PagoFacturas() {
         <div className="flex">
           <div className="mr-4 w-2/6">
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Método:</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Método:
+              </label>
               <select
                 value={metodo}
                 onChange={(e) => setMetodo(e.target.value)}
@@ -68,7 +70,9 @@ export default function PagoFacturas() {
               </select>
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Importe:</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Importe:
+              </label>
               <input
                 type="number"
                 value={importe}
@@ -79,7 +83,9 @@ export default function PagoFacturas() {
           </div>
 
           <div className="mr-4 w-1/2">
-            <label className="block text-sm font-medium text-gray-700">Detalle:</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Detalle:
+            </label>
             <input
               type="text"
               value={detalle}
@@ -114,12 +120,22 @@ export default function PagoFacturas() {
           <tbody>
             {metodosPago.map((metodo) => (
               <tr key={metodo.id}>
-                <td className="border border-gray-300 px-4 py-2">{metodo.id}</td>
-                <td className="border border-gray-300 px-4 py-2">{metodo.metodo}</td>
-                <td className="border border-gray-300 px-4 py-2">{metodo.detalle}</td>
-                <td className="border border-gray-300 px-4 py-2">{metodo.importe}</td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {metodo.id}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {metodo.metodo}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {metodo.detalle}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {metodo.importe}
+                </td>
                 <td className="border border-gray-300 px-4 py-2 flex justify-center items-center">
-                  <button onClick={() => eliminarMetodoPago(metodo.id)}><TrashIcon className="h-6 w-6 hover:text-red-600 text-gray-500"/></button>
+                  <button onClick={() => eliminarMetodoPago(metodo.id)}>
+                    <TrashIcon className="h-6 w-6 hover:text-red-600 text-gray-500" />
+                  </button>
                 </td>
               </tr>
             ))}
