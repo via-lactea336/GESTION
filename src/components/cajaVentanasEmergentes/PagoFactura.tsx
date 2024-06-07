@@ -1,30 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from 'next/navigation';
 import obtenerFacturaPorId from "@/lib/moduloCaja/factura/obtenerFacturaPorId";
-import { Cajero } from "@/lib/definitions";
 import { obtenerCookie } from "@/lib/obtenerCookie";
-import { Caja, Factura } from "@prisma/client";
+import { AperturaCaja, Factura, medioDePago } from "@prisma/client";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import ModalTarjeta from "./ModalTarjeta";
 import obtenerCliente from "@/lib/moduloCaja/cliente/obtenerCliente";
-
-interface MetodoPago {
-  id: number;
-  metodo: string;
-  detalle: string;
-  importe: number;
-}
+import crearMovimiento from "@/lib/moduloCaja/movimiento/crearMovimiento"; 
+import { useRouter } from "next/navigation";
 
 export default function PagoFacturas({ idFactura }: { idFactura: string }) {
-  const cajero: Cajero = obtenerCookie("cajero");
-  const caja: Caja = obtenerCookie("caja");
-  const { id_factura } = useParams();
+  const apertura: AperturaCaja = obtenerCookie("apertura");
+  const router = useRouter();
 
   const [factura, setFactura] = useState<Factura | null>(null);
-  const [metodo, setMetodo] = useState<string>("Efectivo");
+  const [metodo, setMetodo] = useState<medioDePago>(medioDePago.EFECTIVO);
   const [detalle, setDetalle] = useState<string>("");
   const [importe, setImporte] = useState<number>(0);
-  const [metodosPago, setMetodosPago] = useState<MetodoPago[]>([]);
+  const [metodosPago, setMetodosPago] = useState<medioDePago[]>([]);
   const [totalPagado, setTotalPagado] = useState<number>(0);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +27,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
 
   const fetchData = async () => {
     try {
-      const response = await obtenerFacturaPorId(id_factura as string);
+      const response = await obtenerFacturaPorId(idFactura as string);
 
       if (response === undefined || typeof response === "string") {
         setFactura(null);
@@ -65,10 +58,10 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
   };
 
   useEffect(() => {
-    if (id_factura) {
+    if (idFactura) {
       fetchData();          
     }   
-  }, [id_factura]);
+  }, [idFactura]);
 
   const agregarMetodoPago = () => {
     if (importe <= 0) {
@@ -76,41 +69,51 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
       return;
     }
 
-    if (metodo === "Tarjeta de Crédito") {
+    if (metodo === medioDePago.TARJETA) {
       setModalOpen(true);
     } else {
-      const nuevoMetodo: MetodoPago = {
-        id: metodosPago.length + 1,
-        metodo,
-        detalle,
-        importe,
-      };
-
-      setMetodosPago([...metodosPago, nuevoMetodo]);
+      setMetodosPago([...metodosPago, metodo]);
       setTotalPagado(totalPagado + importe);
       setDetalle("");
       setImporte(0);
     }
   };
 
-  const guardarDatosTarjeta = (tarjeta: { tipo: string; nombreTitular: string; banco: string; }) => {
-    const nuevoMetodo: MetodoPago = {
-      id: metodosPago.length + 1,
-      metodo,
-      detalle: `Tipo de Tarjeta: ${tarjetaTipo}, Nombre del Titular: ${nombreTitular}, Banco: ${banco}`,
-      importe,
-    };
+  const pagarFactura = async () => {
+    const movsDetalles = metodosPago.map((metodo) => ({
+      metodoPago: metodo,
+      monto: importe,
+    }));
 
-    setMetodosPago([...metodosPago, nuevoMetodo]);
+    const response = await crearMovimiento({
+      mov: {
+        aperturaId: apertura.id,
+        esIngreso: true, 
+        monto: totalPagado,
+        facturaId: idFactura,
+      },
+      movsDetalles,
+    });
+
+    if (response instanceof Error) {
+      alert(response.message);
+    } else {
+      alert("Factura pagada exitosamente!");
+      router.push("");
+    }
+  };
+
+  const guardarDatosTarjeta = (tarjeta: { tipo: string; nombreTitular: string; banco: string; }) => {
+    setMetodosPago([...metodosPago, medioDePago.TARJETA]);
     setTotalPagado(totalPagado + importe);
     setDetalle("");
     setImporte(0);
   };
 
   const eliminarMetodoPago = (id: number) => {
-    const nuevosMetodos = metodosPago.filter((metodo) => metodo.id !== id);
-    const metodoEliminado = metodosPago.find((metodo) => metodo.id === id);
-    setTotalPagado(totalPagado - (metodoEliminado?.importe || 0));
+    const nuevosMetodos = metodosPago.filter((metodo, index) => index !== id);
+    const metodoEliminado = metodosPago[id];
+    setTotalPagado(totalPagado - importe);
     setMetodosPago(nuevosMetodos);
   };
 
@@ -131,12 +134,12 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
               </label>
               <select
                 value={metodo}
-                onChange={(e) => setMetodo(e.target.value)}
+                onChange={(e) => setMetodo(e.target.value as medioDePago)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
               >
-                <option value="Efectivo">Efectivo</option>
-                <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
-                <option value="Cheque">Cheque</option>
+                <option value={medioDePago.EFECTIVO}>Efectivo</option>
+                <option value={medioDePago.TARJETA}>Tarjeta de Crédito</option>
+                <option value={medioDePago.CHEQUE}>Cheque</option>
               </select>
             </div>
             <div className="mb-4">
@@ -161,7 +164,8 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
               type="text"
               value={detalle}
               onChange={(e) => setDetalle(e.target.value)}
-              className="mt-1 block h-3/4 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
+              className="mt-1 block h-3/4 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none
+focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
             />
           </div>
 
@@ -201,14 +205,14 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
             </tr>
           </thead>
           <tbody>
-            {metodosPago.map((metodo) => (
-              <tr key={metodo.id}>
-                <td className="border border-gray-300 px-4 py-2">{metodo.id}</td>
-                <td className="border border-gray-300 px-4 py-2">{metodo.metodo}</td>
-                <td className="border border-gray-300 px-4 py-2">{metodo.detalle}</td>
-                <td className="border border-gray-300 px-4 py-2">{metodo.importe.toLocaleString()}</td>
+            {metodosPago.map((metodo, index) => (
+              <tr key={index}>
+                <td className="border border-gray-300 px-4 py-2">{index}</td>
+                <td className="border border-gray-300 px-4 py-2">{metodo}</td>
+                <td className="border border-gray-300 px-4 py-2">{detalle}</td>
+                <td className="border border-gray-300 px-4 py-2">{importe.toLocaleString()}</td>
                 <td className="border border-gray-300 px-4 py-2 flex justify-center items-center">
-                  <button onClick={() => eliminarMetodoPago(metodo.id)}><TrashIcon className="h-6 w-6 hover:text-red-600 text-gray-500" /></button>
+                  <button onClick={() => eliminarMetodoPago(index)}><TrashIcon className="h-6 w-6 hover:text-red-600 text-gray-500" /></button>
                 </td>
               </tr>
             ))}
@@ -230,9 +234,12 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
             if (factura.esContado && totalPagado !== +factura.total) {
               alert("El importe total no coincide con el total de la factura.");
               return;
+            }
+            else{
+              pagarFactura()
             }}}
           >
-          Siguiente
+          Terminar
         </button>
       </div>
     </>

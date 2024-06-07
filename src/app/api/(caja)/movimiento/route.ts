@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
 
       const sum = movsDetalles.reduce((total, m) => total + +m.monto, 0);
 
-      if (montoDecimal.greaterThan(sum)) {
+      if (montoDecimal.lessThan(sum)) {
         throw new Error(
           "La suma de los movimientos detalle no coincide con el monto del movimiento"
         );
