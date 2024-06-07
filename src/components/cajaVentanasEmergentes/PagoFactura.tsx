@@ -1,4 +1,3 @@
-"use client";
 import React, { useState, useEffect } from "react";
 import { useParams } from 'next/navigation';
 import obtenerFacturaPorId from "@/lib/moduloCaja/factura/obtenerFacturaPorId";
@@ -29,6 +28,9 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
   const [totalPagado, setTotalPagado] = useState<number>(0);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [tarjetaTipo, setTarjetaTipo] = useState<string>("Crédito");
+  const [nombreTitular, setNombreTitular] = useState<string>("");
+  const [banco, setBanco] = useState<string>("Banco Itaú");
 
   const fetchData = async () => {
     try {
@@ -51,8 +53,6 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
         const facturaConRuc = { ...data, ruc: cliente.docIdentidad };
         setFactura(facturaConRuc);
         setImporte(+facturaConRuc.total);
-        
-
       } else {
         setFactura(null);
         setError(error || null);
@@ -93,11 +93,11 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
     }
   };
 
-  const guardarDatosTarjeta = (tarjeta: { numero: string; nombre: string; vencimiento: string; cvv: string }) => {
+  const guardarDatosTarjeta = (tarjeta: { tipo: string; nombreTitular: string; banco: string; }) => {
     const nuevoMetodo: MetodoPago = {
       id: metodosPago.length + 1,
       metodo,
-      detalle: `Tarjeta: ${tarjeta.numero}, Nombre: ${tarjeta.nombre}, Vencimiento: ${tarjeta.vencimiento}`,
+      detalle: `Tipo de Tarjeta: ${tarjetaTipo}, Nombre del Titular: ${nombreTitular}, Banco: ${banco}`,
       importe,
     };
 
@@ -117,8 +117,6 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
   if (!factura) {
     return <div>Cargando factura...</div>;
   }
-
-  
 
   return (
     <>
@@ -149,7 +147,8 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
                 type="number"
                 value={importe}
                 onChange={(e) => setImporte(Number(e.target.value))}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"               
+                className="mt
+-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"               
               />
             </div>
           </div>
