@@ -1,5 +1,4 @@
 "use client";
-import ContenidoIngresos from "@/components/cajaVentanasEmergentes/TablaFacturasFiltro";
 import Header from "@/components/global/Header";
 import { Cajero } from "@/lib/definitions";
 import { obtenerCookie } from "@/lib/obtenerCookie";

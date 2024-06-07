@@ -32,6 +32,7 @@ export default async function crearMovimiento({mov, movsDetalles, username, pass
           aperturaId: mov.aperturaId,
           esIngreso: mov.esIngreso,
           monto: mov.monto,
+          facturaId: mov.facturaId
         },
         movsDetalles: movsDetalles,
         username: username, 
