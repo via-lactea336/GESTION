@@ -11,6 +11,12 @@ import { useRouter } from "next/navigation";
 import { Toaster, toast } from "sonner";
 import Input from "../global/Input";
 
+type Pagos = {
+  metodoPago: medioDePago;
+  importe: number;
+  detalle: string;
+};
+
 export default function PagoFacturas({ idFactura }: { idFactura: string }) {
   const apertura: AperturaCaja = obtenerCookie("apertura");
   const router = useRouter();
@@ -20,6 +26,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
   const [detalle, setDetalle] = useState<string>("");
   const [importe, setImporte] = useState<number>(0);
   const [metodosPago, setMetodosPago] = useState<medioDePago[]>([]);
+  const [pagos, setPagos] = useState<Pagos[]>([]);
   const [totalPagado, setTotalPagado] = useState<number>(0);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,16 +86,17 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
       setModalOpen(true);
     } else {
       setMetodosPago([...metodosPago, metodo]);
+      setPagos([...pagos, { metodoPago: metodo, importe, detalle }]);
       setTotalPagado(totalPagado + importe);
-      setDetalle(detalle);
-      setImporte(importe);
+      setDetalle("");
+      setImporte(0);
     }
   };
 
   const pagarFactura = async () => {
-    const movsDetalles = metodosPago.map((metodo) => ({
-      metodoPago: metodo,
-      monto: totalPagado,
+    const movsDetalles = pagos.map((pago) => ({
+      metodoPago: pago.metodoPago,
+      monto: pago.importe,
     }));
     console.log(movsDetalles);
     try {
@@ -125,14 +133,15 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
     banco: string;
   }) => {
     setMetodosPago([...metodosPago, medioDePago.TARJETA]);
+    setPagos([...pagos, { metodoPago: medioDePago.TARJETA, importe, detalle }]);
     setTotalPagado(totalPagado + importe);
   };
 
   const eliminarMetodoPago = (id: number) => {
-    const nuevosMetodos = metodosPago.filter((metodo, index) => index !== id);
-    const metodoEliminado = metodosPago[id];
-    setTotalPagado(totalPagado - importe);
-    setMetodosPago(nuevosMetodos);
+    const nuevosMetodos = pagos.filter((pago, index) => index !== id);
+    const metodoEliminado = pagos[id];
+    setTotalPagado(totalPagado - metodoEliminado.importe);
+    setPagos(nuevosMetodos);
   };
 
   if (!factura) {
@@ -159,7 +168,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
         </div>
         <div className="flex flex-col">
           <div className="mr-4 w-full flex justify-start items-center gap-4">
-            <div className="mb-4">
+            <div className="mb-4 w-1/2">
               <label className="block text-sm font-medium text-white mb-2">
                 Método:
               </label>
@@ -169,11 +178,11 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 sm:text-sm"
               >
                 <option value={medioDePago.EFECTIVO}>Efectivo</option>
-                <option value={medioDePago.TARJETA}>Tarjeta de Crédito</option>
+                <option value={medioDePago.TARJETA}>Tarjeta</option>
                 <option value={medioDePago.CHEQUE}>Cheque</option>
               </select>
             </div>
-            <div className="mb-4">
+            <div className="mb-4 w-1/2">
               <label className="block text-sm font-medium text-white mb-2">
                 Importe:
               </label>
@@ -234,13 +243,17 @@ focus:ring-yellow-500 focus:border-primary-600 sm:text-sm"
             </tr>
           </thead>
           <tbody>
-            {metodosPago.map((metodo, index) => (
+            {pagos.map((pago, index) => (
               <tr key={index}>
                 <td className="border border-gray-300 px-4 py-2">{index}</td>
-                <td className="border border-gray-300 px-4 py-2">{metodo}</td>
-                <td className="border border-gray-300 px-4 py-2">{detalle}</td>
                 <td className="border border-gray-300 px-4 py-2">
-                  {importe.toLocaleString()}
+                  {pago.metodoPago}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {pago.detalle}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {pago.importe.toLocaleString()}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 flex justify-center items-center">
                   <button onClick={() => eliminarMetodoPago(index)}>

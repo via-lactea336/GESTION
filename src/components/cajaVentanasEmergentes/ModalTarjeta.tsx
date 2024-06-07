@@ -5,10 +5,18 @@ import React from "react";
 interface ModalTarjetaProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (tarjeta: { tipo: string; nombreTitular: string; banco: string; }) => void;
+  onSave: (tarjeta: {
+    tipo: string;
+    nombreTitular: string;
+    banco: string;
+  }) => void;
 }
 
-export default function ModalTarjeta({ isOpen, onClose, onSave }: ModalTarjetaProps) {
+export default function ModalTarjeta({
+  isOpen,
+  onClose,
+  onSave,
+}: ModalTarjetaProps) {
   const [tipo, setTipo] = React.useState("Crédito");
   const [nombreTitular, setNombreTitular] = React.useState("");
   const [banco, setBanco] = React.useState("Banco Itaú");
@@ -22,34 +30,40 @@ export default function ModalTarjeta({ isOpen, onClose, onSave }: ModalTarjetaPr
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
-      <div className="bg-white p-6 rounded-md shadow-md w-1/3">
+      <div className="bg-gray-700 p-6 rounded-md shadow-md w-1/3">
         <h2 className="text-xl font-semibold mb-4">Datos de la Tarjeta</h2>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Tipo de Tarjeta:</label>
+          <label className="block text-sm font-medium text-white mb-2">
+            Tipo de Tarjeta:
+          </label>
           <select
             value={tipo}
             onChange={(e) => setTipo(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 sm:text-sm"
           >
             <option value="Crédito">Crédito</option>
             <option value="Débito">Débito</option>
           </select>
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Nombre del Titular:</label>
+          <label className="block text-sm font-medium text-white mb-2">
+            Nombre del Titular:
+          </label>
           <input
             type="text"
             value={nombreTitular}
             onChange={(e) => setNombreTitular(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 sm:text-sm"
           />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Banco:</label>
+          <label className="block text-sm font-medium text-white mb-2">
+            Banco:
+          </label>
           <select
             value={banco}
             onChange={(e) => setBanco(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 sm:text-sm"
           >
             <option value="Banco Itaú">Banco Itaú</option>
             <option value="Banco Continental">Banco Continental</option>
@@ -64,7 +78,7 @@ export default function ModalTarjeta({ isOpen, onClose, onSave }: ModalTarjetaPr
           >
             Cancelar
           </button>
-          <button 
+          <button
             onClick={handleSave}
             className="bg-primary-500 text-white py-2 px-4 rounded-md shadow-sm hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
           >
