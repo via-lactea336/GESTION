@@ -52,12 +52,12 @@ export async function POST(req: NextRequest) {
           esIngreso: mov.esIngreso,
         },
         include: {
-          factura:{
-            select:{
-              id:true,
-              clienteId:true,
-              esContado: true
-            }
+          factura: {
+            select: {
+              id: true,
+              clienteId: true,
+              esContado: true,
+            },
           },
           apertura: {
             include: {
@@ -85,7 +85,9 @@ export async function POST(req: NextRequest) {
       //Si es egreso, crear un comprobante
       if (!movimientoTx.esIngreso) {
         if (movimientoTx.apertura.caja.saldo.lessThan(sum))
-          throw new Error("La suma de los movimientos detalle excede el saldo de la caja");
+          throw new Error(
+            "La suma de los movimientos detalle excede el saldo de la caja"
+          );
         if (!username || !password)
           throw new Error("Faltan credenciales para crear el comprobante");
         if (!concepto)
@@ -99,28 +101,33 @@ export async function POST(req: NextRequest) {
             userId: user.id,
             monto: mov.monto,
             concepto: concepto,
+            fechaEmision: new Date(),
           },
         });
       }
 
       //Si es egreso, pagar la factura
-      if (movimientoTx.facturaId) await pagarFactura(movimientoTx.facturaId, mov.monto);
-      
+      if (movimientoTx.facturaId)
+        await pagarFactura(movimientoTx.facturaId, mov.monto);
+
       //Si la factura es a credito, entonces se genera un recibo
-      if(movimientoTx.factura && !movimientoTx.factura.esContado){
-          await tx.recibos.create({
-            data: {
-              clienteId: movimientoTx.factura.clienteId,
-              totalPagado: mov.monto,
-              facturaId: movimientoTx.factura.id,               
-            }
-          })
+      if (movimientoTx.factura && !movimientoTx.factura.esContado) {
+        await tx.recibos.create({
+          data: {
+            clienteId: movimientoTx.factura.clienteId,
+            totalPagado: mov.monto,
+            facturaId: movimientoTx.factura.id,
+            fechaEmision: new Date(),
+          },
+        });
       }
 
-    
       //Se generan los movimientos detalles
       await tx.movimientoDetalle.createMany({
-        data: movsDetalles.map((m) => ({ ...m, movimientoId: movimientoTx.id })),
+        data: movsDetalles.map((m) => ({
+          ...m,
+          movimientoId: movimientoTx.id,
+        })),
         skipDuplicates: true,
       });
 
