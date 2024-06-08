@@ -3,7 +3,9 @@ import {
   Cheque,
   CuentaBancaria,
   Entidad,
+  Movimiento,
   Operacion,
+  RegistroCaja,
   TipoOperacion,
 } from "@prisma/client";
 
@@ -76,3 +78,9 @@ export type Cajero = {
 export type UserWithName = {
   name: string;
 };
+
+export type DatosExtendidosRegistroCaja = RegistroCaja & {
+  obsApertura: string|null
+  obsArqueo: string|null
+  movimientos: Movimiento[]
+}

@@ -394,11 +394,9 @@ model RegistroCaja {
 
   //I=E CHEQUE
   montoIngresoCheque  Decimal @db.Money
-  montoEgresoCheque   Decimal @db.Money
 
   //I=E TARJETA
   montoIngresoTarjeta Decimal @db.Money
-  montoEgresoTarjeta  Decimal @db.Money
 
   deleted   DateTime?
 
