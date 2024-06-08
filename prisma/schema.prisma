@@ -179,8 +179,8 @@ model AperturaCaja {
   cajeroId    String 
 
   movimiento Movimiento[]
-  arqueo     ArqueoDeCaja[]
-  registros  RegistroCaja[]
+  arqueo     ArqueoDeCaja?  
+  registro  RegistroCaja?
 
   apertura     DateTime @default(now())
 
@@ -215,7 +215,7 @@ model ArqueoDeCaja {
   id        String @id @default(uuid())
 
   apertura  AperturaCaja @relation(references: [id], fields: [aperturaId], onDelete: NoAction)
-  aperturaId String
+  aperturaId String @unique
 
   montoRegistrado Decimal @db.Money
   montoEsperado   Decimal @db.Money

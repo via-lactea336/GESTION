@@ -10,7 +10,7 @@ import { AperturaCaja } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   const body: AperturaCaja = await req.json();
-  const { cajaId, cajeroId, apertura, saldoInicial } = body;
+  const { cajaId, cajeroId, apertura, saldoInicial, observaciones } = body;
 
   if (!cajaId || !cajeroId || !apertura || !saldoInicial)
     return generateApiErrorResponse(
@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
           cajeroId,
           apertura,
           saldoInicial,
+          observaciones
         },
         include:{
           caja:{
