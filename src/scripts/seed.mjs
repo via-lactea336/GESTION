@@ -69,20 +69,20 @@ async function main() {
   // Crear tipos de operaciones
   const tiposOperacion = await prisma.tipoOperacion.createMany({
     data: [
+      // {
+      //   nombre: "Movimiento Debito",
+      //   esDebito: true,
+      //   afectaSaldo: true,
+      //   afectaSaldoDisponible: true,
+      // },
+      // {
+      //   nombre: "Movimiento Credito",
+      //   esDebito: false,
+      //   afectaSaldo: true,
+      //   afectaSaldoDisponible: true,
+      // },
       {
-        nombre: "Movimiento Debito",
-        esDebito: true,
-        afectaSaldo: true,
-        afectaSaldoDisponible: true,
-      },
-      {
-        nombre: "Movimiento Credito",
-        esDebito: false,
-        afectaSaldo: true,
-        afectaSaldoDisponible: true,
-      },
-      {
-        nombre: "Transferencia",
+        nombre: "Retiro",
         esDebito: true,
         afectaSaldo: true,
         afectaSaldoDisponible: true,

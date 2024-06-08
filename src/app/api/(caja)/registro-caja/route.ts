@@ -5,6 +5,7 @@ import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiRes
 
 import { RegistroCaja } from "@prisma/client";
 import calcularDatosRegistroCaja from "@/lib/moduloCaja/resumenDiario";
+import { ApiError } from "next/dist/server/api-utils";
 
 export async function POST(req: NextRequest) {
   
@@ -17,11 +18,12 @@ export async function POST(req: NextRequest) {
   if( !aperturaId ) return generateApiErrorResponse("Faltan datos para la creacion del registro", 400)
 
   try{
-    await calcularDatosRegistroCaja(aperturaId)
-    return generateApiSuccessResponse(200, "El registro fue generada correctamente")
+    const registro = await calcularDatosRegistroCaja(aperturaId)
+    return generateApiSuccessResponse(200, "El registro fue generada correctamente", registro)
   
   }catch(err){
     if(err instanceof PrismaClientKnownRequestError && err.code === "P2002") return generateApiErrorResponse("El registro ya existe", 400)
+    if(err instanceof ApiError ) return generateApiErrorResponse(err.message, err.statusCode)
     else return generateApiErrorResponse("Hubo un error en la creacion del registro", 500)
   }  
 }

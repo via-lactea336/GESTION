@@ -29,54 +29,24 @@ type Operacion = {
 
 export default function FormTransferencias() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    
     setLoadingSend(true);
     event.preventDefault();
-    // const form = event.currentTarget;
-    // console.log(form["fechaOperacion"].value);
-    // const dateValue = form["fechaOperacion"].value;
-    // // Desglosar manualmente la fecha seleccionada
-    // const [year, month, day] = dateValue.split("-").map(Number);
-    // const fecha = new Date(year, month - 1, day); // Nota: los meses en JavaScript son 0-indexados
 
-    // // Obtener la fecha y hora actuales
-    // const fechaActual = new Date();
-
-    // // Establecer los componentes de tiempo actuales en el objeto fecha
-    // fecha.setHours(fechaActual.getHours());
-    // fecha.setMinutes(fechaActual.getMinutes());
-    // fecha.setSeconds(fechaActual.getSeconds());
-    // fecha.setMilliseconds(fechaActual.getMilliseconds());
-
-    // // Ahora fecha tiene la fecha seleccionada con la hora actual
-    // console.log(fecha);
-    // const aux = event.target as HTMLFormElement;
-    // const operacion: Operacion = {
-    //   tipoOperacionId: form["operacion"].value,
-    //   fechaOperacion: fecha,
-    //   monto: Number(form["monto"].value),
-    //   cuentaBancariaOrigenId: form["cuentaBancariaOrigenId"].value,
-    //   bancoInvolucrado: form["bancoInvolucrado"].value,
-    //   nombreInvolucrado: form["nombreInvolucrado"].value,
-    //   cuentaInvolucrado: form["cuentaInvolucrado"].value,
-    //   rucInvolucrado: form["rucInvolucrado"].value,
-    //   concepto: form["concepto"].value,
-    //   numeroComprobante: form["comprobante"].value,
-    // };
-
-    console.log("Operacion:", operacion,"\n Cheques:", cheques)
+    console.log("Operacion:", operacion, "\n Cheques:", cheques)
 
     const response = await agregarOperacion({
-      tipoOperacionId:operacion.tipoOperacionId,
-      fechaOperacion: new Date(operacion.fechaOperacion),
+      tipoOperacionId: operacion.tipoOperacionId,
+      fechaOperacion: operacion.fechaOperacion,
       monto: operacion.monto,
-      cuentaBancariaOrigenId:operacion.cuentaBancariaOrigenId,
+      cuentaBancariaOrigenId: operacion.cuentaBancariaOrigenId,
       bancoInvolucrado: operacion.bancoInvolucrado,
       nombreInvolucrado: operacion.nombreInvolucrado,
       cuentaInvolucrado: operacion.cuentaInvolucrado,
       rucInvolucrado: operacion.rucInvolucrado,
       concepto: operacion.concepto,
       numeroComprobante: operacion.numeroComprobante,
-      cheques:cheques
+      cheques: cheques
     }
     );
     if (response !== undefined && typeof response !== "string") {
@@ -86,8 +56,20 @@ export default function FormTransferencias() {
       } else {
         setLoadingSend(false);
         toast.success("Operación registrada correctamente");
-        setOperacion(initialValues);
+        setOperacion(prev => ({
+          ...prev,
+          fechaOperacion: "",
+          monto: 0,
+          cuentaBancariaOrigenId: "",
+          nombreInvolucrado: "",
+          concepto: "",
+          numeroComprobante: "",
+          cuentaInvolucrado: undefined,
+          rucInvolucrado: undefined,
+          bancoInvolucrado: undefined,
+        }));
         setCheques([]);
+        setFinished(prev => !prev);
       }
     }
   };
@@ -95,7 +77,7 @@ export default function FormTransferencias() {
   //Estado de la operacion a ser creada
   const initialValues = {
     tipoOperacionId: "",
-    fechaOperacion: new Date(),
+    fechaOperacion: "",
     monto: 0,
     cuentaBancariaOrigenId: "",
     nombreInvolucrado: "",
@@ -106,28 +88,30 @@ export default function FormTransferencias() {
     bancoInvolucrado: undefined,
   }
   const [operacion, setOperacion] = useState<CrearOperacionFields>(initialValues);
-  
+
   //Naturaleza de la operacion
   const [nombreOperacion, setNombreOperacion] = useState("");
   const [esDebito, setEsDebito] = useState<boolean>(false);
-  
+
   //Estados para manejar opciones 
   const [bancos, setBancos] = useState<Banco[]>([]);
   const [cuentasBancarias, setCuentasBancarias] = useState<CuentaBancariaAndBanco[]>([]);
   const [operaciones, setOperaciones] = useState<TipoOperacion[]>([]);
 
-  //Estados para el manejo de estados de carga/error
+  //Estados para el manejo de estados de carga/error/finalizado
   const [loading, setLoading] = useState(false);
   const [loadingSend, setLoadingSend] = useState(false);
+  const [finished, setFinished] = useState(false);
 
   //Manejo de cheques
   const [cheques, setCheques] = useState<ChequeCreate[]>([]);
+  const [montoParcial, setMontoParcial] = useState<number>(0);
 
   //Handle onChange of the inputs
-  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement| HTMLSelectElement>) => {
+  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, id, type } = event.target;
-    if(type === "datetime-local") setOperacion({...operacion, [name||id]: new Date(value).toISOString()});
-    setOperacion({ ...operacion, [name||id]: value });
+    if (type === "datetime-local") setOperacion({ ...operacion, [name || id]: value });
+    setOperacion({ ...operacion, [name || id]: value });
   };
 
   //Fetch data for the form
@@ -151,8 +135,8 @@ export default function FormTransferencias() {
       setNombreOperacion(operaciones.data[0].nombre);
       setOperacion({
         ...operacion,
-        tipoOperacionId: operaciones.data[0].id,
-        cuentaBancariaOrigenId: cuentasBancarias.data[0].id,
+        tipoOperacionId:"",
+        cuentaBancariaOrigenId: "",
         bancoInvolucrado: bancos.data[0].id,
       })
     }
@@ -166,7 +150,6 @@ export default function FormTransferencias() {
   useEffect(() => {
     setOperacion({
       ...operacion,
-      cuentaBancariaOrigenId: cuentasBancarias.length > 0 ? cuentasBancarias[0].id : "",
       nombreInvolucrado: initialValues.nombreInvolucrado,
       bancoInvolucrado: initialValues.bancoInvolucrado,
       rucInvolucrado: initialValues.rucInvolucrado,
@@ -175,77 +158,62 @@ export default function FormTransferencias() {
     setCheques([])
   }, [operacion.tipoOperacionId])
 
-  console.log(operacion)
+  useEffect(() => {
+    const totalMontoCheques = cheques.reduce((acc, cheque) => acc + cheque.monto, 0);
+    setOperacion(prev => ({ ...prev, monto: totalMontoCheques + montoParcial }));
+  }, [cheques, montoParcial]);
 
   return (
     <form className="w-full" onSubmit={handleSubmit}>
       <div className="w-full mb-6">
-          <label className="mb-2">Tipo de Transacción</label>
-          <div className="relative mt-2">
-            <select
-              className="block appearance-none w-full bg-gray-800 py-3 px-4 pr-8 rounded leading-tight focus:outline-none"
-              id="tipoOperacionId"
-              required
-              onChange={(e) => {
-                handleOnChange(e);
-                setEsDebito(
-                  operaciones.find((op) => op.id === e.target.value)
-                    ?.esDebito || false
-                );
-                setNombreOperacion(
-                  operaciones.find((op) => op.id === e.target.value)?.nombre || ""
-                )
-              }}
-            >
-              {loading ? (
-                <option>Cargando...</option>
-              ) : (
-                operaciones.map((operacion) => (
-                  <option key={operacion.id} value={operacion.id}>
-                    {operacion.nombre}
+        <label className="mb-2">Tipo de Transacción*</label>
+        <div className="relative mt-2">
+          <select
+            className="block appearance-none w-full bg-gray-800 py-3 px-4 pr-8 rounded leading-tight focus:outline-none"
+            id="tipoOperacionId"
+            required
+            onChange={(e) => {
+              handleOnChange(e);
+              setEsDebito(
+                operaciones.find((op) => op.id === e.target.value)
+                  ?.esDebito || false
+              );
+              setNombreOperacion(
+                operaciones.find((op) => op.id === e.target.value)?.nombre || ""
+              )
+            }}
+          >
+            {loading ? (
+              <option>Cargando...</option>
+            ) : (
+              <>
+              <option value="">Selecione un tipo de operacion</option>
+              {
+                operaciones.map((op) => (
+                  <option key={op.id} value={op.id}>
+                    {op.nombre}
                   </option>
                 ))
-              )}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg
-                className="fill-current h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-              </svg>
-            </div>
+              }
+              </>
+            )}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+            <svg
+              className="fill-current h-4 w-4"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+            </svg>
           </div>
         </div>
-    { 
-      nombreOperacion === "Depósito"? 
-      
-        <AgregarCheque 
-          monto={operacion.monto} 
-          setOperacion={setOperacion} 
-          cheques={cheques} 
-          setCheques={setCheques} 
-          bancos={bancos} 
-          cuentasBancarias={cuentasBancarias}
-          handleOnChangeOperacion={handleOnChange}
-        /> 
-      
-      :
+      </div>
+    {
+      operacion.tipoOperacionId && 
+      <div className="flex sm:flex-row flex-wrap flex-col box-border gap-3 w-full">
 
-      nombreOperacion === "Emitir Cheque"?
-
-        <EmitirCheque 
-          setOperacion={setOperacion}
-          cheques={cheques}
-          setCheques={setCheques}
-          cuentasBancarias={cuentasBancarias}
-          handleOnChangeOperacion={handleOnChange}
-        />
-      :
-      <>
-      <div className="flex flex-wrap -mx-3 mb-6">
-        <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+        <div className="flex flex-col ">
           <label className="mb-2">
             Cuenta del {
               !esDebito ? "Beneficiario" : "Remitente"
@@ -261,12 +229,18 @@ export default function FormTransferencias() {
               {loading ? (
                 <option>Cargando...</option>
               ) : (
-                cuentasBancarias.map((cuenta) => (
-                  <option key={cuenta.id} value={cuenta.id}>
-                    {cuenta.banco.nombre.split("Banco")} {cuenta.numeroCuenta}
-                  </option>
-                ))
-              )}
+                <>
+                  <option value="">Seleccionar Cuenta</option>
+                  {
+                    cuentasBancarias.map((cuenta) => (
+                      <option key={cuenta.id} value={cuenta.id}>
+                        {cuenta.banco.nombre.split("Banco")} {cuenta.numeroCuenta}
+                      </option>
+                    ))
+                  }
+                </>
+              )
+              }
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
               <svg
@@ -279,8 +253,10 @@ export default function FormTransferencias() {
             </div>
           </div>
         </div>
-
-        <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+      
+      { 
+        nombreOperacion === "Transferencia" && 
+        <div className="flex flex-col ">
           <label className="mb-2">
             Banco del {esDebito ? "Beneficiario" : "Remitente"}
           </label>
@@ -310,7 +286,12 @@ export default function FormTransferencias() {
             </div>
           </div>
         </div>
-        <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+      }
+      
+        
+      {
+        nombreOperacion === "Transferencia" && 
+        <div className="flex flex-col ">
           <label className="mb-2">
             Cuenta del {esDebito ? "Beneficiario" : "Remitente"}
           </label>
@@ -323,12 +304,15 @@ export default function FormTransferencias() {
             placeholder="22-187805"
           />
         </div>
-      </div>
+      }
 
-      <div className="flex flex-wrap -mx-3 mb-2">
-        <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+        <div className="flex flex-col ">
           <label className=" mb-2">
-            Nombre del {esDebito ? "Beneficiario" : "Remitente"}
+            {
+              nombreOperacion === "Depósito"? "Nombre del Depositante*" :
+              nombreOperacion === "Retiro"? "Titular de la Cuenta*" :
+              esDebito ? "Nombre delBeneficiario" : "Nombre del Remitente"
+            }
           </label>
           <Input
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
@@ -339,7 +323,7 @@ export default function FormTransferencias() {
             placeholder="Pedro Meza"
           />
         </div>
-        <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+        <div className="flex flex-col ">
           <label className="mb-2">Ruc</label>
           <Input
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
@@ -350,19 +334,22 @@ export default function FormTransferencias() {
             placeholder="123456-1"
           />
         </div>
-        <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
-          <label className=" mb-2">Monto</label>
+        <div className="flex flex-col ">
+          <label className=" mb-2">{
+            nombreOperacion === "Depósito"? "Efectivo*" 
+            : "Monto"
+          }</label>
           <Input
             className={'block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none'}
-            id="monto"
-            onChange={handleOnChange}
+            id="montoParcial"
+            onChange={(e) => setMontoParcial(Number(e.target.value))} 
             type="number"
             required
             placeholder="150000"
           />
         </div>
-        <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
-          <label className="mb-2">Número de Comprobante</label>
+        <div className="flex flex-col ">
+          <label className="mb-2">Número de Comprobante*</label>
           <Input
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="numeroComprobante"
@@ -372,10 +359,10 @@ export default function FormTransferencias() {
             placeholder="012345"
           />
         </div>
-      </div>
-      <div className="flex flex-wrap -mx-3 mb-2">
-        <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-          <label className="mb-2">Fecha de la Transacción</label>
+
+      <div className="flex w-full gap-3">
+        <div className="w-full md:  mb-6 md:mb-0">
+          <label className="mb-2">Fecha de la Transacción*</label>
           <InputCalendar
             withTime={true}
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
@@ -384,8 +371,8 @@ export default function FormTransferencias() {
             required
           />
         </div>
-        <div className="w-full md:w-2/3 px-3 mb-6 md:mb-0">
-          <label className="mb-2">Concepto</label>
+        <div className="w-full md:w-2/3 mb-6 md:mb-0">
+          <label className="mb-2">Concepto*</label>
           <Input
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="concepto"
@@ -395,9 +382,23 @@ export default function FormTransferencias() {
             placeholder="Pago de servicios básicos"
           />
         </div>
+
       </div>
-      </>
-    }
+
+      {
+        nombreOperacion === "Depósito" &&
+        <AgregarCheque 
+          cheques={cheques}
+          setCheques={setCheques}
+          handleOnChangeOperacion={handleOnChange}
+          loading={loading}
+          operacion={operacion}
+          setOperacion={setOperacion}
+          monto={operacion.monto}
+          bancos={bancos}
+        />
+      }
+
       <div className="px-3 flex items-center justify-end mb-6 md:mb-0">
         <button
           type="submit"
@@ -409,6 +410,8 @@ export default function FormTransferencias() {
           {loadingSend ? "Registrando..." : "Registrar Transacción"}
         </button>
       </div>
+      </div>
+    }
       <Toaster richColors />
     </form>
   );

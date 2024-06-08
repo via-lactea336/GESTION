@@ -2,7 +2,7 @@ import { ApiResponseData } from "../../definitions";
 
 export type CrearOperacionFields = {
   tipoOperacionId: string,
-  fechaOperacion: Date,
+  fechaOperacion: string,
   monto: number,
   cuentaBancariaOrigenId: string,
   nombreInvolucrado: string,
@@ -37,6 +37,10 @@ export default async function agregarOperacion(
   }: CrearOperacionFields
 ): Promise<ApiResponseData | string | undefined> {
   try {
+
+    if(fechaOperacion === "") throw new Error("La fecha de la operación no puede estar vacía");
+    if(monto === 0) throw new Error("El monto de la operación no puede ser 0");
+
     const response = await fetch("/api/operacion", {
       method: "POST",
       headers: {
@@ -44,7 +48,7 @@ export default async function agregarOperacion(
       },
       body: JSON.stringify({
         tipoOperacionId: tipoOperacionId,
-        fechaOperacion: fechaOperacion,
+        fechaOperacion: new Date(fechaOperacion),
         monto: monto,
         cuentaBancariaOrigenId: cuentaBancariaOrigenId,
         bancoInvolucrado: bancoInvolucrado,
