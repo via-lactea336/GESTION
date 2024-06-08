@@ -82,7 +82,7 @@ model Operacion {
 
   concepto            String               @db.VarChar(255)
 
-  numeroComprobante   String               @db.VarChar(128)
+  numeroComprobante   String               @db.VarChar(128) @unique
 
   cheque              Cheque[]
 
@@ -284,13 +284,13 @@ model Factura {
   numeroFactura   String @unique
 
   fechaEmision     DateTime
-  fechaVencimiento DateTime
+  fechaVencimiento DateTime?
 
   movimientos     Movimiento[]
 
-  esContado       Boolean
+  esContado       Boolean  
 
-  pagado           Boolean
+  pagado           Boolean @default(false)
 
   total            Decimal @db.Money
   totalSaldoPagado Decimal @db.Money

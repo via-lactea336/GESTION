@@ -11,6 +11,7 @@ type InputCalendarProps = {
   placeholder?: string;
   setValue?: (value: string) => void;
   handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  limit?: Date;
 };
 
 export default function InputCalendar({
@@ -21,7 +22,8 @@ export default function InputCalendar({
   setValue,
   handleChange,
   placeholder,
-  withTime
+  withTime,
+  limit
 }: InputCalendarProps) {
   const { maxDate, maxDateTime } = useCalendar();
   const [error, setError] = useState<string>("");
@@ -72,6 +74,10 @@ export default function InputCalendar({
         value={value}
         placeholder={placeholder}
         onChange={(e) => {
+          if(limit && new Date(e.currentTarget.value).toISOString() > limit.toISOString()) {
+            setError(`Por favor, seleccione una fecha anterior a ${limit.toISOString().split("T")[0]}.`);
+            return
+          }
           if (e.currentTarget.value > maxDate) {
             setError(`Por favor, seleccione una fecha válida.`);
           } else {

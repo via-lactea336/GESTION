@@ -63,6 +63,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     if (err instanceof PrismaClientKnownRequestError && err.code === "P2002")
       return generateApiErrorResponse("La apertura de caja ya existe", 400);
+    if(err instanceof Error) return generateApiErrorResponse(err.message, 500)
     else
       return generateApiErrorResponse(
         "Hubo un error en la creacion de la apertura de caja",

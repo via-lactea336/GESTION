@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { estadoCheque } from "@prisma/client";
-import {PrismaClientKnownRequestError, Decimal} from "@prisma/client/runtime/library";
+import {Decimal} from "@prisma/client/runtime/library";
 import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiResponse";
 import reflejarOperacion from "@/lib/moduloBanco/operacion/reflejarOperacion";
 import { ChequeAndOperacion } from "@/lib/definitions";
@@ -20,7 +20,8 @@ export async function POST(req: NextRequest) {
     nombreInvolucrado, 
     bancoInvolucrado, 
     rucInvolucrado, 
-    fechaOperacion  
+    fechaOperacion,
+    cheques
   } = body;
 
   if(!tipoOperacionId || 
@@ -44,81 +45,81 @@ export async function POST(req: NextRequest) {
   if(currentCuentaBancarioOrigen.numeroCuenta === cuentaInvolucrado) return generateApiErrorResponse("Las cuentas involucradas no pueden ser iguales", 400)
 
   if(new Decimal(monto).lessThanOrEqualTo(0)) return generateApiErrorResponse("Monto invalido", 400)
-  
-  try{
-    //Validar la existencia del tipo de operacion
-    const tipoOperacion = await prisma.tipoOperacion.findFirst({
-      where: {
-        id: tipoOperacionId,
-      },
-    });
-    if (!tipoOperacion)
-      throw new Error("No existe el tipo de Operacion ingresado");
-
-    //Obtener caracteristicas clave del tipo de operacion a ejecutar
-    const esDebito = tipoOperacion.esDebito;
-    const afectaSaldo = tipoOperacion.afectaSaldo;
-    const afectaSaldoDisponible = tipoOperacion.afectaSaldoDisponible;
-  
-    //Validar si los saldos son suficiente
-    if (
-      esDebito &&
-      (
-        afectaSaldo && currentCuentaBancarioOrigen?.saldo.sub(monto).lessThanOrEqualTo(0) ||
-        afectaSaldoDisponible && currentCuentaBancarioOrigen?.saldoDisponible.sub(monto).lessThanOrEqualTo(0) 
-      )
-    )
-      throw new Error("Saldo insuficiente para realizar la operacion");
-
-    const {cheques} = body
     
-    if(cheques && cheques.length !== 0){
+  if(cheques && cheques.length !== 0){
       const sum = cheques.reduce((total, obj) => total + (+obj.monto), 0)
       if(new Decimal(monto).lessThan(sum)) return generateApiErrorResponse("La suma de los montos de los cheques no puede ser mayor al monto de la operacion", 400)
-    }
+  }
+  
+  try{
+    const operacion = await prisma.$transaction(async (tx) => {
 
-    const operacion = await prisma.operacion.create({
-      data: {
-        tipoOperacionId, 
-        cuentaBancariaOrigenId, 
-        monto, 
-        concepto, 
-        numeroComprobante, 
-        cuentaInvolucrado, 
-        nombreInvolucrado, 
-        bancoInvolucrado, 
-        rucInvolucrado, 
-        fechaOperacion
-      },
-      include: {
-        tipoOperacion: true
-      }
-    })
-
-    if(cheques && cheques.length !== 0){
-      for(const cheque of cheques){
-        const currentCheque = await prisma.cheque.create({
-          data: {
-            operacionId: operacion.id,
-            numeroCheque: cheque.numeroCheque,
-            involucrado: cheque.involucrado,
-            monto: cheque.monto,
-            fechaEmision: !cheque.esRecibido? operacion.fechaOperacion : cheque.fechaEmision,
-            esRecibido: cheque.esRecibido,
-            cuentaBancariaAfectadaId: operacion.cuentaBancariaOrigenId,
-            bancoChequeId: cheque.bancoChequeId,
-            fechaPago:cheque.esRecibido? new Date() : null,
-            estado: cheque.esRecibido? estadoCheque.PAGADO : estadoCheque.EMITIDO,
+      const operacionTx = await tx.operacion.create({
+        data: {
+          tipoOperacionId,
+          fechaOperacion: new Date(fechaOperacion),
+          monto,
+          cuentaBancariaOrigenId,
+          nombreInvolucrado,
+          concepto,
+          numeroComprobante,
+          cuentaInvolucrado,
+          rucInvolucrado,
+          bancoInvolucrado
+        },
+        include: {
+          cuentaBancariaOrigen: {
+            select: {
+              saldo: true,
+              saldoDisponible: true
+            }
+          },
+          tipoOperacion: {
+            select: {
+              afectaSaldo: true,
+              afectaSaldoDisponible: true,
+              esDebito: true
+            }
           }
-        })
-        if(!currentCheque) return generateApiErrorResponse(`Cheque num: ${cheque.numeroCheque} no creado`, 400)
+        }
+      })
+
+      //Validar si los saldos son suficiente
+      if (operacionTx.tipoOperacion.esDebito &&
+        (
+          operacionTx.tipoOperacion.afectaSaldo && operacionTx.cuentaBancariaOrigen.saldo.sub(monto).lessThanOrEqualTo(0) ||
+          operacionTx.tipoOperacion.afectaSaldoDisponible && operacionTx.cuentaBancariaOrigen.saldoDisponible.sub(monto).lessThanOrEqualTo(0) 
+        )
+      )
+      throw new Error("Saldo insuficiente para realizar la operacion");
+
+      if(cheques && cheques.length !== 0){
+        for(const cheque of cheques){
+          const { numeroCheque, involucrado, monto, esRecibido, bancoChequeId } = cheque
+          if(!numeroCheque || !involucrado || !monto || esRecibido===undefined || esRecibido===null || !bancoChequeId) throw new Error("Uno de los cheques no tiene informacion suficiente para ser procesada la operacion}")
+          await tx.cheque.create({
+            data: {
+              operacionId: operacionTx.id,
+              numeroCheque: cheque.numeroCheque,
+              involucrado: cheque.involucrado,
+              monto: cheque.monto,
+              fechaEmision: !cheque.esRecibido? operacionTx.fechaOperacion : cheque.fechaEmision,
+              esRecibido: cheque.esRecibido,
+              cuentaBancariaAfectadaId: operacionTx.cuentaBancariaOrigenId,
+              bancoChequeId: cheque.bancoChequeId,
+              fechaPago:cheque.esRecibido? new Date() : null,
+              estado: cheque.esRecibido? estadoCheque.PAGADO : estadoCheque.EMITIDO,
+            }
+          })
+        }
       }
-    }
+      return operacionTx
+    })
 
     if(!operacion) return generateApiErrorResponse("Error generating operation", 400)  
 
     //Refleja el incremento o decremento en el saldo de la cuenta bancaria siguiendo las propiedades del tipo de Operacion
-    await reflejarOperacion(cuentaBancariaOrigenId, monto, esDebito, afectaSaldo, afectaSaldoDisponible)
+    await reflejarOperacion(cuentaBancariaOrigenId, monto, operacion.tipoOperacion.esDebito, operacion.tipoOperacion.afectaSaldo, operacion.tipoOperacion.afectaSaldoDisponible)
 
     return generateApiSuccessResponse(200, "La operacion se genero correctamente")
   
