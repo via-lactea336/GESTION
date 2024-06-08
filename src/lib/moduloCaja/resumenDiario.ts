@@ -92,19 +92,10 @@ export default async function calcularDatosRegistroCaja(aperturaId: string) {
       montoEgreso: montoEgreso,
 
       montoIngresoCheque: montoIngresoCheque,
-      montoEgresoCheque: montoEgresoCheque,
       montoIngresoTarjeta: montoIngresoTarjeta,
-      montoEgresoTarjeta: montoEgresoTarjeta,
     }
   })
 
   if(!registroCaja) throw new ApiError('Error creando el registro de caja', 500)
-
-  return {
-    ...registroCaja,
-    obsApertura: apertura.observaciones,
-    obsArqueo: apertura.arqueo[0].observaciones,
-    movimientos: apertura.movimiento,
-  }
 
 }

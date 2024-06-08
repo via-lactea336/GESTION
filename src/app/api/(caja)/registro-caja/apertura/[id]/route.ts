@@ -10,24 +10,37 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     where: {
       aperturaId: id
     },
-    include: {
-      apertura: {
-        include:{
-          arqueo: {
-            select: {
-              montoEsperado: true,
-              montoRegistrado: true,
+    include:{
+      apertura:{
+        select:{
+          observaciones: true,
+          movimiento: true,
+          arqueo:{
+            select:{
               observaciones: true
-            }
-          },
-          movimiento: {
-            include: {
-              movimientoDetalles: true,
             }
           }
         }
-      },
+      }
     }
+    // include: {
+    //   apertura: {
+    //     include:{
+    //       arqueo: {
+    //         select: {
+    //           montoEsperado: true,
+    //           montoRegistrado: true,
+    //           observaciones: true
+    //         }
+    //       },
+    //       movimiento: {
+    //         include: {
+    //           movimientoDetalles: true,
+    //         }
+    //       }
+    //     }
+    //   },
+    // }
   })
 
   if (!registroCaja) return generateApiErrorResponse("No existe el registro de caja en la base de datos", 404)

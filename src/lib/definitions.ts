@@ -80,7 +80,11 @@ export type UserWithName = {
 };
 
 export type DatosExtendidosRegistroCaja = RegistroCaja & {
-  obsApertura: string|null
-  obsArqueo: string|null
-  movimientos: Movimiento[]
+  apertura:{
+    movimiento: Movimiento[]
+    observaciones: string|null
+    arqueo:{
+      observaciones: string|null
+    }
+  }
 }

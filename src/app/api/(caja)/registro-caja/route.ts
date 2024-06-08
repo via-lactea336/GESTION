@@ -18,8 +18,8 @@ export async function POST(req: NextRequest) {
   if( !aperturaId ) return generateApiErrorResponse("Faltan datos para la creacion del registro", 400)
 
   try{
-    const registro = await calcularDatosRegistroCaja(aperturaId)
-    return generateApiSuccessResponse(200, "El registro fue generada correctamente", registro)
+    await calcularDatosRegistroCaja(aperturaId)
+    return generateApiSuccessResponse(200, "El registro fue generada correctamente")
   
   }catch(err){
     if(err instanceof PrismaClientKnownRequestError && err.code === "P2002") return generateApiErrorResponse("El registro ya existe", 400)

@@ -26,15 +26,15 @@ export async function DELETE(req:NextRequest, { params }: { params: { id: string
   try {
     
     if(deleteFromDB){
-      const caja = await prisma.cliente.delete({
+      const factura = await prisma.factura.delete({
         where: {
           id
         }
       })
-      return generateApiSuccessResponse(200, `La factura fue eliminada correctamente de la base de datos`, caja);
+      return generateApiSuccessResponse(200, `La factura fue eliminada correctamente de la base de datos`, factura);
     }
 
-    const caja = await prisma.cliente.update({
+    const caja = await prisma.factura.update({
       where: {
         id
       },

@@ -2,6 +2,7 @@ import { generateApiErrorResponse, generateApiSuccessResponse } from "@/lib/apiR
 import { comparePasswords } from "@/lib/bcrypt";
 import cerrarCaja from "@/lib/moduloCaja/cerrarCaja";
 import prisma from "@/lib/prisma";
+import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest } from "next/server";
 
 
@@ -40,6 +41,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     await cerrarCaja(aperturaId, observaciones);
     return generateApiSuccessResponse(200, `La caja se ha cerrado exitosamente`);
   } catch (error) {
+    if(error instanceof ApiError) return generateApiErrorResponse(error.message, error.statusCode)
     if(error instanceof Error) return generateApiErrorResponse(error.message, 500)
     return generateApiErrorResponse("Error cerrando la caja", 500);
   }
