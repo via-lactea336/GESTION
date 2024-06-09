@@ -2,9 +2,8 @@
 import Header from "@/components/global/Header";
 import ResumenDeCaja from "@/components/dashboard/resumendiario/ResumenDeCaja";
 import { obtenerCookie } from "@/lib/obtenerCookie";
-import { AperturaCaja, Movimiento, RegistroCaja } from "@prisma/client";
+import { AperturaCaja } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { obtenerMovimientos } from "@/lib/moduloCaja/movimiento/obtenerMovimientos";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import ResumenCajaPDF from "@/components/PDF/ResumenDiario";
 import { CajaData, Cajero, DatosExtendidosRegistroCaja } from "@/lib/definitions";
@@ -67,6 +66,10 @@ export default function Page() {
               montoIngresoCheque={Number(registros.montoIngresoCheque)}
               montoIngresoTarjeta={Number(registros.montoIngresoTarjeta)}
               movimientos={registros.apertura.movimiento}
+              observaciones= {registros.apertura.observaciones?
+                registros.apertura.observaciones  :
+                "Sin observaciones durante el cierre"
+              }
             />
           }
           fileName="ResumenCaja.pdf"
@@ -108,7 +111,7 @@ export default function Page() {
                   .split("T")[0]
                   .split("-")
                   .reverse()
-                  .join("-")}
+                  .join("/")}
               </td>
               <td className="p-2">
                 {new Date(apertura.createdAt).getHours()}:{new Date(apertura.createdAt).getMinutes()}
@@ -127,7 +130,12 @@ export default function Page() {
                   {Number(mov.monto).toLocaleString()} Gs.
                 </td>
                 <td className="p-2">
-                  {new Date(mov.createdAt).toLocaleDateString()}
+                  {new Date(mov.createdAt)
+                    .toISOString()
+                    .split("T")[0]
+                    .split("-")
+                    .reverse()
+                    .join("/")}
                 </td>
                 <td className="p-2">
                   {new Date(mov.createdAt).getHours()}:

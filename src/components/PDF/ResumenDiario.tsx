@@ -67,6 +67,7 @@ type ResumenCajaProps = {
     montoIngresoCheque: number;
     montoIngresoTarjeta: number;
     movimientos: Array<Movimiento>;
+    observaciones: string;
 };
 
 // Componente del Resumen de Caja PDF
@@ -80,6 +81,7 @@ const ResumenCajaPDF: React.FC<ResumenCajaProps> = ({
     montoIngresoCheque,
     montoIngresoTarjeta,
     movimientos,
+    observaciones
 }) => (
     <Document>
         <Page size="A4" style={styles.page}>
@@ -103,18 +105,24 @@ const ResumenCajaPDF: React.FC<ResumenCajaProps> = ({
             </Text>
 
             <View style={styles.table}>
-            <View style={[styles.tableRow, styles.tableHeader]}>
-                <Text style={[styles.tableCol, styles.tableCell]}>Caja Inicial</Text>
-                <Text style={[styles.tableCol, styles.tableCell]}>
-                {Number(apertura?.saldoInicial).toLocaleString()} Gs.
-                </Text>
-            </View>
-            <View style={styles.tableRow}>
-                <Text style={[styles.tableCol, styles.tableCell]}>Dinero en Caja</Text>
-                <Text style={[styles.tableCol, styles.tableCell]}>
-                {Number(montoRegistrado).toLocaleString()} Gs.
-                </Text>
-            </View>
+                <View style={[styles.tableRow, styles.tableHeader]}>
+                    <Text style={[styles.tableCol, styles.tableCell]}>Caja Inicial</Text>
+                    <Text style={[styles.tableCol, styles.tableCell]}>
+                    {Number(apertura?.saldoInicial).toLocaleString()} Gs.
+                    </Text>
+                </View>
+                <View style={styles.tableRow}>
+                    <Text style={[styles.tableCol, styles.tableCell]}>Dinero en Caja</Text>
+                    <Text style={[styles.tableCol, styles.tableCell]}>
+                    {Number(montoRegistrado).toLocaleString()} Gs.
+                    </Text>
+                </View>
+                <View style={styles.tableRow}>
+                    <Text style={[styles.tableCol, styles.tableCell]}>observaciones</Text>
+                    <Text style={[styles.tableCol, styles.tableCell]}>
+                    {observaciones}
+                    </Text>
+                </View>
             </View>
 
             <Text style={styles.header}>Resumen de ingresos y egresos por forma de pago</Text>
