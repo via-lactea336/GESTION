@@ -11,6 +11,7 @@ import reflejarMovimiento from "@/lib/moduloCaja/movimiento/reflejarMovimiento";
 import pagarFactura from "@/lib/moduloCaja/factura/pagarFactura";
 import verifyUser from "@/lib/auth/verifyUser";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import ApiError from "@/lib/api/ApiError";
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,12 +24,8 @@ export async function POST(req: NextRequest) {
     } = await req.json();
     const { mov, movsDetalles, username, password, concepto } = body;
 
-    if (mov.esIngreso === undefined || !mov.monto || !mov.aperturaId)
+    if (!mov || !movsDetalles || mov.esIngreso === undefined || !mov.monto || !mov.aperturaId)
       return generateApiErrorResponse("Faltan datos para el movimiento", 400);
-
-    if (!mov || !movsDetalles) {
-      return generateApiErrorResponse("Faltan datos para el movimiento", 400);
-    }
 
     if (movsDetalles.length === 0) {
       return generateApiErrorResponse(
@@ -43,7 +40,15 @@ export async function POST(req: NextRequest) {
       return generateApiErrorResponse("El monto debe ser mayor a 0", 400);
     }
 
-    const movimiento = await prisma.$transaction(async (tx) => {
+    const sum = movsDetalles.reduce((total, m) => total + +m.monto, 0);
+
+    if (sum !== +mov.monto) {
+      throw new ApiError(
+        "La suma de los movimientos detalle no coincide con el monto del movimiento", 400
+      );
+    }
+
+    await prisma.$transaction(async (tx) => {
       const movimientoTx = await tx.movimiento.create({
         data: {
           monto: mov.monto,
@@ -51,12 +56,16 @@ export async function POST(req: NextRequest) {
           aperturaId: mov.aperturaId,
           esIngreso: mov.esIngreso,
         },
-        include: {
+        select: {
+          esIngreso: true,
+          id: true,
           factura: {
             select: {
               id: true,
               clienteId: true,
               esContado: true,
+              totalSaldoPagado: true,
+              total:true
             },
           },
           apertura: {
@@ -64,34 +73,25 @@ export async function POST(req: NextRequest) {
               caja: {
                 select: {
                   id: true,
-                  saldo: true,
+                  saldoEfectivo: true,
                 },
               },
             },
           },
         },
       });
-
       if (!movimientoTx) throw new Error("Error generando el movimiento");
-
-      const sum = movsDetalles.reduce((total, m) => total + +m.monto, 0);
-
-      if (sum !== +mov.monto) {
-        throw new Error(
-          "La suma de los movimientos detalle no coincide con el monto del movimiento"
-        );
-      }
 
       //Si es egreso, crear un comprobante
       if (!movimientoTx.esIngreso) {
-        if (movimientoTx.apertura.caja.saldo.lessThan(sum))
-          throw new Error(
-            "La suma de los movimientos detalle excede el saldo de la caja"
+        if (movimientoTx.apertura.caja.saldoEfectivo.lessThan(sum))
+          throw new ApiError(
+            "La suma de los movimientos detalle excede el saldo de la caja", 400
           );
         if (!username || !password)
-          throw new Error("Faltan credenciales para crear el comprobante");
+          throw new ApiError("Faltan credenciales para crear el comprobante", 400);
         if (!concepto)
-          throw new Error("Falta el concepto para crear el comprobante");
+          throw new ApiError("Falta el concepto para crear el comprobante", 400);
 
         const user = await verifyUser(username, password, "ADMIN");
 
@@ -104,22 +104,25 @@ export async function POST(req: NextRequest) {
             fechaEmision: new Date(),
           },
         });
-      }
+      //Ingreso
+      }else{
+        //Para el ingreso se debe existir una factura 
+        if(!movimientoTx.factura) throw new ApiError("No existe la factura", 400);
 
-      //Si es egreso, pagar la factura
-      if (movimientoTx.facturaId)
-        await pagarFactura(movimientoTx.facturaId, mov.monto);
+        //Si la factura es a credito, entonces se genera un recibo
+        if (!movimientoTx.factura.esContado) {
+          await tx.recibos.create({
+            data: {
+              clienteId: movimientoTx.factura.clienteId,
+              totalPagado: mov.monto,
+              facturaId: movimientoTx.factura.id,
+              fechaEmision: new Date(),
+            },
+          });
+        }
 
-      //Si la factura es a credito, entonces se genera un recibo
-      if (movimientoTx.factura && !movimientoTx.factura.esContado) {
-        await tx.recibos.create({
-          data: {
-            clienteId: movimientoTx.factura.clienteId,
-            totalPagado: mov.monto,
-            facturaId: movimientoTx.factura.id,
-            fechaEmision: new Date(),
-          },
-        });
+        //Si es egreso, pagar la factura
+        await pagarFactura(tx, movimientoTx.factura.totalSaldoPagado, movimientoTx.factura.total, movimientoTx.factura.id, mov.monto);
       }
 
       //Se generan los movimientos detalles
@@ -131,24 +134,31 @@ export async function POST(req: NextRequest) {
         skipDuplicates: true,
       });
 
-      return movimientoTx;
-    });
+      //Se refleja el movimiento dentro de la caja
+      await reflejarMovimiento(
+        tx,
+        movimientoTx.apertura.caja.id,
+        movsDetalles,
+        mov.esIngreso
+      );
 
-    await reflejarMovimiento(
-      movimiento.apertura.caja.id,
-      mov.monto,
-      mov.esIngreso
-    );
+      return movimientoTx;
+    }, {
+      maxWait: 6000,
+      timeout: 6000
+    });
 
     return generateApiSuccessResponse(
       200,
       "El movimiento fue generado correctamente"
     );
   } catch (err) {
+    console.error(err);
     if (err instanceof PrismaClientKnownRequestError && err.code === "P2002") {
       return generateApiErrorResponse("El movimiento ya existe", 400);
-    } else {
-      console.error(err);
+    }if(err instanceof ApiError) {
+      return generateApiErrorResponse(err.message, err.status); 
+    }else {
       return generateApiErrorResponse(
         "Hubo un error en la creación del movimiento",
         500

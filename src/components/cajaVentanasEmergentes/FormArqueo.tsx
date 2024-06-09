@@ -1,5 +1,5 @@
 "use client";
-import cerrarCajaAdmin from "@/lib/aperturaCaja/cerrarCajaAdmin";
+import cerrarCajaAdmin from "@/lib/moduloCaja/aperturaCaja/cerrarCajaAdmin";
 import { login } from "@/lib/auth/login";
 import { useRouter } from "next/navigation";
 import PasswordField from "../auth/PasswordField";

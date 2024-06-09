@@ -7,7 +7,7 @@ import { obtenerCookie } from "@/lib/obtenerCookie";
 import { AperturaCaja, Caja } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import Input from "@/components/global/Input";
-import crearArqueo from "@/lib/arqueoCaja/crearArqueo";
+import crearArqueo from "@/lib/moduloCaja/arqueoCaja/crearArqueo";
 import Header from "@/components/global/Header";
 import { Toaster, toast } from "sonner";
 import useCookies from "@/lib/hooks/useCookies";

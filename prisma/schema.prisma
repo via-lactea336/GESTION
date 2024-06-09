@@ -161,7 +161,9 @@ model Caja {
 
   aperturas   AperturaCaja[]
 
-  saldo       Decimal @db.Money @default(0)
+  saldoEfectivo  Decimal @db.Money @default(0)
+  saldoCheque    Decimal @db.Money @default(0)
+  saldoTarjeta   Decimal @db.Money @default(0)
 
   deleted     DateTime?
 

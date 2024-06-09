@@ -16,9 +16,7 @@ const ResumenDeCaja: React.FC<RegistroCaja> = ({
   montoIngreso,
   montoEgreso,
   montoIngresoCheque,
-  montoEgresoCheque,
   montoIngresoTarjeta,
-  montoEgresoTarjeta,
   createdAt,
   updatedAt,
 }) => {

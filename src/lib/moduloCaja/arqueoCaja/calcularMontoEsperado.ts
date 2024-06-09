@@ -1,3 +1,4 @@
+import ApiError from "@/lib/api/ApiError";
 import prisma from "@/lib/prisma";
 
 /**
@@ -12,22 +13,26 @@ export default async function calcularMontoEsperado(aperturaId:string){
       id:aperturaId,
     },
     select:{
-      saldoInicial:true
+      saldoInicial:true,
+      movimiento: {
+        select: {
+          id: true,
+          esIngreso: true,
+          movimientoDetalles: {
+            select: {
+              id: true,
+              monto: true,
+              metodoPago: true
+            }
+          }
+        }
+      }
     }
   })
 
-  if(!apertura) throw new Error("No se encontro la apertura relacionada a su cierre de caja")
+  if(!apertura) throw new ApiError("No se encontro la apertura relacionada a su cierre de caja", 404)
 
-  const movs = await prisma.movimiento.findMany({
-    where:{
-      aperturaId:aperturaId
-    },
-    include:{
-      movimientoDetalles: true
-    }
-  })
-
-  if(!movs) throw new Error("No se pudieron encontrar los movimientos ligados a su apertura de caja")
+  const movs = apertura.movimiento
 
   let sum = +apertura.saldoInicial;
 
