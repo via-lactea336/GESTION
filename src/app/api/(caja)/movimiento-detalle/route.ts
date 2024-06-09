@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
     movimientoId,
     metodoPago,
     monto,
+    concepto
    } = body;
 
   if(!movimientoId || !monto ) return generateApiErrorResponse("Faltan datos para el movimiento detalle", 400)
@@ -24,6 +25,7 @@ export async function POST(req: NextRequest) {
         movimientoId,
         metodoPago, 
         monto, 
+        concepto
       }
     })
   
