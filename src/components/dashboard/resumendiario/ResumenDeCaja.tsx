@@ -6,21 +6,11 @@ import { Caja } from "@prisma/client";
 import { Cajero } from "@/lib/definitions";
 
 const ResumenDeCaja: React.FC<RegistroCaja> = ({
-  id,
-  aperturaId,
   montoRegistrado,
-  montoEsperado,
-  montoInicial,
-  cantCheques,
-  cantTarjetas,
   montoIngreso,
-  montoEgreso,
   montoIngresoCheque,
-  montoEgresoCheque,
   montoIngresoTarjeta,
-  montoEgresoTarjeta,
   createdAt,
-  updatedAt,
 }) => {
   const caja: Caja = obtenerCookie("caja");
   const cajero: Cajero = obtenerCookie("cajero");
