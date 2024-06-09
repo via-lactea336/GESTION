@@ -222,7 +222,12 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
                 value={metodo}
                 disabled={disabled}
                 onChange={(e) => setMetodo(e.target.value as medioDePago)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 sm:text-sm"
+                className={
+                  "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 sm:text-sm" +
+                  disabled
+                    ? " cursor-not-allowed"
+                    : ""
+                }
               >
                 <option value={medioDePago.EFECTIVO}>Efectivo</option>
                 <option value={medioDePago.TARJETA}>Tarjeta</option>
