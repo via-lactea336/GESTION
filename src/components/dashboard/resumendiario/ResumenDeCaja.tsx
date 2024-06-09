@@ -7,7 +7,11 @@ import { Cajero } from "@/lib/definitions";
 
 const ResumenDeCaja: React.FC<RegistroCaja> = ({
   montoRegistrado,
-  montoIngreso,
+  montoEsperado,
+  montoInicial,
+  cantCheques,
+  cantTarjetas,
+  montoIngresoEfectivo,
   montoIngresoCheque,
   montoIngresoTarjeta,
   createdAt,
@@ -68,7 +72,7 @@ const ResumenDeCaja: React.FC<RegistroCaja> = ({
         <tbody className="">
           <tr className="border-b-2 border-gray-700">
             <td className="p-2">Efectivo</td>
-            <td className="p-2">{Number(montoIngreso).toLocaleString()} Gs.</td>
+            <td className="p-2">{Number(montoIngresoEfectivo).toLocaleString()} Gs.</td>
           </tr>
           <tr className="border-b-2 border-gray-700">
             <td className="p-2">Cheque</td>

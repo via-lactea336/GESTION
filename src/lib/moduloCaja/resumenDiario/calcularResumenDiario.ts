@@ -1,5 +1,5 @@
-import prisma from "../prisma"
-import ApiError from "../api/ApiError"
+import prisma from "../../prisma"
+import ApiError from "../../api/ApiError"
 
 export default async function calcularDatosRegistroCaja(aperturaId: string) {
   // Obtener la apertura de caja con todos sus movimientos y detalles de movimientos
@@ -20,11 +20,14 @@ export default async function calcularDatosRegistroCaja(aperturaId: string) {
       }
     }
   })
-
+  
   if (!apertura) throw new ApiError('Apertura de caja no encontrada', 404)
+  if (!apertura.arqueo) throw new ApiError('No se puede realizar el registro diario sin que haya un arqueo de la caja', 404)
 
-  let montoIngreso = 0
-  let montoEgreso = 0
+  let montoEgresoTotal = 0
+  let montoIngresoTotal = 0
+
+  let montoIngresoEfectivo = 0
   let montoIngresoCheque = 0
   let montoEgresoCheque = 0
   let montoIngresoTarjeta = 0
@@ -39,18 +42,27 @@ export default async function calcularDatosRegistroCaja(aperturaId: string) {
       const { monto, metodoPago } = detalle
 
       if (esIngreso) {
-        montoIngreso += metodoPago === 'EFECTIVO' ? monto.toNumber() : 0
+        
+        montoIngresoTotal += monto.toNumber()
 
-        if (metodoPago === 'CHEQUE') {
-          montoIngresoCheque += monto.toNumber()
-          cantCheques++
-        } else if (metodoPago === 'TARJETA') {
-          montoIngresoTarjeta += monto.toNumber()
-          cantTarjetas++
+        switch (metodoPago) {
+          case 'EFECTIVO':
+            montoIngresoEfectivo += monto.toNumber()
+            break
+          case 'CHEQUE':
+            montoIngresoCheque += monto.toNumber()
+            cantCheques++
+            break
+          case 'TARJETA':
+            montoIngresoTarjeta += monto.toNumber()
+            cantTarjetas++
+            break
+          default:
+            break
         }
+        
       } else {
-        montoEgreso += monto.toNumber()
-
+        montoEgresoTotal += monto.toNumber()
         if (metodoPago === 'CHEQUE') {
           montoEgresoCheque += monto.toNumber()
         } else if (metodoPago === 'TARJETA') {
@@ -61,8 +73,8 @@ export default async function calcularDatosRegistroCaja(aperturaId: string) {
   })
 
   const montoInicial = apertura.saldoInicial.toNumber()
-  const montoRegistrado = montoInicial + montoIngreso - montoEgreso
-  const montoEsperado = montoInicial + montoIngreso - montoEgreso
+  const montoRegistrado = apertura.arqueo.montoRegistrado.toNumber()
+  const montoEsperado = montoInicial + montoIngresoEfectivo - montoEgresoTotal
 
   // Crear la instancia de RegistroCaja
   const registroCaja = await prisma.registroCaja.create({
@@ -79,18 +91,18 @@ export default async function calcularDatosRegistroCaja(aperturaId: string) {
       //Monto con el que se abrio la caja
       montoInicial: montoInicial,
 
-      //Cant de cheques en la apertura de caja
+      //Cant de cheques y tarjetas en la apertura de caja
       cantCheques: cantCheques,
-
-      //Cant de tarjetas en la apertura de caja
       cantTarjetas: cantTarjetas,
 
       //Monto de ingreso en efectivo de la caja 
-      montoIngreso: montoIngreso,
+      montoIngresoEfectivo: montoIngresoEfectivo,
 
-      //Monto de egreso en efectivo de la caja
-      montoEgreso: montoEgreso,
+      //Monto de Ingreso y egreso Total de la caja
+      montoEgresoTotal: montoEgresoTotal,
+      montoIngresoTotal: montoIngresoEfectivo,
 
+      //Monto de ingresos en cheques y tarjetas
       montoIngresoCheque: montoIngresoCheque,
       montoIngresoTarjeta: montoIngresoTarjeta,
     }
