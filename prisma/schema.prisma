@@ -411,3 +411,46 @@ model RegistroCaja {
 }
 
 //ASIENTOS
+model Asiento {
+  id          String     @id @default(uuid())
+  fecha       DateTime
+  descripcion String
+  detalles    DetalleAsiento[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deleted   DateTime?
+}
+
+model Cuenta {
+  id          String    @id @default(uuid())
+  nombre      String
+  codigo      String    @unique
+  detalles    DetalleAsiento[]
+
+  asentable   Boolean
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deleted   DateTime?
+}
+
+model DetalleAsiento {
+  id        String       @id @default(uuid())
+  debe      Decimal      @db.Money
+  haber     Decimal      @db.Money
+  asientoId String
+  cuentaId  String
+
+  asiento   Asiento  @relation(fields: [asientoId], references: [id])
+  cuenta    Cuenta   @relation(fields: [cuentaId], references: [id])
+
+  @@unique([asientoId, cuentaId])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deleted   DateTime?
+}
