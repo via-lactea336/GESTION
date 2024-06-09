@@ -1,16 +1,16 @@
 import { AperturaCaja } from "@prisma/client";
-import { ApiResponseData } from "../definitions";
+import { ApiResponseData } from "../../definitions";
 
 /**
- * Permite obtener todas las aperturas de caja
- * @returns Un arreglo con todas las aperturas de caja
+ * Permite obtener una apertura de caja por su id
+ * @returns una apertura de caja
  */
 
-export default async function obtenerAperturas() {
+export default async function obtenerAperturaPorId({ id }: { id: string }) {
   const server_url = process.env.URL;
   const url = server_url || "";
   try {
-    const aperturasCaja = await fetch(`${url}/api/apertura-caja`, {
+    const aperturasCaja = await fetch(`${url}/api/apertura-caja/${id}`, {
       headers: {
         "Content-Type": "application/json",
       },

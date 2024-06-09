@@ -8,6 +8,7 @@ export type Filter = {
   ruc?: string;
   pagado?: boolean;
   esContado?: boolean;
+  numeroFactura?: string;
   skip: number;
   upTo: number;
 };
@@ -17,6 +18,7 @@ export type FacturaAndClient = Factura & {cliente: {docIdentidad: string, nombre
 export default async function obtenerFacturasFiltro({
   fechaDesde,
   fechaHasta,
+  numeroFactura,
   ruc,
   pagado,
   esContado,
@@ -32,6 +34,7 @@ export default async function obtenerFacturasFiltro({
   if (esContado != undefined)
     searchParams.append("esContado", esContado.toString());
 
+  if (numeroFactura) searchParams.append("numeroFactura", numeroFactura);
   if (fechaDesde) searchParams.append("fechaDesde", fechaDesde);
   if (fechaHasta) searchParams.append("fechaHasta", fechaHasta);
 

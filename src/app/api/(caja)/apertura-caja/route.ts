@@ -7,6 +7,7 @@ import {
 } from "@/lib/apiResponse";
 
 import { AperturaCaja } from "@prisma/client";
+import ApiError from "@/lib/api/ApiError";
 
 export async function POST(req: NextRequest) {
   const body: AperturaCaja = await req.json();
@@ -39,19 +40,19 @@ export async function POST(req: NextRequest) {
         }
       })
 
-      if(!aperturaTx.caja.estaCerrado) throw new Error("La caja no esta cerrada")
+      if(!aperturaTx.caja.estaCerrado) throw new ApiError("La caja ya fue abierta", 400)
 
       const caja = await tx.caja.update({
         where: {
           id: cajaId,
         },
         data: {
-          saldo: aperturaTx.saldoInicial,
+          saldoEfectivo: aperturaTx.saldoInicial,
           estaCerrado: false,
         },
       });
 
-      if(!caja) throw new Error("Error actualizando la caja posterior a la apertura")
+      if(!caja) throw new ApiError("Error actualizando la caja posterior a la apertura", 500)
       
       return aperturaTx
     });
@@ -62,8 +63,8 @@ export async function POST(req: NextRequest) {
       [aperturaCaja]
     );
   } catch (err) {
-    if (err instanceof PrismaClientKnownRequestError && err.code === "P2002")
-      return generateApiErrorResponse("La apertura de caja ya existe", 400);
+    if (err instanceof PrismaClientKnownRequestError && err.code === "P2002")return generateApiErrorResponse("La apertura de caja ya existe", 400);
+    if(err instanceof ApiError) return generateApiErrorResponse(err.message, err.status);
     if(err instanceof Error) return generateApiErrorResponse(err.message, 500)
     else
       return generateApiErrorResponse(

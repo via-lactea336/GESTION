@@ -1,5 +1,5 @@
 import { Caja } from "@prisma/client";
-import { ApiResponseData } from "../definitions";
+import { ApiResponseData } from "../../definitions";
 
 /**
  * Obtiene una caja de la base de datos

@@ -1,5 +1,5 @@
 import { AperturaCaja } from "@prisma/client";
-import { ApiResponseData } from "../definitions";
+import { ApiResponseData } from "../../definitions";
 
 /**
  * Permite eliminar una apertura de caja por su id

@@ -25,9 +25,9 @@ export async function POST(req: NextRequest) {
   if (montoRegistradoDecimal.lessThan(0))
     return generateApiErrorResponse("El monto debe ser mayor o igual a 0", 400);
 
-  const montoEsperado = await calcularMontoEsperado(aperturaId);
-  console.log(montoEsperado, aperturaId);
   try {
+    const montoEsperado = await calcularMontoEsperado(aperturaId);
+
     const arqueoCaja = await prisma.arqueoDeCaja.create({
       data: {
         aperturaId,
@@ -55,6 +55,8 @@ export async function POST(req: NextRequest) {
     if (err instanceof PrismaClientKnownRequestError && err.code === "P2002")
       return generateApiErrorResponse("El arqueo de caja ya existe", 400);
     if (err instanceof Error) {
+      return generateApiErrorResponse(err.message, 500);
+    }if (err instanceof Error) {
       return generateApiErrorResponse(err.message, 500);
     }
     return generateApiErrorResponse(

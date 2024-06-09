@@ -1,6 +1,6 @@
 "use client";
 import Input from "@/components/global/Input";
-import crearApertura from "@/lib/aperturaCaja/crearApertura";
+import crearApertura from "@/lib/moduloCaja/aperturaCaja/crearApertura";
 import { AperturaCajaData, CajaData } from "@/lib/definitions";
 import verificarApiResponse from "@/lib/verificarApiResponse";
 import { useRouter } from "next/navigation";

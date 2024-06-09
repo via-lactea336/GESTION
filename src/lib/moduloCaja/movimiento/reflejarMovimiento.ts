@@ -1,32 +1,43 @@
-import { Decimal } from "@prisma/client/runtime/library";
 import prisma from "@/lib/prisma";
+import { MovimientoDetalle, Prisma } from "@prisma/client";
+import calcularSaldosMovimiento from "./calcularSaldosMovimiento";
+import ApiError from "@/lib/api/ApiError";
 
-export default async function reflejarMovimiento(cajaId:string, monto:Decimal, esIngreso:boolean) {
+export default async function reflejarMovimiento(tx:Prisma.TransactionClient, cajaId:string, movsDetalles:MovimientoDetalle[], esIngreso:boolean) {
 
-  const cajaVerif = await prisma.caja.findUnique({
+  const { sumSaldoEfectivo, sumSaldoCheque, sumSaldoTarjeta } = calcularSaldosMovimiento(movsDetalles)
+
+  const cajaVerif = await tx.caja.findUnique({
     where:{
       id: cajaId
     },
     select:{
-      saldo:true
+      saldoEfectivo:true,
+      saldoCheque:true,
+      saldoTarjeta:true
     }
   })
 
-  if(!cajaVerif) throw new Error("Caja no encontrada")
+  console.log(sumSaldoCheque, sumSaldoEfectivo, sumSaldoTarjeta)
 
-  if(!esIngreso && cajaVerif.saldo.lessThan(monto)) throw new Error("Saldo insuficiente para realizar el movimiento")
+  if(!cajaVerif) throw new ApiError("Caja no encontrada", 404)
 
-  const newSaldo = {
-    decrement: !esIngreso ? monto : undefined,
-    increment: esIngreso ? monto : undefined
-  }
+  if(
+    !esIngreso &&
+    (cajaVerif.saldoEfectivo.lessThan(sumSaldoEfectivo)
+    || cajaVerif.saldoCheque.lessThan(sumSaldoCheque)
+    || cajaVerif.saldoTarjeta.lessThan(sumSaldoTarjeta))
+  ) throw new ApiError("Saldo insuficiente para realizar el movimiento", 400)
+
 
   await prisma.caja.update({
     where:{
       id: cajaId
     },
     data:{
-      saldo: newSaldo
+      saldoEfectivo: sumSaldoEfectivo > 0 ? esIngreso? {increment: sumSaldoEfectivo} : {decrement: sumSaldoEfectivo} : undefined,
+      saldoCheque: sumSaldoCheque > 0 ? esIngreso? {increment: sumSaldoCheque} : {decrement: sumSaldoCheque} : undefined,
+      saldoTarjeta: sumSaldoTarjeta > 0 ? esIngreso? {increment: sumSaldoTarjeta} : {decrement: sumSaldoTarjeta} : undefined
     }
   })
 
