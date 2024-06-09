@@ -1,16 +1,16 @@
 "use client";
 import Header from "@/components/global/Header";
 import ResumenDeCaja from "@/components/dashboard/resumendiario/ResumenDeCaja";
-import { obtenerRegistrosCaja } from "@/lib/moduloCaja/resumenDiario/obtenerRegistrosCaja";
 import { obtenerCookie } from "@/lib/obtenerCookie";
 import { AperturaCaja, Movimiento, RegistroCaja } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { obtenerMovimientos } from "@/lib/moduloCaja/movimiento/obtenerMovimientos";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import ResumenCajaPDF from "@/components/PDF/ResumenDiario";
-import { CajaData, Cajero } from "@/lib/definitions";
+import { CajaData, Cajero, DatosExtendidosRegistroCaja } from "@/lib/definitions";
 import Link from "next/link";
 import LoadingCirleIcon from "@/components/global/LoadingCirleIcon";
+import obtenerRegistroDeCajaPorAperturaId from "@/lib/moduloCaja/resumenDiario/obtenerRegistroDeCajaPorAperturaId";
 export default function Page() {
   const links = [
     { href: `/dashboard/caja`, text: "Inicio" },
@@ -19,27 +19,15 @@ export default function Page() {
   const apertura = obtenerCookie("apertura") as AperturaCaja;
   const caja = obtenerCookie("caja") as CajaData;
   const cajero = obtenerCookie("cajero") as Cajero;
-  const [registros, setRegistros] = useState<RegistroCaja>();
-  const [movimientos, setMovimientos] = useState<Movimiento[]>();
+  const [registros, setRegistros] = useState<DatosExtendidosRegistroCaja>();
 
   useEffect(() => {
     const fetchRegistro = async () => {
       try {
-        const registros = await obtenerRegistrosCaja();
+        const registros = await obtenerRegistroDeCajaPorAperturaId(apertura.id);
         if (!registros || typeof registros == "string") return;
-        const registroActual = registros.data.filter(
-          (registro) => registro.aperturaId == apertura.id
-        );
-        console.log(registroActual[0]);
-        setRegistros(registroActual[0]);
-
-        const movimientos = await obtenerMovimientos();
-        if (!movimientos || typeof movimientos == "string") return;
-
-        const movimientosRegistrados = movimientos.data.filter(
-          (movimiento) => movimiento.aperturaId == apertura.id
-        );
-        setMovimientos(movimientosRegistrados);
+        console.log(registros);
+        setRegistros(registros.data);
       } catch (error) {
         console.log(error);
       }
@@ -78,7 +66,7 @@ export default function Page() {
               montoIngreso={Number(registros.montoIngresoEfectivo)}
               montoIngresoCheque={Number(registros.montoIngresoCheque)}
               montoIngresoTarjeta={Number(registros.montoIngresoTarjeta)}
-              movimientos={movimientos ? movimientos : []}
+              movimientos={registros.apertura.movimiento}
             />
           }
           fileName="ResumenCaja.pdf"
@@ -123,11 +111,10 @@ export default function Page() {
                   .join("-")}
               </td>
               <td className="p-2">
-                {new Date(apertura.createdAt).getHours()}:
-                {new Date(apertura.createdAt).getMinutes()}
+                {new Date(apertura.createdAt).getHours()}:{new Date(apertura.createdAt).getMinutes()}
               </td>
             </tr>
-            {movimientos?.map((mov) => (
+            {registros.apertura.movimiento?.map((mov) => (
               <tr key={mov.id} className="border-b-2 border-gray-700">
                 <td
                   className={
