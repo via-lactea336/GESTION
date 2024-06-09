@@ -11,6 +11,7 @@ type Params = {
   movsDetalles:{
     metodoPago: medioDePago,
     monto:number 
+    concepto?:string
   }[],
   username?:string,
   password?:string,

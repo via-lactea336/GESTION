@@ -265,6 +265,7 @@ model MovimientoDetalle {
   movimientoId    String
 
   monto           Decimal @db.Money
+  concepto        String?
 
   metodoPago      medioDePago @default(EFECTIVO)
 

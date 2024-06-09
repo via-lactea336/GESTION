@@ -1,5 +1,6 @@
-import { Comprobante, Factura, Movimiento, MovimientoDetalle } from "@prisma/client";
+import { AperturaCaja, ArqueoDeCaja, ChequeCaja, Comprobante, Factura, Movimiento, MovimientoDetalle, RegistroCaja, Tarjeta } from "@prisma/client";
 import { fetchPlus } from "../../verificarApiResponse"
+import { DatosFiltrados } from "@/lib/definitions";
 
 export type ParamsReportes = {
   cajaId?: string,
@@ -10,15 +11,20 @@ export type ParamsReportes = {
   upTo:number
 }
 
-export type Reportes = {
-  values: 
-    Movimiento & 
-    {comprobantes: Comprobante} &
-    {movimientoDetalles: MovimientoDetalle[]} &
-    {factura: Factura}
-}
+export type Reportes = RegistroCaja & {
+  apertura: AperturaCaja & {
+    arqueo: ArqueoDeCaja;
+    movimiento: (Movimiento &
+      {
+        factura:Factura|null
+        comprobantes: Comprobante[];
+        movimientoDetalles: MovimientoDetalle[];
+      }
+    )[];
+  };
+};  
 
-export default async function obtenerReportes({fechaDesde, fechaHasta, cajaId, documentacion, skip, upTo}:ParamsReportes) {
+export default async function obtenerRegistrosDiariosFiltro({fechaDesde, fechaHasta, cajaId, documentacion, skip, upTo}:ParamsReportes) {
   
   const server_url = process.env.URL;
   const url = server_url || "";
@@ -35,5 +41,5 @@ export default async function obtenerReportes({fechaDesde, fechaHasta, cajaId, d
 
   const queryString = searchParams.toString()
 
-  return await fetchPlus<Reportes>(`${url}/api/registro-caja/search?${queryString}`)
+  return await fetchPlus<DatosFiltrados<Reportes>>(`${url}/api/registro-caja/search?${queryString}`)
 }
