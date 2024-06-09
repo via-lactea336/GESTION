@@ -66,6 +66,10 @@ export default function Page() {
               montoIngresoCheque={Number(registros.montoIngresoCheque)}
               montoIngresoTarjeta={Number(registros.montoIngresoTarjeta)}
               movimientos={registros.apertura.movimiento}
+              observaciones= {registros.apertura.observaciones?
+                registros.apertura.observaciones  :
+                "Sin observaciones durante el cierre"
+              }
             />
           }
           fileName="ResumenCaja.pdf"
