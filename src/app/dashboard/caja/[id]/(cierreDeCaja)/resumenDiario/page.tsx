@@ -66,6 +66,10 @@ export default function Page() {
               montoIngresoCheque={Number(registros.montoIngresoCheque)}
               montoIngresoTarjeta={Number(registros.montoIngresoTarjeta)}
               movimientos={registros.apertura.movimiento}
+              observaciones= {registros.apertura.observaciones?
+                registros.apertura.observaciones  :
+                "Sin observaciones durante el cierre"
+              }
             />
           }
           fileName="ResumenCaja.pdf"
@@ -107,7 +111,7 @@ export default function Page() {
                   .split("T")[0]
                   .split("-")
                   .reverse()
-                  .join("-")}
+                  .join("/")}
               </td>
               <td className="p-2">
                 {new Date(apertura.createdAt).getHours()}:{new Date(apertura.createdAt).getMinutes()}
@@ -126,7 +130,12 @@ export default function Page() {
                   {Number(mov.monto).toLocaleString()} Gs.
                 </td>
                 <td className="p-2">
-                  {new Date(mov.createdAt).toLocaleDateString()}
+                  {new Date(mov.createdAt)
+                    .toISOString()
+                    .split("T")[0]
+                    .split("-")
+                    .reverse()
+                    .join("/")}
                 </td>
                 <td className="p-2">
                   {new Date(mov.createdAt).getHours()}:
