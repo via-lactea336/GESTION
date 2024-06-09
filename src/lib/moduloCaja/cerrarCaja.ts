@@ -1,7 +1,6 @@
 import ApiError from "../api/ApiError";
 import prisma from "../prisma";
-import calcularDatosRegistroCaja from "./resumenDiario";
-
+import calcularDatosRegistroCaja from "./resumenDiario/calcularResumenDiario";
 
 export default async function cerrarCaja(aperturaId: string, observaciones?: string) {
 

@@ -390,9 +390,12 @@ model RegistroCaja {
   cantCheques     Int
   cantTarjetas    Int
 
-  //I=E TOTAL
-  montoIngreso    Decimal @db.Money
-  montoEgreso     Decimal @db.Money
+  //I=E TOTAL (SUM DE INGRESOS Y EGRESOS INDEPENDIENTES AL METODO DE PAGO)
+  montoIngresoTotal    Decimal @db.Money
+  montoEgresoTotal     Decimal @db.Money
+
+  //I=E EFECTIVO
+  montoIngresoEfectivo    Decimal @db.Money
 
   //I=E CHEQUE
   montoIngresoCheque  Decimal @db.Money

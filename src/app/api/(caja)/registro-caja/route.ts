@@ -4,7 +4,7 @@ import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
 import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiResponse";
 
 import { RegistroCaja } from "@prisma/client";
-import calcularDatosRegistroCaja from "@/lib/moduloCaja/resumenDiario";
+import calcularDatosRegistroCaja from "@/lib/moduloCaja/resumenDiario/calcularResumenDiario";
 import { ApiError } from "next/dist/server/api-utils";
 
 export async function POST(req: NextRequest) {
