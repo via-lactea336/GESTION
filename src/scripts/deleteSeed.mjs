@@ -23,23 +23,23 @@ async function main() {
   await prisma.banco.deleteMany({});
   
   //CAJA
-  // await prisma.registroCaja.deleteMany({});
+  await prisma.comprobante.deleteMany({});
+  
+  await prisma.movimientoDetalle.deleteMany({});
 
-  // await prisma.arqueoDeCaja.deleteMany({});
+  await prisma.movimiento.deleteMany({});
 
-  // await prisma.aperturaCaja.deleteMany({});
+  await prisma.registroCaja.deleteMany({});
 
-  // await prisma.recibos.deleteMany({});
+  await prisma.arqueoDeCaja.deleteMany({});
 
-  // await prisma.comprobante.deleteMany({});
+  await prisma.aperturaCaja.deleteMany({});
 
-  // await prisma.movimientoDetalle.deleteMany({});
+  await prisma.recibos.deleteMany({});
 
-  // await prisma.movimiento.deleteMany({});
-
-  // await prisma.factura.deleteMany({});
+  await prisma.factura.deleteMany({});
  
-  // await prisma.cliente.deleteMany({});
+  await prisma.cliente.deleteMany({});
 
   console.log("All records have been deleted.");
 }

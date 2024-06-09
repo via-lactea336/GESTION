@@ -62,7 +62,7 @@ export default function Page() {
                 createdAt: apertura.createdAt,
               }}
               montoRegistrado={Number(registros.montoRegistrado)}
-              montoIngreso={Number(registros.montoIngreso)}
+              montoIngreso={Number(registros.montoIngresoEfectivo)}
               montoIngresoCheque={Number(registros.montoIngresoCheque)}
               montoIngresoTarjeta={Number(registros.montoIngresoTarjeta)}
               movimientos={registros.apertura.movimiento}

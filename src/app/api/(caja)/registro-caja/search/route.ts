@@ -11,52 +11,38 @@ export async function GET(request: NextRequest) {
   const fechaDesde = searchParams.get("fechaDesde");
   const fechaHasta = searchParams.get("fechaHasta");
 
-  const ruc = searchParams.get("ruc");
-  const pagado = searchParams.get("pagado");
-  const esContado = searchParams.get("esContado"); 
-
-  const numeroFactura = searchParams.get("numeroFactura");
+  const cajaId = searchParams.get("cajaId");
+  const documentacion = searchParams.get("documentacion");
 
   const skip = searchParams.get("skip");
   const upTo  = searchParams.get("upTo");
 
-  const verifiedSkip = (!skip || Number.isNaN(parseInt(skip))) ? 0 : parseInt(skip)
-  const verifiedUpTo = (!upTo || Number.isNaN(parseInt(upTo))) ? 4 : parseInt(upTo)
+  const verifiedSkip = (!skip || Number.isNaN(parseInt(skip))) ? undefined : parseInt(skip)
+  const verifiedUpTo = (!upTo || Number.isNaN(parseInt(upTo))) ? undefined : parseInt(upTo)
 
   const fechaHastaDateTime = fechaHasta ? new Date(Number(fechaHasta.split("-")[0]), Number(fechaHasta.split("-")[1])-1, Number(fechaHasta.split("-")[2]), 23, 59, 59, 999) : undefined
 
   //Si hay informacion para la busqueda, agregarla al filtro
   const where = {
-    fechaEmision: {
+    createdAt: {
       gte: fechaDesde ? new Date(fechaDesde) : undefined,
       lte: fechaHastaDateTime ? fechaHastaDateTime : undefined,
     },
-    numeroFactura: numeroFactura || undefined,
-    esContado: esContado ? (esContado === "true" ? true : esContado === "false" ? false : undefined) : undefined,
-    cliente:ruc ? {
-      docIdentidad: ruc
-    }: undefined,
-    pagado: pagado ? (pagado === "true" ? true : pagado === "false" ? false : undefined) : undefined
   };
 
   //Asignar los elementos encontrados a los valores
-  const values = await prisma.factura.findMany({
+  const values = await prisma.registroCaja.findMany({
     skip: verifiedSkip,
     take: verifiedUpTo,
     where: {
-      ...where
+      ...where,
+      apertura: cajaId? {
+        cajaId: cajaId
+      } :undefined
     },
     orderBy:{
-      fechaEmision: "desc"
+      createdAt: "desc"
     },
-    include: {
-      cliente: {
-        select: {
-          docIdentidad: true,
-          nombre: true,
-        }
-      }
-    }
   });
 
   const count = await prisma.factura.count({ where: where as any });
