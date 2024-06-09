@@ -1,6 +1,6 @@
 import { AperturaCaja } from "@prisma/client";
-import { ApiResponseData } from "../definitions";
-import { fetchPlus } from "../verificarApiResponse";
+import { ApiResponseData } from "../../definitions";
+import { fetchPlus } from "../../verificarApiResponse";
 
 /**
  * Permite actualizar una apertura de caja

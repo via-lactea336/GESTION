@@ -3,7 +3,7 @@
 import FormApertura from "@/components/cajaVentanasEmergentes/FormApertura";
 import { Modal } from "@/components/global/Modal";
 import ListaDeCajas from "./ListaDeCajas";
-import obtenerCajas from "@/lib/cajas/obtenerCajas";
+import obtenerCajas from "@/lib/moduloCaja/cajas/obtenerCajas";
 import verificarApiResponse from "@/lib/verificarApiResponse";
 import { Caja } from "@prisma/client";
 import { useState, useEffect } from "react";

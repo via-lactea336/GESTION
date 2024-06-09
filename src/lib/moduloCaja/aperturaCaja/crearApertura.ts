@@ -1,4 +1,4 @@
-import { AperturaCajaData, ApiResponseData } from "../definitions";
+import { AperturaCajaData, ApiResponseData } from "../../definitions";
 
 /**
  * Permite crear una apertura de caja

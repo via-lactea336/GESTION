@@ -1,4 +1,4 @@
-import obtenerAperturas from "@/lib/aperturaCaja/obtenerAperturas";
+import obtenerAperturas from "@/lib/moduloCaja/aperturaCaja/obtenerAperturas";
 import verificarApiResponse from "@/lib/verificarApiResponse";
 
 export default async function Page() {

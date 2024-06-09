@@ -1,5 +1,5 @@
 import { ArqueoDeCaja } from "@prisma/client";
-import { ApiResponseData, ArqueoCajaData } from "../definitions";
+import { ApiResponseData, ArqueoCajaData } from "../../definitions";
 
 /**
  * Permite crear arqueos de caja

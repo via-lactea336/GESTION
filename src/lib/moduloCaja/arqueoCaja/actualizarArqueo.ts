@@ -1,4 +1,4 @@
-import { ApiResponseData, ArqueoCajaData } from "../definitions";
+import { ApiResponseData, ArqueoCajaData } from "../../definitions";
 
 /**
  * Permite actualizar un arqueo de caja

@@ -200,6 +200,11 @@ const ContenidoIngresos = () => {
         <h2 className="text-xl font-bold my-4">Listado de Facturas</h2>
         {error && <p className="text-red-500">{error}</p>}
         {
+          listaDeFacturas.length === 0 && !loading?
+          <div>
+            <td colSpan={10} className="border border-white py-2 px-1 text-center">No hay facturas</td>
+          </div>
+        :
           loading?
             <div className="h-64 flex items-center justify-center w-full">
               <LoadingCirleIcon className="w-12 h-12 animate-spin m-auto" />
@@ -212,7 +217,6 @@ const ContenidoIngresos = () => {
               <th className="py-2 border border-white">RUC</th>
               <th className="py-2 border border-white">Cliente</th>
               <th className="py-2 border border-white">Fecha de Emision</th>
-              <th className="py-2 border border-white">Fecha de Vencimiento</th>
               <th className="py-2 border border-white">Pagado</th>
               <th className="py-2 border border-white">Tipo</th>
               <th className="py-2 border border-white">IVA</th>
@@ -222,13 +226,7 @@ const ContenidoIngresos = () => {
             </tr>
           </thead>
           <tbody>
-            
-          {
-            listaDeFacturas.length === 0 && !loading?
-              <tr>
-                <td colSpan={10} className="border border-white py-2 px-1 text-center">No hay facturas</td>
-              </tr>
-            :
+            {
             listaDeFacturas.map((factura) => {
               return(
                 <tr key={factura.id} className="border-t border-white">
@@ -243,9 +241,6 @@ const ContenidoIngresos = () => {
                   </td>
                   <td className="py-2 px-1 border border-white">
                     {new Date(factura.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="py-2 px-1 border border-white">
-                    {new Date(factura.fechaVencimiento).toLocaleDateString()}
                   </td>
                   <td className="py-2 px-1 border border-white text-center">
                     {factura.pagado ? 
@@ -282,7 +277,6 @@ const ContenidoIngresos = () => {
               )
             })
           }
-          
           </tbody>
         </table>
         }

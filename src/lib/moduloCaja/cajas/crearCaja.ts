@@ -1,5 +1,5 @@
 import { Caja } from "@prisma/client";
-import { ApiResponseData } from "../definitions";
+import { ApiResponseData } from "../../definitions";
 
 /**
  * Crea una caja en la base de datos

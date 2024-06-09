@@ -1,4 +1,4 @@
-import { ApiResponseData } from "../definitions";
+import { ApiResponseData } from "../../definitions";
 
 /**
  * Permite eliminar un arqueo de caja por su id

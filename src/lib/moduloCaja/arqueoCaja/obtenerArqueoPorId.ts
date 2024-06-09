@@ -1,5 +1,5 @@
 import { ArqueoDeCaja } from "@prisma/client";
-import { ApiResponseData } from "../definitions";
+import { ApiResponseData } from "../../definitions";
 
 /**
  * Permite obtener un arqueo de caja por su id

@@ -1,4 +1,4 @@
-import { fetchPlus } from "../verificarApiResponse";
+import { fetchPlus } from "../../verificarApiResponse";
 
 const cerrarCajaAdmin = async (
   cajaId: string,
