@@ -2,9 +2,8 @@
 import Header from "@/components/global/Header";
 import ResumenDeCaja from "@/components/dashboard/resumendiario/ResumenDeCaja";
 import { obtenerCookie } from "@/lib/obtenerCookie";
-import { AperturaCaja, Movimiento, RegistroCaja } from "@prisma/client";
+import { AperturaCaja } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { obtenerMovimientos } from "@/lib/moduloCaja/movimiento/obtenerMovimientos";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import ResumenCajaPDF from "@/components/PDF/ResumenDiario";
 import { CajaData, Cajero, DatosExtendidosRegistroCaja } from "@/lib/definitions";
