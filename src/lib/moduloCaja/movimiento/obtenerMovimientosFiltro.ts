@@ -1,5 +1,6 @@
 import { Comprobante, Factura, Movimiento, MovimientoDetalle } from "@prisma/client";
 import { fetchPlus } from "../../verificarApiResponse"
+import { DatosFiltrados } from "@/lib/definitions";
 
 export type ParamsReportes = {
   cajaId?: string,
@@ -10,13 +11,13 @@ export type ParamsReportes = {
   upTo?:number
 }
 
-export type MovimientosFiltroData = {
-  values: 
+export type MovimientosFiltroData = 
     Movimiento & 
     {comprobantes: Comprobante} &
     {movimientoDetalles: MovimientoDetalle[]} &
     {factura: Factura}
-}
+  
+
 
 export default async function obtenerMovimientosFiltro({fechaDesde, fechaHasta, cajaId, incluirDocumentacion, skip, upTo}:ParamsReportes) {
   
@@ -35,5 +36,5 @@ export default async function obtenerMovimientosFiltro({fechaDesde, fechaHasta, 
 
   const queryString = searchParams.toString()
 
-  return await fetchPlus<MovimientosFiltroData>(`${url}/api/movimiento/search?${queryString}`)
+  return await fetchPlus<DatosFiltrados<MovimientosFiltroData>>(`${url}/api/movimiento/search?${queryString}`)
 }
