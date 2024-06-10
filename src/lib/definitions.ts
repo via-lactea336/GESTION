@@ -100,7 +100,7 @@ export type RegistroDiarioFullData = RegistroCaja & {
     movimiento: (Movimiento &
       {
         factura:Factura|null
-        comprobantes: Comprobante[];
+        comprobantes: Comprobante & {user: {nombre: string, apellido: string, docIdentidad: string}}[];
         movimientoDetalles: MovimientoDetalle[];
       }
     )[];
