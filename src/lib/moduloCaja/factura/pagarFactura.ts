@@ -14,7 +14,7 @@ export default async function pagarFactura(tx:Prisma.TransactionClient, facturaS
         totalSaldoPagado: {
           increment: monto
         },
-        pagado: pagado
+        pagado: new Date(),
       }
     })
 

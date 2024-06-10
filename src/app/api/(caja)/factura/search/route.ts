@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     cliente:ruc ? {
       docIdentidad: ruc
     }: undefined,
-    pagado: pagado ? (pagado === "true" ? true : pagado === "false" ? false : undefined) : undefined
+    pagado: pagado ? (pagado === "true" ? {not: null} : pagado === "false" ? null : undefined) : undefined
   };
 
   //Asignar los elementos encontrados a los valores
