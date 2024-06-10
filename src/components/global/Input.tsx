@@ -49,7 +49,7 @@ export default function Input({
   };
 
   const formatted =
-    value === 0 ? "" : (value as number).toLocaleString("es-PY");
+    value === 0 ? "" : (value as number)?.toLocaleString("es-PY");
   const val = type === "formattedNumber" ? formatted : value;
 
   return (

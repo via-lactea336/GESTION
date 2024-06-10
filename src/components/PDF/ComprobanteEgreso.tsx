@@ -50,35 +50,40 @@ const ComprobantePDF: React.FC<ComprobanteProps> = ({
   dateTime,
   monto,
   observaciones
-}) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.section}>
-        <Text style={styles.header}>Comprobante de Extracción</Text>
-        <Text style={styles.text}>
-          <Text style={styles.bold}>Caja: </Text>
-          {caja}
-        </Text>
-        <Text style={styles.text}>
-          <Text style={styles.bold}>Cajero: </Text>
-          {cajero}
-        </Text>
-        <Text style={styles.text}>
-          <Text style={styles.bold}>Fecha y Hora: </Text>
-          {dateTime}
-        </Text>
-        <Text style={styles.text}>
-          <Text style={styles.bold}>Monto: </Text>
-          {monto} Gs.
-        </Text>
-        <Text style={styles.text}>
-          <Text style={styles.bold}>Observaciones: </Text>
-          {observaciones} 
-        </Text>
-      </View>
-    </Page>
-  </Document>
-);
+}) => {
+  // Formatear el monto
+  const montoFormateado = monto.toLocaleString("es-PY");
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.section}>
+          <Text style={styles.header}>Comprobante de Extracción</Text>
+          <Text style={styles.text}>
+            <Text style={styles.bold}>Caja: </Text>
+            {caja}
+          </Text>
+          <Text style={styles.text}>
+            <Text style={styles.bold}>Cajero: </Text>
+            {cajero}
+          </Text>
+          <Text style={styles.text}>
+            <Text style={styles.bold}>Fecha y Hora: </Text>
+            {dateTime}
+          </Text>
+          <Text style={styles.text}>
+            <Text style={styles.bold}>Monto: </Text>
+            {montoFormateado} Gs. {/* Usar el monto formateado aquí */}
+          </Text>
+          <Text style={styles.text}>
+            <Text style={styles.bold}>Observaciones: </Text>
+            {observaciones} 
+          </Text>
+        </View>
+      </Page>
+    </Document>
+  );
+};
 
 export const generatePDF = async (props: ComprobanteProps) => {
   const blob = await pdf(<ComprobantePDF {...props} />).toBlob();

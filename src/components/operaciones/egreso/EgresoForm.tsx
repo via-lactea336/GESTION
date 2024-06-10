@@ -15,11 +15,12 @@ import Input from "@/components/global/Input";
 import PasswordField from "@/components/auth/PasswordField";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 
+
 const caja: Caja = obtenerCookie("caja");
 const cajero: Cajero = obtenerCookie("cajero");
 
 const Extraccion: React.FC = () => {
-  const [cantidad, setCantidad] = useState("");
+  const [cantidad, setCantidad] = useState(0);
   const [observaciones, setObservaciones] = useState("");
   const [usuario, setUsuario] = useState("");
   const [contrasena, setContrasena] = useState("");
@@ -46,7 +47,7 @@ const Extraccion: React.FC = () => {
   };
 
   const handleCantidadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCantidad(e.target.value);
+    setCantidad(Number(e.target.value));
   };
 
   const handleObservacionesChange = (
@@ -106,7 +107,7 @@ const Extraccion: React.FC = () => {
           observaciones: observaciones,
         });
 
-        setCantidad("");
+        setCantidad(0);
         setObservaciones("");
         setUsuario("");
         setContrasena("");
@@ -168,19 +169,20 @@ const Extraccion: React.FC = () => {
           </label>
           <Input
             id="cantidad"
-            placeholder="100000"
-            type="number"
-            value={cantidad}
-            onChange={handleCantidadChange}
+            type="formattedNumber"
+            value={cantidad}     
+            placeholder="Ingrese el monto a extraer"
+            onChange={(e) => setCantidad(Number(e.target.value))}
             className="text-white py-2 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
+          
         </div>
         <div className="">
-          <label className="block text-primary-200 mb-2">Observaciones:</label>
+          <label className="block text-primary-200 mb-2">Observacioes:</label>
           <Input
             type="text"
             id="observaciones"
-            placeholder="Retiro de efectivo para gastos de caja chica"
+            placeholder="Observaciones..."
             value={observaciones}
             onChange={handleObservacionesChange}
             className="text-white py-2 px-4 bg-gray-900 mt-1 mb-5 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
