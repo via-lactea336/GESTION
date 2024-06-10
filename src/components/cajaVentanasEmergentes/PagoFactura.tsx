@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, use } from "react";
 import obtenerFacturaPorId from "@/lib/moduloCaja/factura/obtenerFacturaPorId";
 import { obtenerCookie } from "@/lib/obtenerCookie";
@@ -148,9 +149,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
           facturaId: idFactura,
         },
         movsDetalles,
-        concepto: `Pago de factura ${
-          factura?.numeroFactura
-        } por valor de ${totalPagado.toLocaleString("es-PY")} Gs.`,
+        concepto: `Pago de factura ${factura?.numeroFactura} del cliente ${factura?.cliente.nombre}`,
       });
       if (response === undefined || typeof response === "string") {
         throw new Error(response || "Error al pagar la factura");
