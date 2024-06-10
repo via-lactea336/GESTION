@@ -1,6 +1,7 @@
 import { DatosFiltrados } from "@/lib/definitions";
 import { fetchPlus } from "@/lib/verificarApiResponse";
 import { AperturaCaja, User } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
 
 export type Filtro = {
   cajaId?: string,
@@ -11,7 +12,7 @@ export type Filtro = {
   upTo:number
 }
 
-type Data = AperturaCaja & {cajero: {nombre:string, apellido:string} & {registro: {id:string}}}
+type Data = AperturaCaja & {cajero: {nombre:string, apellido:string} & {caja: {numero:string}} & {registro: {id:string, montoIngresoTotal:Decimal, montoEgresoTotal:Decimal}}}
 
 export default async function obtenerAperturasFiltro({fechaDesde, fechaHasta, cajaId, skip, upTo, cerrarda}:Filtro) {
   const server_url = process.env.URL;
