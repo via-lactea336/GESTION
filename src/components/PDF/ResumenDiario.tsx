@@ -105,7 +105,7 @@ const ResumenCajaPDF: React.FC<ResumenCajaProps> = ({
             </Text>
 
             <View style={styles.table}>
-                <View style={[styles.tableRow, styles.tableHeader]}>
+                <View style={[styles.tableRow]}>
                     <Text style={[styles.tableCol, styles.tableCell]}>Caja Inicial</Text>
                     <Text style={[styles.tableCol, styles.tableCell]}>
                     {Number(apertura?.saldoInicial).toLocaleString()} Gs.
@@ -118,7 +118,7 @@ const ResumenCajaPDF: React.FC<ResumenCajaProps> = ({
                     </Text>
                 </View>
                 <View style={styles.tableRow}>
-                    <Text style={[styles.tableCol, styles.tableCell]}>observaciones</Text>
+                    <Text style={[styles.tableCol, styles.tableCell]}>Observaciones</Text>
                     <Text style={[styles.tableCol, styles.tableCell]}>
                     {observaciones}
                     </Text>

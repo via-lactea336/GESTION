@@ -23,6 +23,7 @@ export default function Page() {
   useEffect(() => {
     const fetchRegistro = async () => {
       try {
+        console.log(apertura.id)
         const registros = await obtenerRegistroDeCajaPorAperturaId(apertura.id);
         if (!registros || typeof registros == "string") return;
         console.log(registros);
