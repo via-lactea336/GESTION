@@ -6,7 +6,8 @@ export type Props = {
     esContado:boolean,
     total:number,
     ivaTotal:number,
-    totalSaldoPagado:number
+    totalSaldoPagado:number,
+    concepto?:string
   }
 }
 

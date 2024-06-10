@@ -12,10 +12,10 @@ export type ParamsReportes = {
 }
 
 export type MovimientosFiltroData = 
-    Movimiento & 
-    {comprobantes: Comprobante} &
+    Movimiento & (
+    {comprobantes: Comprobante[]} &
     {movimientoDetalles: MovimientoDetalle[]} &
-    {factura: Factura}
+    {factura: Factura})|null
   
 
 
