@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, use } from "react";
 import obtenerFacturaPorId from "@/lib/moduloCaja/factura/obtenerFacturaPorId";
 import { obtenerCookie } from "@/lib/obtenerCookie";
