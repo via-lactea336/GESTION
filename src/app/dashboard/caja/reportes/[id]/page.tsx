@@ -8,7 +8,7 @@ import ResumenCajaPDF from "@/components/PDF/ResumenDiario";
 import {
   CajaData,
   Cajero,
-  DatosExtendidosRegistroCaja,
+  RegistroDiarioFullData,
 } from "@/lib/definitions";
 import Link from "next/link";
 import LoadingCirleIcon from "@/components/global/LoadingCirleIcon";
@@ -24,7 +24,7 @@ export default function Page() {
   ];
   const caja = obtenerCookie("caja") as CajaData;
   const cajero = obtenerCookie("cajero") as Cajero;
-  const [registros, setRegistros] = useState<DatosExtendidosRegistroCaja>();
+  const [registros, setRegistros] = useState<RegistroDiarioFullData>();
 
   useEffect(() => {
     const fetchRegistro = async () => {
@@ -181,15 +181,69 @@ export default function Page() {
       </div>
 
       <h2 className="my-5 font-semibold text-lg">Testing De componente para detalle operaciones</h2>
-      <div className="bg-gray-800 py-6 px-4 rounded-md shadow-md mt-5 flex flex-col">
-        <div className="mb-5">
-          <h1 className="text-center text-xl">Operacion de {registros.apertura.movimiento[0].esIngreso? "Ingreso" : "Egreso"}</h1>
+      {registros.apertura.movimiento[0].esIngreso? 
+
+
+
+        <div className="bg-gray-800 py-6 px-4 rounded-md shadow-md mt-5 flex flex-col">
+          <div className="mb-5">
+            <h1 className="text-center text-xl">Operacion de Ingreso</h1>
+          </div>
+          <div className="flex flex-row justify-between">
+            <div className="ml-5">
+              <h1 className="mb-2">Monto total de la operacion : {Number(registros.apertura.movimiento[0].monto).toLocaleString()} Gs.</h1>
+              <h1 className="mb-2">Fecha: {formatDate(registros.apertura.movimiento[0].createdAt)}</h1>
+              <h1 className="mb-2">Hora: {formatTime(registros.apertura.movimiento[0].createdAt)}</h1>
+            </div>
+            <div className="mr-20">
+              <h1 className="mb-2">Detalles de Factura</h1>
+              <h1 className="mb-2">Tipo de factura : {registros.apertura.movimiento[0].factura?.esContado? "Contado": "Credito"}</h1>
+              <h1 className="mb-2">Numero de Factura : {registros.apertura.movimiento[0].factura?.numeroFactura}</h1>
+              <h1 className="mb-2">Fecha de emision de la factura : {"  "}
+                {registros.apertura.movimiento[0].factura?.createdAt?
+                  formatDate(registros.apertura.movimiento[0].factura?.createdAt) : ""}</h1>
+              <h1 className="mb-2">Monto total a pagar : {Number(registros.apertura.movimiento[0].factura?.total).toLocaleString()} Gs.</h1>
+            </div>
+          </div>
+          <div className="bg-gray-800 py-6 px-4 rounded-md shadow-md mt-5 flex flex-col">
+            <h1 className="mb-2">Detalles Operacion</h1>
+            {registros.apertura.movimiento[0].movimientoDetalles.map((detalle, index) =>(
+              <div key={index} className="flex flex-row justify-between border-b border-white mt-5">
+                <h1 className="mb-2">N°{index + 1}</h1>
+                <h1 className="mb-2">Metodo de pago: {detalle.metodoPago}</h1>
+                <h1 className="mb-2">Monto Parcial: {Number(detalle.monto)}</h1>
+              </div>
+            ))}
+          </div>
+
+
+
+
+
+
+        </div>:
+        <div className="bg-gray-800 py-6 px-4 rounded-md shadow-md mt-5 flex flex-col">
+          <div className="mb-5">
+            <h1 className="text-center text-xl">Operacion de Egreso</h1>
+          </div>
+          <div className="flex flex-row justify-around">
+            <div>
+              <h1 className="mb-2">Monto total de la operacion : {Number(registros.apertura.movimiento[0].monto).toLocaleString()} Gs.</h1>
+              <h1 className="mb-2">Extraccion en efectivo</h1>
+              <h1 className="mb-2">Fecha: {formatDate(registros.apertura.movimiento[0].createdAt)}</h1>
+              <h1 className="mb-2">Hora: {formatTime(registros.apertura.movimiento[0].createdAt)}</h1>
+            </div>
+            <div>
+              <h1 className="mb-2">Encargado: {"  "}
+                {registros.apertura.movimiento[0].comprobantes[0].user.nombre}{"  "}
+                {registros.apertura.movimiento[0].comprobantes[0].user.apellido}  
+              </h1>
+              <h1 className="mb-2">RUC: {registros.apertura.movimiento[0].comprobantes[0].user.docIdentidad}</h1>
+              <h1 className="mb-2">Observaciones: {registros.apertura.observaciones}</h1>
+            </div>
+          </div>
         </div>
-        <h1>Comprobante:</h1>
-        <div>
-            <h1></h1>
-        </div>
-      </div>
+      }
     </div>
   );
 }
