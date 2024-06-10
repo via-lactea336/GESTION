@@ -47,7 +47,17 @@ export async function GET(request: NextRequest) {
           movimiento: {
             include:{
               factura: true,
-              comprobantes:true,
+              comprobantes:{
+                include:{
+                  user:{
+                    select:{
+                      nombre: true,
+                      apellido: true,
+                      docIdentidad: true
+                    }
+                  }
+                }
+              },
               movimientoDetalles: {
                 include:{
                   tarjeta: true,
