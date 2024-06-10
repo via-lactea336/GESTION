@@ -39,12 +39,19 @@ export async function GET(request: NextRequest) {
       registro:{
         select:{
           id: true,
+          montoIngresoTotal: true,
+          montoEgresoTotal: true
         }
       },
       cajero: {
         select:{
           nombre: true,
           apellido: true
+        }
+      },
+      caja: {
+        select:{
+          numero: true
         }
       }
     },
@@ -58,7 +65,7 @@ export async function GET(request: NextRequest) {
 
   const count = await prisma.aperturaCaja.count({ where: {...where}});
   if (!values)
-    return generateApiErrorResponse("Error intentando buscar Movimientos", 500);
+    return generateApiErrorResponse("Error intentando buscar aperturas", 500);
 
-  return generateApiSuccessResponse(200, "Movimientos encontradas", {values:values, totalQuantity: count});
+  return generateApiSuccessResponse(200, "Aperturas encontradas", {values:values, totalQuantity: count});
 }
