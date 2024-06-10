@@ -293,7 +293,7 @@ model Factura {
 
   esContado       Boolean  
 
-  pagado           Boolean @default(false)
+  pagado           DateTime?
 
   total            Decimal @db.Money
   totalSaldoPagado Decimal @db.Money
@@ -311,7 +311,7 @@ model Factura {
 model Recibos {
   id          String @id @default(uuid())
 
-  fechaEmision DateTime
+  fechaEmision DateTime @default(now())
   
   cliente     Cliente @relation(references: [id], fields: [clienteId], onDelete: NoAction)
   clienteId   String
@@ -330,7 +330,7 @@ model Recibos {
 model Comprobante {
   id            String @id @default(uuid())
 
-  fechaEmision  DateTime
+  fechaEmision  DateTime @default(now())
 
   concepto      String
   monto         Decimal @db.Money
@@ -411,3 +411,48 @@ model RegistroCaja {
 }
 
 //ASIENTOS
+model Asiento {
+  id          String     @id @default(uuid())
+  fecha       DateTime
+  descripcion String
+  detalles    DetalleAsiento[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deleted   DateTime?
+}
+
+model Cuenta {
+  id          String    @id @default(uuid())
+  nombre      String
+  codigo      String    @unique
+  detalles    DetalleAsiento[]
+
+  asentable   Boolean
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deleted   DateTime?
+}
+
+model DetalleAsiento {
+  id        String       @id @default(uuid())
+  
+  esDebe    Boolean
+  monto     Decimal @db.Money
+  
+  asientoId String
+  cuentaId  String
+
+  asiento   Asiento  @relation(fields: [asientoId], references: [id])
+  cuenta    Cuenta   @relation(fields: [cuentaId], references: [id])
+
+  @@unique([asientoId, cuentaId])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deleted   DateTime?
+}
