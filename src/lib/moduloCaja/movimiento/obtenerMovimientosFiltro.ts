@@ -17,7 +17,8 @@ export type ParamsReportes = {
 };
 
 export type MovimientosFiltroData = Movimiento & {
-  comprobantes: Comprobante[];
+  comprobantes: Comprobante[] &
+    { user: { nombre: string; apellido: string; docIdentidad: string } }[];
 } & { movimientoDetalles: MovimientoDetalle[] } & { factura: Factura };
 
 export default async function obtenerMovimientosFiltro({

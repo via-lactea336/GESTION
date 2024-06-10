@@ -82,7 +82,17 @@ export async function GET(request: NextRequest) {
       incluirDocumentacion === "true"
         ? {
             movimientoDetalles: true,
-            comprobantes: true,
+            comprobantes: {
+              include: {
+                user: {
+                  select: {
+                    nombre: true,
+                    apellido: true,
+                    docIdentidad: true,
+                  },
+                },
+              },
+            },
             factura: true,
           }
         : undefined,
