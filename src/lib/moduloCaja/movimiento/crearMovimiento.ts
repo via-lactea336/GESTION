@@ -1,5 +1,5 @@
 import { fetchPlus } from "@/lib/verificarApiResponse";
-import { medioDePago } from "@prisma/client";
+import { Recibos, medioDePago } from "@prisma/client";
 
 type Params = {
   mov:{
@@ -23,7 +23,7 @@ export default async function crearMovimiento({mov, movsDetalles, username, pass
   const url = server_url || "";
   try {
     if(!mov.esIngreso && !(username && password && concepto)) throw new Error("Si el movimiento es de egreso debe de enviar las credenciales y un concepto")
-    const aperturaCaja = await fetchPlus(`${url}/api/movimiento`, {
+    const aperturaCaja = await fetchPlus<{recibo:Recibos|null}>(`${url}/api/movimiento`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
