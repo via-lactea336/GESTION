@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { Asiento, DetalleAsiento } from "@prisma/client";
 import { generateApiErrorResponse, generateApiSuccessResponse } from "@/lib/apiResponse";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import ApiError from "@/lib/api/ApiError";
 
 export async function POST(req: NextRequest) {
   
@@ -18,19 +19,18 @@ export async function POST(req: NextRequest) {
   if(asientoDetalle.length === 0) return generateApiErrorResponse("Faltan detalles para la creacion del asiento", 400)
 
   try {
-
     await prisma.$transaction(async (tx) => {
-      await tx.asiento.create({
+      const asiento = await tx.asiento.create({
         data: {
           fecha,
           descripcion
         }
       })
       await tx.detalleAsiento.createMany({
-        data: asientoDetalle
-      })    })
-
-    return generateApiSuccessResponse(200, "El asiento fue creada correctamente")
+        data: {...asientoDetalle, asientoId:asiento.id}
+      })
+    })
+    return generateApiSuccessResponse(200, "El asiento fue creada correctamente", asiento)
 
   } catch (error) {
     if(error instanceof PrismaClientKnownRequestError){

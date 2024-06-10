@@ -313,6 +313,8 @@ model Recibos {
   id          String @id @default(uuid())
 
   fechaEmision DateTime @default(now())
+
+  numeroRecibo Int @unique @default(autoincrement())
   
   cliente     Cliente @relation(references: [id], fields: [clienteId], onDelete: NoAction)
   clienteId   String
@@ -335,6 +337,8 @@ model Comprobante {
 
   concepto      String
   monto         Decimal @db.Money
+
+  numeroComprobante Int @unique @default(autoincrement())
 
   user          User @relation(references: [id], fields: [userId], onDelete: NoAction)
   userId        String
