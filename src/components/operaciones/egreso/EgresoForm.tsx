@@ -14,7 +14,7 @@ import { Toaster, toast } from "sonner";
 import Input from "@/components/global/Input";
 import PasswordField from "@/components/auth/PasswordField";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
-
+import { crearMovimientoAndRevalidate } from "@/lib/actions";
 
 const caja: Caja = obtenerCookie("caja");
 const cajero: Cajero = obtenerCookie("cajero");
@@ -76,7 +76,7 @@ const Extraccion: React.FC = () => {
 
   const solicitarExtraccion = async () => {
     try {
-      const result = await crearMovimiento({
+      const result = await crearMovimientoAndRevalidate({
         mov: {
           aperturaId: apertura.id,
           esIngreso: false,
@@ -170,12 +170,11 @@ const Extraccion: React.FC = () => {
           <Input
             id="cantidad"
             type="formattedNumber"
-            value={cantidad}     
+            value={cantidad}
             placeholder="Ingrese el monto a extraer"
             onChange={(e) => setCantidad(Number(e.target.value))}
             className="text-white py-2 px-4 bg-gray-900 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
-          
         </div>
         <div className="">
           <label className="block text-primary-200 mb-2">Observacioes:</label>
