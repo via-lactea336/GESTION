@@ -38,6 +38,7 @@ export default function ModalTarjeta({
           </label>
           <select
             value={tipo}
+            required
             onChange={(e) => setTipo(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 sm:text-sm"
           >
@@ -51,6 +52,7 @@ export default function ModalTarjeta({
           </label>
           <input
             type="text"
+            required
             value={nombreTitular}
             onChange={(e) => setNombreTitular(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 sm:text-sm"
@@ -62,6 +64,7 @@ export default function ModalTarjeta({
           </label>
           <select
             value={banco}
+            required
             onChange={(e) => setBanco(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 sm:text-sm"
           >
@@ -74,13 +77,13 @@ export default function ModalTarjeta({
         <div className="flex justify-end">
           <button
             onClick={onClose}
-            className="bg-gray-500 text-white py-2 px-4 rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 mr-2"
+            className="bg-gray-800 text-white py-2 px-4 rounded-md shadow-sm hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 mr-2"
           >
             Cancelar
           </button>
           <button
             onClick={handleSave}
-            className="bg-primary-500 text-white py-2 px-4 rounded-md shadow-sm hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+            className="bg-primary-700 text-white py-2 px-4 rounded-md shadow-sm hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
           >
             Guardar
           </button>

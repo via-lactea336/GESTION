@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import React, { useState, useEffect, use } from "react";
 import obtenerFacturaPorId from "@/lib/moduloCaja/factura/obtenerFacturaPorId";
 import { obtenerCookie } from "@/lib/obtenerCookie";
-import { AperturaCaja, Factura, medioDePago } from "@prisma/client";
+import { AperturaCaja, Cliente, Factura, medioDePago } from "@prisma/client";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import ModalTarjeta from "./ModalTarjeta";
 import obtenerCliente from "@/lib/moduloCaja/cliente/obtenerCliente";
@@ -11,17 +10,28 @@ import { useRouter } from "next/navigation";
 import { Toaster, toast } from "sonner";
 import Input from "../global/Input";
 
+type Tarjeta = {
+  tipo: string;
+  nombreTitular: string;
+  banco: string;
+};
+
 type Pagos = {
   metodoPago: medioDePago;
   importe: number;
   detalle: string;
+  tarjeta?: Tarjeta;
 };
+
+interface FacturaConCliente extends Factura {
+  cliente: Cliente;
+}
 
 export default function PagoFacturas({ idFactura }: { idFactura: string }) {
   const apertura: AperturaCaja = obtenerCookie("apertura");
   const router = useRouter();
 
-  const [factura, setFactura] = useState<Factura | null>(null);
+  const [factura, setFactura] = useState<FacturaConCliente | null>(null);
   const [metodo, setMetodo] = useState<medioDePago>(medioDePago.EFECTIVO);
   const [detalle, setDetalle] = useState<string>("");
   const [importe, setImporte] = useState<number>(0);
@@ -34,6 +44,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
   const [nombreTitular, setNombreTitular] = useState<string>("");
   const [banco, setBanco] = useState<string>("Banco Itaú");
   const [loading, setLoading] = useState(false);
+  const [disabled, setDisabled] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -56,7 +67,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
         }
 
         const cliente = responseCliente.data;
-        const facturaConRuc = { ...data, ruc: cliente.docIdentidad };
+        const facturaConRuc = { ...data, cliente };
         setFactura(facturaConRuc);
         setImporte(+facturaConRuc.total);
       } else {
@@ -76,9 +87,26 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
     }
   }, [idFactura]);
 
+  useEffect(() => {
+    if (factura) {
+      if (Number(factura.total) - (importe + totalPagado) < 0) {
+        setError("No se puede exceder el monto total de la factura");
+      }
+      if (Number(factura.total) - totalPagado <= 0) {
+        setDisabled(true);
+      }
+      if (importe + totalPagado <= Number(factura.total)) {
+        setError(null);
+      }
+    }
+  }, [importe, totalPagado, factura]);
+
   const agregarMetodoPago = () => {
     if (importe <= 0) {
-      alert("El importe debe ser mayor que 0");
+      setError("El importe debe ser mayor a 0");
+      return;
+    }
+    if (factura && Number(factura.total) - (importe + totalPagado) < 0) {
       return;
     }
 
@@ -109,6 +137,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
           facturaId: idFactura,
         },
         movsDetalles,
+        concepto: "Pago de factura",
       });
       if (response === undefined || typeof response === "string") {
         throw new Error(response || "Error al pagar la factura");
@@ -127,14 +156,15 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
     }
   };
 
-  const guardarDatosTarjeta = (tarjeta: {
-    tipo: string;
-    nombreTitular: string;
-    banco: string;
-  }) => {
+  const guardarDatosTarjeta = (tarjeta: Tarjeta) => {
     setMetodosPago([...metodosPago, medioDePago.TARJETA]);
-    setPagos([...pagos, { metodoPago: medioDePago.TARJETA, importe, detalle }]);
+    setPagos([
+      ...pagos,
+      { metodoPago: medioDePago.TARJETA, importe, detalle, tarjeta },
+    ]);
     setTotalPagado(totalPagado + importe);
+    setDetalle("");
+    setImporte(0);
   };
 
   const eliminarMetodoPago = (id: number) => {
@@ -142,38 +172,55 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
     const metodoEliminado = pagos[id];
     setTotalPagado(totalPagado - metodoEliminado.importe);
     setPagos(nuevosMetodos);
+    setDisabled(false);
   };
 
   if (!factura) {
     return <div>Cargando factura...</div>;
   }
-
+  const detallesFactura = [
+    {
+      label: "Tipo de Venta:",
+      value: factura.esContado ? "Contado" : "Crédito",
+    },
+    {
+      label: "Cliente:",
+      value: factura.cliente.nombre,
+    },
+    {
+      label: "Monto:",
+      value: Number(factura.total).toLocaleString() + " Gs.",
+    },
+    {
+      label: "Falta:",
+      value: (Number(factura.total) - totalPagado).toLocaleString() + " Gs.",
+    },
+  ];
   return (
     <>
       <div className="px-6 rounded-md flex flex-col mx-auto mt-4">
-        <h2 className="text-xl font-semibold mb-4">Agregar Método de Pago</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          Detalles de la Factura N° {factura.numeroFactura}
+        </h2>
         <div className="flex gap-4 items-center">
-          <h2 className="text-md font-semibold mb-4 text-white">
-            Monto de la Factura:{" "}
-            <span className="text-primary-300">
-              {Number(factura.total).toLocaleString()}
-            </span>
-          </h2>
-          <h3 className="text-md font-semibold mb-4">
-            Falta:{" "}
-            <span className="text-primary-300">
-              {(Number(factura.total) - totalPagado).toLocaleString()}
-            </span>
-          </h3>
+          {detallesFactura.map((detalle, index) => (
+            <h3 key={index} className="text-base font-semibold mb-4 text-white">
+              {detalle.label}{" "}
+              <span className="text-primary-300">{detalle.value}</span>
+            </h3>
+          ))}
         </div>
+        <h2 className="text-xl font-semibold mb-4">Agregar Método de Pago</h2>
+
         <div className="flex flex-col">
           <div className="mr-4 w-full flex justify-start items-center gap-4">
             <div className="mb-4 w-1/2">
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-base font-medium text-white mb-2">
                 Método:
               </label>
               <select
                 value={metodo}
+                disabled={disabled}
                 onChange={(e) => setMetodo(e.target.value as medioDePago)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 sm:text-sm"
               >
@@ -182,39 +229,53 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
                 <option value={medioDePago.CHEQUE}>Cheque</option>
               </select>
             </div>
-            <div className="mb-4 w-1/2">
-              <label className="block text-sm font-medium text-white mb-2">
+            <div className="mb-4 w-1/2 relative">
+              <label className="block text-base font-medium text-white mb-2">
                 Importe:
               </label>
               <Input
                 id="importe"
-                placeholder="100000"
-                type="number"
-                value={importe === 0 ? "" : importe}
+                type="formattedNumber"
+                value={importe}
+                disabled={disabled}
+                placeholder="Ingrese el importe del pago"
                 onChange={(e) => setImporte(Number(e.target.value))}
-                className="mt
--1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-primary-600 sm:text-sm"
               />
+              {error && (
+                <p
+                  title="mensaje de error"
+                  className="text-gray-200 text-sm absolute top-20"
+                >
+                  {error}
+                </p>
+              )}
             </div>
             <div className="mr-4 w-full flex justify-center flex-col mb-4">
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-base font-medium text-white mb-2">
                 Detalle:
               </label>
-              <input
+              <Input
+                id="detalle"
                 type="text"
                 value={detalle}
-                placeholder="Pago de factura al contado por productos"
+                disabled={disabled}
+                placeholder="Especifique detalles del pago (por ejemplo,Cheque #12345)"
                 onChange={(e) => setDetalle(e.target.value)}
-                className="mt-1 block h-3/4 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none
-focus:ring-yellow-500 focus:border-primary-600 sm:text-sm"
+                className="mt-1 block h-3/4 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-primary-600 sm:text-sm"
               />
             </div>
           </div>
-
-          <div className="w-full flex justify-end items-center gap-4 mb-4">
+          <div className="w-full flex justify-end items-center gap-4">
             <button
+              disabled={disabled}
               onClick={agregarMetodoPago}
-              className="bg-primary-800 text-white py-2 px-4 rounded-md shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-900"
+              className={
+                " text-white py-2 px-4 rounded-md shadow-sm " +
+                (error
+                  ? " cursor-not-allowed bg-primary-900"
+                  : "bg-primary-800 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-900")
+              }
             >
               Agregar
             </button>
@@ -235,7 +296,6 @@ focus:ring-yellow-500 focus:border-primary-600 sm:text-sm"
         <table className="w-full border-collapse border border-gray-300">
           <thead>
             <tr>
-              <th className="border border-gray-300 px-4 py-2">ID</th>
               <th className="border border-gray-300 px-4 py-2">Método</th>
               <th className="border border-gray-300 px-4 py-2">Detalle</th>
               <th className="border border-gray-300 px-4 py-2">Importe</th>
@@ -245,14 +305,13 @@ focus:ring-yellow-500 focus:border-primary-600 sm:text-sm"
           <tbody>
             {pagos.map((pago, index) => (
               <tr key={index}>
-                <td className="border border-gray-300 px-4 py-2">{index}</td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border text-center border-gray-300 px-4 py-2">
                   {pago.metodoPago}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border text-center border-gray-300 px-4 py-2">
                   {pago.detalle}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border text-center border-gray-300 px-4 py-2">
                   {pago.importe.toLocaleString()}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 flex justify-center items-center">
@@ -269,13 +328,12 @@ focus:ring-yellow-500 focus:border-primary-600 sm:text-sm"
               <td className="border border-gray-300 px-4 py-2">
                 {totalPagado.toLocaleString()}
               </td>
-              <td className="border border-gray-300 px-4 py-2"></td>
             </tr>
           </tbody>
         </table>
         <div className="w-full flex justify-center items-end flex-col">
           <div className="my-4 text-xl font-semibold">
-            <span>Total: {totalPagado.toLocaleString()}</span>
+            <span>Total: {totalPagado.toLocaleString()} Gs.</span>
           </div>
           <button
             className={
@@ -284,7 +342,7 @@ focus:ring-yellow-500 focus:border-primary-600 sm:text-sm"
             }
             onClick={() => {
               if (factura.esContado && totalPagado !== +factura.total) {
-                alert(
+                toast.error(
                   "El importe total no coincide con el total de la factura."
                 );
                 return;

@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
     if (sum !== +mov.monto) {
       throw new ApiError(
-        "La suma de los movimientos detalle no coincide con el monto del movimiento", 400
+        "La suma de los montos detallados no coincide con el monto total del movimiento", 400
       );
     }
 
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
       if (!movimientoTx.esIngreso) {
         if (movimientoTx.apertura.caja.saldoEfectivo.lessThan(sum))
           throw new ApiError(
-            "La suma de los movimientos detalle excede el saldo de la caja", 400
+            "El monto que se desea extraer excede al saldo de la caja", 400
           );
         if (!username || !password)
           throw new ApiError("Faltan credenciales para crear el comprobante", 400);

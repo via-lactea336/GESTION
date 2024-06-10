@@ -40,14 +40,33 @@ export async function GET(request: NextRequest) {
         cajaId: cajaId
       } :undefined
     },
+    include: documentacion === "true" ? {
+      apertura:{
+        include:{
+          arqueo: true,
+          movimiento: {
+            include:{
+              factura: true,
+              comprobantes:true,
+              movimientoDetalles: {
+                include:{
+                  tarjeta: true,
+                  chequeCaja: true
+                }
+              }
+            }
+          }
+        }
+      }
+    }:undefined,
     orderBy:{
       createdAt: "desc"
     },
   });
 
-  const count = await prisma.factura.count({ where: where as any });
+  const count = await prisma.registroCaja.count({ where: {...where} });
   if (!values)
-    return generateApiErrorResponse("Error intentando buscar Facturas", 500);
+    return generateApiErrorResponse("Error intentando buscar Registros de Caja", 500);
 
-  return generateApiSuccessResponse(200, "Facturas encontradas", {values:values, totalQuantity: count});
+  return generateApiSuccessResponse(200, "Busqueda de Registros de Caja exitoso", {values:values, totalQuantity: count});
 }

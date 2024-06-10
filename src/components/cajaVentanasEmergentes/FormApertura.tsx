@@ -9,6 +9,9 @@ import { Toaster, toast } from "sonner";
 import LoadingCirleIcon from "../global/LoadingCirleIcon";
 import Cookie from "js-cookie";
 import { AperturaCaja, ArqueoDeCaja, Caja } from "@prisma/client";
+import { obtenerCookie } from "@/lib/obtenerCookie";
+const caja: Caja = obtenerCookie("caja");
+
 type Params = {
   caja: Caja;
   cajeroId: string;
@@ -65,6 +68,7 @@ export default function FormApertura({ caja, cajeroId, cajeroNombre }: Params) {
   return (
     <form className="flex flex-col w-full gap-4" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-2">
+      <p className="font-sans text-xl text-white bg-primary-400 py-3 px-6 my-2 rounded shadow-lg text-center">Bienvenido a la caja n° {caja.numero}</p>
         <label htmlFor="monto">Monto de Apertura</label>
         <Input
           className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"

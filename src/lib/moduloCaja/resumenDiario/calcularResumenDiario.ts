@@ -29,9 +29,7 @@ export default async function calcularDatosRegistroCaja(aperturaId: string) {
 
   let montoIngresoEfectivo = 0
   let montoIngresoCheque = 0
-  let montoEgresoCheque = 0
   let montoIngresoTarjeta = 0
-  let montoEgresoTarjeta = 0
   let cantCheques = 0
   let cantTarjetas = 0
 
@@ -63,11 +61,6 @@ export default async function calcularDatosRegistroCaja(aperturaId: string) {
         
       } else {
         montoEgresoTotal += monto.toNumber()
-        if (metodoPago === 'CHEQUE') {
-          montoEgresoCheque += monto.toNumber()
-        } else if (metodoPago === 'TARJETA') {
-          montoEgresoTarjeta += monto.toNumber()
-        }
       }
     })
   })
@@ -100,7 +93,7 @@ export default async function calcularDatosRegistroCaja(aperturaId: string) {
 
       //Monto de Ingreso y egreso Total de la caja
       montoEgresoTotal: montoEgresoTotal,
-      montoIngresoTotal: montoIngresoEfectivo,
+      montoIngresoTotal: montoIngresoTotal,
 
       //Monto de ingresos en cheques y tarjetas
       montoIngresoCheque: montoIngresoCheque,
