@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
 
   const where = {
     cierreCaja: cerrada ? (cerrada === "true" ? {not:null} : undefined):undefined,
+    registro: cerrada && cerrada === "true" ? {isNot: null} : undefined,
     apertura: {
       gte: fechaDesde ? new Date(fechaDesde) : undefined,
       lte: fechaHastaDateTime ? fechaHastaDateTime : undefined,
