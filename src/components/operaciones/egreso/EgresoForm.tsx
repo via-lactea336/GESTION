@@ -15,11 +15,10 @@ import Input from "@/components/global/Input";
 import PasswordField from "@/components/auth/PasswordField";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { crearMovimientoAndRevalidate } from "@/lib/actions";
-
-const caja: Caja = obtenerCookie("caja");
-const cajero: Cajero = obtenerCookie("cajero");
+import useCookies from "@/lib/hooks/useCookies";
 
 const Extraccion: React.FC = () => {
+  const { caja, cajero } = useCookies();
   const [cantidad, setCantidad] = useState(0);
   const [observaciones, setObservaciones] = useState("");
   const [usuario, setUsuario] = useState("");
@@ -56,24 +55,6 @@ const Extraccion: React.FC = () => {
     setObservaciones(e.target.value);
   };
 
-  const autenticarJefeDeCajas = async () => {
-    try {
-      const error = await login({ username: usuario, password: contrasena });
-      if (!error) {
-        setAutenticado(true);
-        setError("");
-        alert("Autenticacion correcta");
-        await solicitarExtraccion();
-      } else {
-        setAutenticado(false);
-        alert("Autenticacion incorrecta");
-        setError("Usuario no autorizado para la extracción");
-      }
-    } catch (err) {
-      setError("Error en la autenticación.");
-    }
-  };
-
   const solicitarExtraccion = async () => {
     try {
       const result = await crearMovimientoAndRevalidate({
@@ -99,6 +80,7 @@ const Extraccion: React.FC = () => {
         if (result.error) throw new Error(result.error);
         setMostrarComprobante(true);
         toast.success("Extracción realizada con éxito");
+        if (!caja || !cajero) return;
         generatePDF({
           cajero: cajero.nombre,
           caja: caja.numero,
