@@ -42,6 +42,26 @@ export default function Page() {
     fetchRegistro();
   }, [id]);
 
+  const formatDate = (dateString: Date) => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const formattedDate = `${day < 10 ? "0" + day : day}-${
+      month < 10 ? "0" + month : month
+    }-${year}`;
+    return formattedDate;
+  };
+  const formatTime = (dateString: Date) => {
+    const date = new Date(dateString);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const formattedTime = `${hours < 10 ? "0" + hours : hours}:${
+      minutes < 10 ? "0" + minutes : minutes
+    }`;
+    return formattedTime;
+  };
+
   return !registros ? (
     <div className="flex justify-center items-center">
       <LoadingCirleIcon className="animate-spin h-8 w-8" />
@@ -115,16 +135,10 @@ export default function Page() {
                 {Number(registros.montoInicial).toLocaleString()} Gs.
               </td>
               <td className="p-2">
-                {new Date(registros.createdAt)
-                  .toISOString()
-                  .split("T")[0]
-                  .split("-")
-                  .reverse()
-                  .join("/")}
+                {formatDate(registros.createdAt)}
               </td>
               <td className="p-2">
-                {new Date(registros.createdAt).getHours()}:
-                {new Date(registros.createdAt).getMinutes()}
+                {formatTime(registros.createdAt)}
               </td>
             </tr>
             {registros.apertura.movimiento?.map((mov, i) => (
@@ -140,16 +154,10 @@ export default function Page() {
                   {Number(mov.monto).toLocaleString()} Gs.
                 </td>
                 <td className="p-2">
-                  {new Date(mov.createdAt)
-                    .toISOString()
-                    .split("T")[0]
-                    .split("-")
-                    .reverse()
-                    .join("/")}
+                    {formatDate(mov.createdAt)}
                 </td>
                 <td className="p-2">
-                  {new Date(mov.createdAt).getHours()}:
-                  {new Date(mov.createdAt).getMinutes()}
+                  {formatTime(mov.createdAt)}
                 </td>
               </tr>
             ))}
