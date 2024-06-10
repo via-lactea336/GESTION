@@ -46,7 +46,7 @@ const ResumenDeCaja: React.FC<DatosExtendidosRegistroCaja> = ({
             </td>
           </tr>
           <tr className="bg-gray-900 py-1 px-2 rounded">
-            <td className="p-2 text-primary-300">Oberservaciones</td>
+            <td className="p-2 text-primary-300">Observaciones</td>
             <td className="p-2">
               {apertura.observaciones == ""? "Sin observaciones durante el cierre" :  apertura.observaciones}
             </td>

@@ -84,7 +84,7 @@ export default function Reportes() {
   if (error) return <p className="text-red-500">Error al obtener las cajas</p>;
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 -mt-7">
       <Header title="Reportes">
         <div className="flex w-full gap-8 items-center">
           <div className="flex gap-2 items-center">
@@ -105,34 +105,24 @@ export default function Reportes() {
             </select>
           </div>
 
-          <div className="flex flex-col gap-2 items-center">
-            <div className="flex items-center gap-2">
-              <label htmlFor="fechaDesde">Fecha Desde:</label>
-              <InputCalendar
-                value={reporteParam.fechaDesde?.toString() || ""}
-                handleChange={onChange}
-                className="bg-gray-800 text-white py-1 px-2 rounded-md"
-                id="fechaDesde"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label htmlFor="fechaHasta">Fecha Hasta:</label>
-              <InputCalendar
-                value={reporteParam.fechaHasta?.toString() || ""}
-                handleChange={onChange}
-                className="bg-gray-800 text-white py-1 px-2 rounded-md"
-                id="fechaHasta"
-              />
-            </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="fechaDesde">Fecha Desde:</label>
+            <InputCalendar
+              value={reporteParam.fechaDesde?.toString() || ""}
+              handleChange={onChange}
+              className="bg-gray-800 text-white py-1 px-2 rounded-md"
+              id="fechaDesde"
+            />
           </div>
-
-          <button className="bg-gray-800 h-12 hover:bg-gray-700 text-white p-2 rounded">
-            Buscar
-          </button>
-
-          <button className="bg-primary-600 h-12 hover:bg-primary-500 text-white p-2 rounded">
-            Generar
-          </button>
+          <div className="flex items-center gap-2">
+            <label htmlFor="fechaHasta">Fecha Hasta:</label>
+            <InputCalendar
+              value={reporteParam.fechaHasta?.toString() || ""}
+              handleChange={onChange}
+              className="bg-gray-800 text-white py-1 px-2 rounded-md"
+              id="fechaHasta"
+            />
+          </div>
         </div>
       </Header>
 
@@ -162,7 +152,8 @@ export default function Reportes() {
                 <td className='border-b border-gray-300 px-4 py-2'>{Number(registro.registro.montoIngresoTotal)}</td>
                 <td className='border-b border-gray-300 px-4 py-2'>{Number(registro.registro.montoEgresoTotal)}</td>
                 <td className='border-b border-gray-300 px-4 py-2'>
-                  <button onClick={() => redirecting(registro.id)}>mov
+                  <button onClick={() => redirecting(registro.id)}>
+                  {<EyeIcon className='w-6 h-6 ml-auto mr-auto'/>}
                   </button>
                 </td>
               </tr>
