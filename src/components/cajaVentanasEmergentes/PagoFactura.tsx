@@ -136,8 +136,8 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
     const movsDetalles = pagos.map((pago) => ({
       metodoPago: pago.metodoPago,
       monto: pago.importe,
+      concepto: pago.detalle,
     }));
-    console.log(movsDetalles);
     try {
       setLoading(true);
       const response = await crearMovimiento({
@@ -148,7 +148,9 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
           facturaId: idFactura,
         },
         movsDetalles,
-        concepto: "Pago de factura",
+        concepto: `Pago de factura ${
+          factura?.numeroFactura
+        } por valor de ${totalPagado.toLocaleString("es-PY")} Gs.`,
       });
       if (response === undefined || typeof response === "string") {
         throw new Error(response || "Error al pagar la factura");
@@ -156,6 +158,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
       if (response.error) {
         throw new Error(response.error);
       }
+      console.log(response.data);
       setLoading(false);
       toast.success("Factura pagada exitosamente!");
       router.push("./");
