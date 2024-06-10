@@ -68,15 +68,23 @@ export default function FormApertura({ caja, cajeroId, cajeroNombre }: Params) {
   return (
     <form className="flex flex-col w-full gap-4" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-2">
-      <p className="font-sans text-xl text-white bg-primary-400 py-3 px-6 my-2 rounded shadow-lg text-center">Bienvenido a la caja n° {caja.numero}</p>
+        <p className="font-sans text-xl mb-4 text-white  text-center">
+          Caja N° {caja.numero}
+        </p>
         <label htmlFor="monto">Monto de Apertura</label>
         <Input
           className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
           id="saldoInicial"
-          type="number"
-          placeholder="150000"
+          type="formattedNumber"
+          placeholder="Ingrese el monto de apertura"
+          value={dataApertura.saldoInicial}
           required
-          onChange={handleChange}
+          onChange={(e) => {
+            setDataApertura({
+              ...dataApertura,
+              saldoInicial: Number(e.target.value),
+            });
+          }}
         />
       </div>
       <div className="flex flex-col gap-2">
