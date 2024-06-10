@@ -14,6 +14,7 @@ import Link from "next/link";
 import LoadingCirleIcon from "@/components/global/LoadingCirleIcon";
 import obtenerRegistroDeCajaPorAperturaId from "@/lib/moduloCaja/resumenDiario/obtenerRegistroDeCajaPorAperturaId";
 import { useParams } from "next/navigation";
+import { EyeIcon } from "@heroicons/react/16/solid";
 
 export default function Page() {
   const { id } = useParams();
@@ -28,7 +29,6 @@ export default function Page() {
   useEffect(() => {
     const fetchRegistro = async () => {
       try {
-        console.log(id as string);
         const registros = await obtenerRegistroDeCajaPorAperturaId(
           id as string
         );
@@ -61,6 +61,10 @@ export default function Page() {
     }`;
     return formattedTime;
   };
+
+  const changeValue = () => {
+
+  }
 
   return !registros ? (
     <div className="flex justify-center items-center">
@@ -126,6 +130,7 @@ export default function Page() {
               <th className="p-2 w-1/5 text-primary-300 font-normal">Monto</th>
               <th className="p-2 w-1/5 text-primary-300 font-normal">Fecha</th>
               <th className="p-2 w-1/5 text-primary-300 font-normal">Hora</th>
+              <th className="p-2 w-1/5 text-primary-300 font-normal">Detalles</th>
             </tr>
           </thead>
           <tbody>
@@ -139,6 +144,11 @@ export default function Page() {
               </td>
               <td className="p-2">
                 {formatTime(registros.createdAt)}
+              </td>
+              <td>
+                <button className="mt-4 mb-4">
+                    {<EyeIcon className='w-6 h-6 ml-auto mr-auto'/>}
+                  </button>
               </td>
             </tr>
             {registros.apertura.movimiento?.map((mov, i) => (
@@ -159,10 +169,26 @@ export default function Page() {
                 <td className="p-2">
                   {formatTime(mov.createdAt)}
                 </td>
+                <td>
+                  <button className="mt-4 mb-4">
+                    {<EyeIcon className='w-6 h-6 ml-auto mr-auto'/>}
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+
+      <h2 className="my-5 font-semibold text-lg">Testing De componente para detalle operaciones</h2>
+      <div className="bg-gray-800 py-6 px-4 rounded-md shadow-md mt-5 flex flex-col">
+        <div className="mb-5">
+          <h1 className="text-center text-xl">Operacion de {registros.apertura.movimiento[0].esIngreso? "Ingreso" : "Egreso"}</h1>
+        </div>
+        <h1>Comprobante:</h1>
+        <div>
+            <h1></h1>
+        </div>
       </div>
     </div>
   );
