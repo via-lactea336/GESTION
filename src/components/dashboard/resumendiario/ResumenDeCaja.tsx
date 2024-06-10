@@ -9,7 +9,8 @@ const ResumenDeCaja: React.FC<DatosExtendidosRegistroCaja> = ({
   montoIngresoTarjeta,
   createdAt,
   apertura,
-  montoInicial
+  montoInicial,
+  montoEsperado
 }) => {
 
 
@@ -59,7 +60,13 @@ const ResumenDeCaja: React.FC<DatosExtendidosRegistroCaja> = ({
             </td>
           </tr>
           <tr className="bg-gray-900 py-1 px-2 border-b-2 border-gray-700">
-            <td className="p-2 text-primary-300">Dinero en Caja</td>
+            <td className="p-2 text-primary-300">Efectivo Tras Operaciones</td>
+            <td className="p-2">
+              {Number(montoEsperado).toLocaleString()} Gs.
+            </td>
+          </tr>
+          <tr className="bg-gray-900 py-1 px-2 border-b-2 border-gray-700">
+            <td className="p-2 text-primary-300">Dinero registrado por el Cajero</td>
             <td className="p-2">
               {Number(montoRegistrado).toLocaleString()} Gs.
             </td>
