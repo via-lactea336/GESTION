@@ -13,7 +13,7 @@ export type Filtro = {
 
 type Data = AperturaCaja & {cajero: {nombre:string, apellido:string} & {registro: {id:string}}}
 
-export default async function obtenerAperturasFiltro({fechaDesde, fechaHasta, cajaId, skip, upTo}:Filtro) {
+export default async function obtenerAperturasFiltro({fechaDesde, fechaHasta, cajaId, skip, upTo, cerrarda}:Filtro) {
   const server_url = process.env.URL;
   const url = server_url || "";
 
@@ -22,6 +22,7 @@ export default async function obtenerAperturasFiltro({fechaDesde, fechaHasta, ca
   if(fechaDesde) searchParams.append('fechaDesde', fechaDesde)
   if(fechaHasta) searchParams.append('fechaHasta', fechaHasta)
   if(cajaId) searchParams.append('cajaId', cajaId)
+  if(cerrarda) searchParams.append('cerrarda', cerrarda.toString())
 
   if(skip) searchParams.append('skip', skip.toString())
   if(upTo) searchParams.append('upTo', upTo.toString())
