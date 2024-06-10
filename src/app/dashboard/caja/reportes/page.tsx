@@ -3,12 +3,12 @@
 import Header from '@/components/global/Header'
 import InputCalendar from '@/components/global/InputCalendar';
 import LoadingPage from '@/components/global/LoadingPage';
-import obtenerRegistrosDiariosFiltro from '@/lib/moduloCaja/resumenDiario/obtenerRegistrosDiariosFiltro';
 import { EyeIcon } from '@heroicons/react/24/outline';
 
 import { fetchPlus } from '@/lib/verificarApiResponse'
 import { Caja, RegistroCaja } from '@prisma/client';
 import React, { useEffect } from 'react'
+import obtenerAperturasFiltro from '@/lib/moduloCaja/aperturaCaja/obtenerAperturasFiltro';
 
 type ReporteParams = {
   cajaId: string|undefined,
@@ -23,7 +23,7 @@ export default function Reportes() {
   const [loading, setLoading] = React.useState(true);
   const [cajas, setCajas] = React.useState<Caja[]>([]);
   const [error, setError] = React.useState<string | null>(null);
-  const [registros, setRegistros] = React.useState<RegistroCaja[]>();
+  const [registros, setRegistros] = React.useState<[]>();
   const [reporteParam, setReporteParam] = React.useState<ReporteParams>({
     cajaId: undefined,
     fechaDesde: null,
@@ -40,16 +40,16 @@ export default function Reportes() {
 
   
   const getRegistrosEffect = async () => {
-    const {data, error} = await obtenerRegistrosDiariosFiltro({
+    const {data, error} = await obtenerAperturasFiltro({
       fechaDesde: (reporteParam.fechaDesde)?.toDateString(),
       fechaHasta:  (reporteParam.fechaHasta)?.toDateString(),
+      cerrarda: true,
       cajaId: reporteParam.cajaId,
-      documentacion: false,
       skip: 0,
       upTo: 10
     });
     if(error) setError(error)
-    setRegistros(data?.values)
+    console.log(data)
   }
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,7 +69,7 @@ export default function Reportes() {
     getRegistrosEffect()
     getCajasEffect()
     setLoading(false)
-  }, [])
+  }, [reporteParam])
 
   if(loading) return <LoadingPage />
 
@@ -132,24 +132,26 @@ export default function Reportes() {
       <div>
         <table className="table-auto mx-auto text-center w-full border-separate border-spacing-0">
           <thead className='bg-primary-500'>
-            <th className="border-b border-gray-400 px-4 py-2">Fecha</th>
-            <th className="border-b border-gray-400 px-4 py-2">N° Caja</th>
-            <th className="border-b border-gray-400 px-4 py-2">Total Ingresos</th>
-            <th className="border-b border-gray-400 px-4 py-2">Total Egresos</th>
-            <th className="border-b border-gray-400 px-4 py-2">Ver Detalle</th>
+            <tr>
+              <td className="border-b border-gray-400 px-4 py-2">Fecha</td>
+              <td className="border-b border-gray-400 px-4 py-2">N° Caja</td>
+              <td className="border-b border-gray-400 px-4 py-2">Total Ingresos</td>
+              <td className="border-b border-gray-400 px-4 py-2">Total Egresos</td>
+              <td className="border-b border-gray-400 px-4 py-2">Ver Detalle</td>
+            </tr>
           </thead>
           <tbody>
-            {registros?.map((registro) =>(
-              <tr>
-                <td className='border-b border-gray-300 px-4 py-2'>{new Date(registro.createdAt)
+            {registros?.map((registro, index) =>(
+              <tr key={index}>
+                <td className='border-b border-gray-300 px-4 py-2'>{new Date()
                             .toISOString()
                             .split("T")[0]
                             .split("-")
                             .reverse()
                             .join("/")}</td>
                 <td className='border-b border-gray-300 px-4 py-2'>2</td>
-                <td className='border-b border-gray-300 px-4 py-2'>{Number(registro.montoIngresoTotal)}</td>
-                <td className='border-b border-gray-300 px-4 py-2'>{Number(registro.montoEgresoTotal)}</td>
+                <td className='border-b border-gray-300 px-4 py-2'>{Number(1)}</td>
+                <td className='border-b border-gray-300 px-4 py-2'>{Number(1)}</td>
                 <td className='border-b border-gray-300 px-4 py-2'>{<EyeIcon className='w-6 h-6 ml-auto mr-auto'/>}</td>
               </tr>
             ))}
