@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import obtenerFacturasFiltro, {
   FacturaAndClient,
   Filter,
-} from "@/lib/moduloCaja/factura/obtenerFacturasFiltro"; // Asegúrate de ajustar la ruta según la ubicación de tu archivo obtenerFacturasFiltro
+} from "@/lib/moduloCaja/factura/obtenerFacturasFiltro"; 
 import LoadingCirleIcon from "../global/LoadingCirleIcon";
 import Pagination from "../global/Pagination";
 import { useRouter } from "next/navigation";
@@ -37,6 +37,7 @@ const ContenidoIngresos = () => {
 
   const handleClearFilters = () => {
     setTempFilters(initialFilters);
+    setFilters(initialFilters);
   };
 
   const fetchData = async () => {
@@ -48,6 +49,7 @@ const ContenidoIngresos = () => {
         ruc: filters.ruc,
         pagado: filters.pagado,
         esContado: filters.esContado,
+        numeroFactura: filters.numeroFactura,
         skip: filters.skip,
         upTo: filters.upTo,
       });
@@ -125,6 +127,21 @@ const ContenidoIngresos = () => {
                 required
               />
             </div>
+            <div className="flex flex-col my-2">
+              <label htmlFor="numeroFactura" className="my-2">
+                N° Factura:
+              </label>
+              <input
+                type="text"
+                placeholder="00000001"
+                id="numeroFactura"
+                name="numeroFactura"
+                value={tempFilters.numeroFactura || ""}
+                onChange={handleChange}
+                className="rounded px-2 py-1 "
+                required
+              />
+            </div>
             <div className="flex flex-col">
               <label htmlFor="fechaDesde" className="my-2">
                 Fecha Desde:
@@ -176,7 +193,7 @@ const ContenidoIngresos = () => {
             </div>
             <div className="flex flex-col">
               <label htmlFor="esContado" className="my-2">
-                Es Contado:
+                Tipo:
               </label>
               <select
                 id="esContado"
@@ -188,8 +205,8 @@ const ContenidoIngresos = () => {
                 className="rounded p-2"
               >
                 <option value="">Seleccione</option>
-                <option value="true">Sí</option>
-                <option value="false">No</option>
+                <option value="true">Contado</option>
+                <option value="false">Crédito</option>
               </select>
             </div>
           </div>
@@ -202,7 +219,7 @@ const ContenidoIngresos = () => {
         {
           listaDeFacturas.length === 0 && !loading?
           <div>
-            <td colSpan={10} className="border border-white py-2 px-1 text-center">No hay facturas</td>
+            <h2 className="border border-white py-2 px-1 text-center">No hay facturas</h2>
           </div>
         :
           loading?
