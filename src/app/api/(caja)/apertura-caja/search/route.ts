@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       }
     },
     where:{
-      ...where,
+      ...where
     },
     orderBy:{
       apertura: "desc"

@@ -16,7 +16,17 @@ export async function GET(req:NextRequest, { params }: { params: { id: string } 
             movimiento: {
               include:{
                 factura: true,
-                comprobantes:true,
+                comprobantes:{
+                  include:{
+                    user:{
+                      select:{
+                        nombre: true,
+                        apellido: true,
+                        docIdentidad: true
+                      }
+                    }
+                  }
+                },
                 movimientoDetalles: {
                   include:{
                     tarjeta: true,
