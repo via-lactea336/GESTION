@@ -63,7 +63,7 @@ export default function Table({
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
         <table className="hidden min-w-full bg-gray-900 rounded-md text-white md:table">
-          <thead className="rounded-lg text-left text-sm font-normal">
+          <thead className="rounded-lg text-center text-sm font-normal">
             <tr>
               <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
                 Tipo de Operación
@@ -78,11 +78,11 @@ export default function Table({
                 Concepto
               </th>
               <th scope="col" className="px-3 py-5 font-medium">
-                Ver Detalles
+                Detalles
               </th>
             </tr>
           </thead>
-          <tbody className="bg-gray-800 text-white">
+          <tbody className="bg-gray-800 text-white text-center">
             {movimientos?.map((mov) => (
               <tr
                 key={mov.id}
