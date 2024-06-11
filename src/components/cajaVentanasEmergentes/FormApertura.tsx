@@ -1,14 +1,14 @@
 "use client";
 import Input from "@/components/global/Input";
 import crearApertura from "@/lib/moduloCaja/aperturaCaja/crearApertura";
-import { AperturaCajaData, CajaData } from "@/lib/definitions";
+import { AperturaCajaData } from "@/lib/definitions";
 import verificarApiResponse from "@/lib/verificarApiResponse";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Toaster, toast } from "sonner";
 import LoadingCirleIcon from "../global/LoadingCirleIcon";
 import Cookie from "js-cookie";
-import { AperturaCaja, ArqueoDeCaja, Caja } from "@prisma/client";
+import { AperturaCaja, Caja } from "@prisma/client";
 import { obtenerCookie } from "@/lib/obtenerCookie";
 const caja: Caja = obtenerCookie("caja");
 
