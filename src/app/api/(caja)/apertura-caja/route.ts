@@ -48,6 +48,8 @@ export async function POST(req: NextRequest) {
         },
         data: {
           saldoEfectivo: aperturaTx.saldoInicial,
+          saldoCheque:0,
+          saldoTarjeta:0,
           estaCerrado: false,
         },
       });

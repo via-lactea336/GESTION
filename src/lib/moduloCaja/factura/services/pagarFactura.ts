@@ -1,24 +1,23 @@
-import { Factura, Movimiento } from "@prisma/client"
+import { Factura } from "@prisma/client"
 import prisma from "@/lib/prisma"
 import ApiError from "@/lib/api/ApiError"
+import { Decimal } from "@prisma/client/runtime/library"
 
-const pagarFactura = async (movimiento:Movimiento & {factura:Factura}) => {
+const pagarFactura = async (facturaId:string, totalPagado:Decimal, totalFactura:Decimal, monto:Decimal) => {
   
-  if(!movimiento.factura || !movimiento.facturaId) throw new ApiError("La factura no existe", 404)
-
-  const pagado = movimiento.factura.totalSaldoPagado.plus(movimiento.monto).lessThanOrEqualTo(movimiento.factura.total)
+  const nuevoMonto = totalPagado.plus(monto)
   
-  if(!pagado) throw new ApiError("Lo pagado no puede superar el total de la factura", 400)
+  if(nuevoMonto.greaterThan(totalFactura)) throw new ApiError("Lo pagado no puede superar el total de la factura", 400)
 
   const facturas = await prisma.factura.update({
       where:{
-        id:movimiento.facturaId
+        id:facturaId
       },
       data:{
         totalSaldoPagado: {
-          increment: movimiento.monto
+          increment: monto
         },
-        pagado: new Date(),
+        pagado: nuevoMonto.equals(totalFactura) ? new Date() : null,
       }
     })
 
