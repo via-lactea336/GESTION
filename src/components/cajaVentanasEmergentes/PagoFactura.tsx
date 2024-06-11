@@ -2,7 +2,13 @@
 import React, { useState, useEffect, use } from "react";
 import obtenerFacturaPorId from "@/lib/moduloCaja/factura/obtenerFacturaPorId";
 import { obtenerCookie } from "@/lib/obtenerCookie";
-import { AperturaCaja, Cliente, Factura, Recibos, medioDePago } from "@prisma/client";
+import {
+  AperturaCaja,
+  Cliente,
+  Factura,
+  Recibos,
+  medioDePago,
+} from "@prisma/client";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import ModalTarjeta from "./ModalTarjeta";
 import obtenerCliente from "@/lib/moduloCaja/cliente/obtenerCliente";
@@ -12,7 +18,7 @@ import { Toaster, toast } from "sonner";
 import Input from "../global/Input";
 import { pdf } from "@react-pdf/renderer";
 import TransferReceipt from "../PDF/ReciboPagoFactura";
-import { saveAs } from 'file-saver';
+import { saveAs } from "file-saver";
 
 type Tarjeta = {
   tipo: string;
@@ -96,14 +102,14 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
     if (factura) {
       if (
         Number(factura.total) -
-        (importe + totalPagado + Number(factura.totalSaldoPagado)) <
+          (importe + totalPagado + Number(factura.totalSaldoPagado)) <
         0
       ) {
         setError("No se puede exceder el monto total de la factura");
       }
       if (
         Number(factura.total) -
-        (totalPagado + Number(factura.totalSaldoPagado)) <=
+          (totalPagado + Number(factura.totalSaldoPagado)) <=
         0
       ) {
         setDisabled(true);
@@ -129,23 +135,47 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
     if (metodo === medioDePago.TARJETA) {
       setModalOpen(true);
     } else {
-      setMetodosPago([...metodosPago, metodo]);
-      setPagos([...pagos, { metodoPago: metodo, importe, detalle }]);
-      setTotalPagado(totalPagado + importe);
-      setDetalle("");
-      setImporte(0);
+      // si el metodo de pago es efectivo y ya se ha pagado con efectivo
+      // se incrementa el importe en el pago ya existente
+      if (metodo === medioDePago.EFECTIVO) {
+        const pago = pagos.find((pago) => pago.metodoPago === metodo);
+        if (pago) {
+          const index = pagos.indexOf(pago);
+          const nuevosPagos = [...pagos];
+          nuevosPagos[index] = {
+            ...pago,
+            importe: pago.importe + importe,
+          };
+          setPagos(nuevosPagos);
+          setTotalPagado(totalPagado + importe);
+          setDetalle("");
+          setImporte(0);
+        } else {
+          setMetodosPago([...metodosPago, metodo]);
+          setPagos([...pagos, { metodoPago: metodo, importe, detalle }]);
+          setTotalPagado(totalPagado + importe);
+          setDetalle("");
+          setImporte(0);
+        }
+      } else {
+        setMetodosPago([...metodosPago, metodo]);
+        setPagos([...pagos, { metodoPago: metodo, importe, detalle }]);
+        setTotalPagado(totalPagado + importe);
+        setDetalle("");
+        setImporte(0);
+      }
     }
   };
 
   useEffect(() => {
     const generatePDF = async () => {
-      if (recibo) {
+      if (recibo && factura) {
         const doc = (
           <TransferReceipt
-            id={recibo.id}
+            numeroRecibo={`${recibo.numeroRecibo}`}
             fechaEmision={recibo.fechaEmision}
-            clienteId={recibo.clienteId}
-            facturaId={recibo.facturaId}
+            cliente={factura.cliente}
+            numeroFactura={factura.numeroFactura}
             totalPagado={recibo.totalPagado}
             createdAt={recibo.createdAt}
           />
@@ -154,8 +184,8 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
         const asPdf = pdf();
         asPdf.updateContainer(doc);
         const blob = await asPdf.toBlob();
-        saveAs(blob, 'recibo.pdf');
-        setLoading(false); 
+        saveAs(blob, "recibo.pdf");
+        setLoading(false);
       }
     };
 
@@ -180,8 +210,9 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
           facturaId: idFactura,
         },
         movsDetalles,
-        concepto: `Pago de factura ${factura?.numeroFactura
-          } por valor de ${totalPagado.toLocaleString("es-PY")} Gs.`,
+        concepto: `Pago de factura ${
+          factura?.numeroFactura
+        } por valor de ${totalPagado.toLocaleString("es-PY")} Gs.`,
       });
       if (response === undefined || typeof response === "string") {
         throw new Error(response || "Error al pagar la factura");
@@ -189,8 +220,8 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
       if (response.error) {
         throw new Error(response.error);
       }
-      if (response.data?.recibo) {      
-        console.log(response)
+      if (response.data?.recibo) {
+        console.log(response.data.recibo.numeroRecibo);
         setRecibo(response.data.recibo);
       }
       setLoading(false);
@@ -279,6 +310,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
                 <option value={medioDePago.EFECTIVO}>Efectivo</option>
                 <option value={medioDePago.TARJETA}>Tarjeta</option>
                 <option value={medioDePago.CHEQUE}>Cheque</option>
+                <option value={"Otro"}>Otro</option>
               </select>
             </div>
             <div className="mb-4 w-1/2 relative">
@@ -403,7 +435,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
                 Total
               </td>
               <td className="border text-center font-semibold border-gray-300 px-4 py-2">
-                {totalPagado.toLocaleString()} Gs.
+                {totalPagado.toLocaleString("es-PY")} Gs.
               </td>
             </tr>
           </tbody>
@@ -416,17 +448,18 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
             }
             onClick={async () => {
               if (factura.esContado && totalPagado !== +factura.total) {
-                toast.error("El importe total no coincide con el total de la factura.");
+                toast.error(
+                  "El importe total no coincide con el total de la factura."
+                );
                 return;
               } else {
-                await pagarFactura();                
+                await pagarFactura();
               }
             }}
             disabled={loading}
           >
             {loading ? "Procesando..." : "Realizar Pago"}
           </button>
-
         </div>
         <Toaster richColors />
       </div>
