@@ -7,9 +7,11 @@ import LoadingPage from '@/components/global/LoadingPage';
 import { EyeIcon } from '@heroicons/react/24/outline';
 
 import { fetchPlus } from "@/lib/verificarApiResponse";
-import { Caja, RegistroCaja } from "@prisma/client";
+import { Caja } from "@prisma/client";
 import React, { useEffect } from "react";
 import obtenerAperturasFiltro from '@/lib/moduloCaja/aperturaCaja/obtenerAperturasFiltro';
+import { Data } from "@/lib/moduloCaja/aperturaCaja/obtenerAperturasFiltro";
+import { useRouter } from "next/navigation";
 
 type ReporteParams = {
   cajaId: string | undefined;
@@ -18,12 +20,12 @@ type ReporteParams = {
   skip: number;
   upto: number;
 };
-
 export default function Reportes() {
+  const router = useRouter();
   const [loading, setLoading] = React.useState(true);
   const [cajas, setCajas] = React.useState<Caja[]>([]);
   const [error, setError] = React.useState<string | null>(null);
-  const [registros, setRegistros] = React.useState<[]>();
+  const [registros, setRegistros] = React.useState<Data[]>();
   const [reporteParam, setReporteParam] = React.useState<ReporteParams>({
     cajaId: undefined,
     fechaDesde: null,
@@ -44,12 +46,13 @@ export default function Reportes() {
     const { data, error } = await obtenerAperturasFiltro({
       fechaDesde: reporteParam.fechaDesde?.toDateString(),
       fechaHasta: reporteParam.fechaHasta?.toDateString(),
-      cerrarda: true,
+      cerrada: true,
       cajaId: reporteParam.cajaId,
       skip: 0,
       upTo: 10,
     });
     if (error) setError(error);
+    setRegistros(data?.values)
     console.log(data);
   };
 
@@ -66,6 +69,10 @@ export default function Reportes() {
     setReporteParam((prev) => ({ ...prev, [name || id]: value }));
   };
 
+  const redirecting = (id : string) =>{
+    router.push(`/dashboard/caja/reportes/${id}`)
+  }
+
   useEffect(() => {
     getRegistrosEffect()
     getCajasEffect()
@@ -77,7 +84,7 @@ export default function Reportes() {
   if (error) return <p className="text-red-500">Error al obtener las cajas</p>;
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 -mt-7">
       <Header title="Reportes">
         <div className="flex w-full gap-8 items-center">
           <div className="flex gap-2 items-center">
@@ -98,34 +105,24 @@ export default function Reportes() {
             </select>
           </div>
 
-          <div className="flex flex-col gap-2 items-center">
-            <div className="flex items-center gap-2">
-              <label htmlFor="fechaDesde">Fecha Desde:</label>
-              <InputCalendar
-                value={reporteParam.fechaDesde?.toString() || ""}
-                handleChange={onChange}
-                className="bg-gray-800 text-white py-1 px-2 rounded-md"
-                id="fechaDesde"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label htmlFor="fechaHasta">Fecha Hasta:</label>
-              <InputCalendar
-                value={reporteParam.fechaHasta?.toString() || ""}
-                handleChange={onChange}
-                className="bg-gray-800 text-white py-1 px-2 rounded-md"
-                id="fechaHasta"
-              />
-            </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="fechaDesde">Fecha Desde:</label>
+            <InputCalendar
+              value={reporteParam.fechaDesde?.toString() || ""}
+              handleChange={onChange}
+              className="bg-gray-800 text-white py-1 px-2 rounded-md"
+              id="fechaDesde"
+            />
           </div>
-
-          <button className="bg-gray-800 h-12 hover:bg-gray-700 text-white p-2 rounded">
-            Buscar
-          </button>
-
-          <button className="bg-primary-600 h-12 hover:bg-primary-500 text-white p-2 rounded">
-            Generar
-          </button>
+          <div className="flex items-center gap-2">
+            <label htmlFor="fechaHasta">Fecha Hasta:</label>
+            <InputCalendar
+              value={reporteParam.fechaHasta?.toString() || ""}
+              handleChange={onChange}
+              className="bg-gray-800 text-white py-1 px-2 rounded-md"
+              id="fechaHasta"
+            />
+          </div>
         </div>
       </Header>
 
@@ -135,28 +132,30 @@ export default function Reportes() {
             <tr>
               <td className="border-b border-gray-400 px-4 py-2">Fecha</td>
               <td className="border-b border-gray-400 px-4 py-2">N° Caja</td>
-              <td className="border-b border-gray-400 px-4 py-2">
-              Total Ingresos
-            </td>
-              <td className="border-b border-gray-400 px-4 py-2">
-              Total Egresos
-            </td>
+              <td className="border-b border-gray-400 px-4 py-2">Cajero</td>
+              <td className="border-b border-gray-400 px-4 py-2">Total Ingresos</td>
+              <td className="border-b border-gray-400 px-4 py-2">Total Egresos</td>
               <td className="border-b border-gray-400 px-4 py-2">Ver Detalle</td>
             </tr>
           </thead>
           <tbody>
             {registros?.map((registro, index) =>(
               <tr key={index}>
-                <td className='border-b border-gray-300 px-4 py-2'>{new Date()
+                <td className='border-b border-gray-300 px-4 py-2'>{new Date(registro.createdAt)
                             .toISOString()
                             .split("T")[0]
                             .split("-")
                             .reverse()
                             .join("/")}</td>
-                <td className='border-b border-gray-300 px-4 py-2'>2</td>
-                <td className='border-b border-gray-300 px-4 py-2'>{Number(1)}</td>
-                <td className='border-b border-gray-300 px-4 py-2'>{Number(1)}</td>
-                <td className='border-b border-gray-300 px-4 py-2'>{<EyeIcon className='w-6 h-6 ml-auto mr-auto'/>}</td>
+                <td className='border-b border-gray-300 px-4 py-2'>{registro.caja.numero}</td>
+                <td className='border-b border-gray-300 px-4 py-2'>{registro.cajero.nombre + " " + registro.cajero.apellido}</td>
+                <td className='border-b border-gray-300 px-4 py-2'>{Number(registro.registro.montoIngresoTotal)}</td>
+                <td className='border-b border-gray-300 px-4 py-2'>{Number(registro.registro.montoEgresoTotal)}</td>
+                <td className='border-b border-gray-300 px-4 py-2'>
+                  <button onClick={() => redirecting(registro.id)}>
+                  {<EyeIcon className='w-6 h-6 ml-auto mr-auto'/>}
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

@@ -170,6 +170,8 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
     }));
     try {
       setLoading(true);
+      const contado = factura?.esContado ? "al contado" : "a crédito ";
+      const texto = `Pago de factura N° ${factura?.numeroFactura} ${contado} del cliente ${factura?.cliente.nombre}`;
       const response = await crearMovimiento({
         mov: {
           aperturaId: apertura.id,

@@ -57,7 +57,7 @@ const Extraccion: React.FC = () => {
 
   const solicitarExtraccion = async () => {
     try {
-      const result = await crearMovimientoAndRevalidate({
+      const result = await crearMovimiento({
         mov: {
           aperturaId: apertura.id,
           esIngreso: false,

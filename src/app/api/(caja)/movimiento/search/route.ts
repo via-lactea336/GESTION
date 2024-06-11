@@ -20,50 +20,93 @@ export async function GET(request: NextRequest) {
   const montoHasta = searchParams.get("montoHasta");
 
   const skip = searchParams.get("skip");
-  const upTo  = searchParams.get("upTo");
+  const upTo = searchParams.get("upTo");
 
-  const verifiedSkip = (!skip || Number.isNaN(parseInt(skip))) ? undefined : parseInt(skip)
-  const verifiedUpTo = (!upTo || Number.isNaN(parseInt(upTo))) ? undefined : parseInt(upTo)
+  const verifiedSkip =
+    !skip || Number.isNaN(parseInt(skip)) ? undefined : parseInt(skip);
+  const verifiedUpTo =
+    !upTo || Number.isNaN(parseInt(upTo)) ? undefined : parseInt(upTo);
 
-  const verifiedMontoDesde = (!montoDesde || Number.isNaN(parseFloat(montoDesde))) ? undefined : parseFloat(montoDesde)
-  const verifiedMontoHasta = (!montoHasta || Number.isNaN(parseFloat(montoHasta))) ? undefined : parseFloat(montoHasta)
+  const verifiedMontoDesde =
+    !montoDesde || Number.isNaN(parseFloat(montoDesde))
+      ? undefined
+      : parseFloat(montoDesde);
+  const verifiedMontoHasta =
+    !montoHasta || Number.isNaN(parseFloat(montoHasta))
+      ? undefined
+      : parseFloat(montoHasta);
 
-  const fechaHastaDateTime = fechaHasta ? new Date(Number(fechaHasta.split("-")[0]), Number(fechaHasta.split("-")[1])-1, Number(fechaHasta.split("-")[2]), 23, 59, 59, 999) : undefined
+  const fechaHastaDateTime = fechaHasta
+    ? new Date(
+        Number(fechaHasta.split("-")[0]),
+        Number(fechaHasta.split("-")[1]) - 1,
+        Number(fechaHasta.split("-")[2]),
+        23,
+        59,
+        59,
+        999
+      )
+    : undefined;
 
   const where = {
-    createdAt:{
+    createdAt: {
       gte: fechaDesde ? new Date(fechaDesde) : undefined,
       lte: fechaHastaDateTime ? fechaHastaDateTime : undefined,
     },
     monto: {
       gte: verifiedMontoDesde,
-      lte: verifiedMontoHasta
+      lte: verifiedMontoHasta,
     },
-    apertura:caja ? {
-      cajaId: caja
-    }:undefined,
-    esIngreso: esIngreso ? (esIngreso === "true" ? true : esIngreso === "false" ? false : undefined) : undefined
-  }
+    apertura: caja
+      ? {
+          cajaId: caja,
+        }
+      : undefined,
+    esIngreso: esIngreso
+      ? esIngreso === "true"
+        ? true
+        : esIngreso === "false"
+        ? false
+        : undefined
+      : undefined,
+  };
 
   //Asignar los elementos encontrados a los valores
   const values = await prisma.movimiento.findMany({
     skip: verifiedSkip,
     take: verifiedUpTo,
-    where:{
-      ...where
+    where: {
+      ...where,
     },
-    include: incluirDocumentacion === "true" ? {
-      movimientoDetalles: true,
-      comprobantes: true
-    }:undefined,
-    orderBy:{
-      createdAt: "desc"
-    }
+    include:
+      incluirDocumentacion === "true"
+        ? {
+            movimientoDetalles: true,
+            comprobantes: {
+              include: {
+                user: {
+                  select: {
+                    nombre: true,
+                    apellido: true,
+                    docIdentidad: true,
+                  },
+                },
+              },
+            },
+            factura: true,
+          }
+        : undefined,
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
-  const count = await prisma.factura.count({ where: {...where}});
+  const count = await prisma.movimiento.count({ where: { ...where } });
   if (!values)
     return generateApiErrorResponse("Error intentando buscar Movimientos", 500);
 
-  return generateApiSuccessResponse(200, "Movimientos encontradas", {values:values, totalQuantity: count});
+  return generateApiSuccessResponse(200, "Movimientos encontradas", {
+    values: values,
+    totalQuantity: count,
+  });
 }
