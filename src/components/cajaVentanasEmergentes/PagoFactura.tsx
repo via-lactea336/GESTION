@@ -2,7 +2,7 @@
 import React, { useState, useEffect, use } from "react";
 import obtenerFacturaPorId from "@/lib/moduloCaja/factura/obtenerFacturaPorId";
 import { obtenerCookie } from "@/lib/obtenerCookie";
-import { AperturaCaja, Cliente, Factura, medioDePago } from "@prisma/client";
+import { AperturaCaja, Cliente, Factura, Recibos, medioDePago } from "@prisma/client";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import ModalTarjeta from "./ModalTarjeta";
 import obtenerCliente from "@/lib/moduloCaja/cliente/obtenerCliente";
@@ -10,6 +10,9 @@ import crearMovimiento from "@/lib/moduloCaja/movimiento/crearMovimiento";
 import { useRouter } from "next/navigation";
 import { Toaster, toast } from "sonner";
 import Input from "../global/Input";
+import { pdf } from "@react-pdf/renderer";
+import TransferReceipt from "../PDF/ReciboPagoFactura";
+import { saveAs } from 'file-saver';
 
 type Tarjeta = {
   tipo: string;
@@ -46,6 +49,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
   const [banco, setBanco] = useState<string>("Banco Itaú");
   const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(false);
+  const [recibo, setRecibo] = useState<Recibos | null>(null);
 
   const fetchData = async () => {
     try {
@@ -92,14 +96,14 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
     if (factura) {
       if (
         Number(factura.total) -
-          (importe + totalPagado + Number(factura.totalSaldoPagado)) <
+        (importe + totalPagado + Number(factura.totalSaldoPagado)) <
         0
       ) {
         setError("No se puede exceder el monto total de la factura");
       }
       if (
         Number(factura.total) -
-          (totalPagado + Number(factura.totalSaldoPagado)) <=
+        (totalPagado + Number(factura.totalSaldoPagado)) <=
         0
       ) {
         setDisabled(true);
@@ -133,6 +137,31 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
     }
   };
 
+  useEffect(() => {
+    const generatePDF = async () => {
+      if (recibo) {
+        const doc = (
+          <TransferReceipt
+            id={recibo.id}
+            fechaEmision={recibo.fechaEmision}
+            clienteId={recibo.clienteId}
+            facturaId={recibo.facturaId}
+            totalPagado={recibo.totalPagado}
+            createdAt={recibo.createdAt}
+          />
+        );
+
+        const asPdf = pdf();
+        asPdf.updateContainer(doc);
+        const blob = await asPdf.toBlob();
+        saveAs(blob, 'recibo.pdf');
+        setLoading(false); 
+      }
+    };
+
+    generatePDF();
+  }, [recibo]);
+
   const pagarFactura = async () => {
     const movsDetalles = pagos.map((pago) => ({
       metodoPago: pago.metodoPago,
@@ -149,9 +178,8 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
           facturaId: idFactura,
         },
         movsDetalles,
-        concepto: `Pago de factura ${
-          factura?.numeroFactura
-        } por valor de ${totalPagado.toLocaleString("es-PY")} Gs.`,
+        concepto: `Pago de factura ${factura?.numeroFactura
+          } por valor de ${totalPagado.toLocaleString("es-PY")} Gs.`,
       });
       if (response === undefined || typeof response === "string") {
         throw new Error(response || "Error al pagar la factura");
@@ -159,7 +187,10 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
       if (response.error) {
         throw new Error(response.error);
       }
-      console.log(response.data);
+      if (response.data?.recibo) {      
+        console.log(response)
+        setRecibo(response.data.recibo);
+      }
       setLoading(false);
       toast.success("Factura pagada exitosamente!");
       router.push("./");
@@ -381,19 +412,19 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
               "bg-primary-800 text-white py-2 px-4 rounded-md shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-900 " +
               (loading ? "cursor-not-allowed" : "")
             }
-            onClick={() => {
+            onClick={async () => {
               if (factura.esContado && totalPagado !== +factura.total) {
-                toast.error(
-                  "El importe total no coincide con el total de la factura."
-                );
+                toast.error("El importe total no coincide con el total de la factura.");
                 return;
               } else {
-                pagarFactura();
+                await pagarFactura();                
               }
             }}
+            disabled={loading}
           >
             {loading ? "Procesando..." : "Realizar Pago"}
           </button>
+
         </div>
         <Toaster richColors />
       </div>
