@@ -211,7 +211,7 @@ export default function Page() {
               <div key={index} className="flex flex-row justify-between border-b border-white mt-5">
                 <h1 className="mb-2">N°{index + 1}</h1>
                 <h1 className="mb-2">Metodo de pago: {detalle.metodoPago}</h1>
-                <h1 className="mb-2">Monto Parcial: {Number(detalle.monto)}</h1>
+                <h1 className="mb-2">Monto Parcial: {Number(detalle.monto).toLocaleString()} Gs.</h1>
               </div>
             ))}
           </div>

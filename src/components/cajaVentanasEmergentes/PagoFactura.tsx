@@ -141,6 +141,8 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
     }));
     try {
       setLoading(true);
+      const contado = factura?.esContado ? "al contado" : "a crédito ";
+      const texto = `Pago de factura N° ${factura?.numeroFactura} ${contado} del cliente ${factura?.cliente.nombre}`;
       const response = await crearMovimiento({
         mov: {
           aperturaId: apertura.id,
@@ -149,7 +151,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
           facturaId: idFactura,
         },
         movsDetalles,
-        concepto: `Pago de factura ${factura?.numeroFactura} del cliente ${factura?.cliente.nombre}`,
+        concepto: texto,
       });
       if (response === undefined || typeof response === "string") {
         throw new Error(response || "Error al pagar la factura");

@@ -83,15 +83,15 @@ export async function GET(request: NextRequest) {
         ? {
             movimientoDetalles: true,
             comprobantes: {
-              include:{
-                user:{
-                  select:{
+              include: {
+                user: {
+                  select: {
                     nombre: true,
                     apellido: true,
-                    docIdentidad: true
-                  }
-                }
-              }
+                    docIdentidad: true,
+                  },
+                },
+              },
             },
             factura: true,
           }
