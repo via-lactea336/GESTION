@@ -13,7 +13,6 @@ import { Comprobante } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { Modal } from "./Modal";
 import Pagination from "./Pagination";
-import { usePathname, useSearchParams } from "next/navigation";
 
 interface Props extends ParamsReportes {
   currentPage: number;
@@ -33,9 +32,7 @@ export default function Table({
   const [movimientos, setMovimientos] = useState<MovimientosFiltroData[]>();
   const [showModal, setShowModal] = useState(false);
   const [totalPaginas, setTotalPaginas] = useState(0);
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const [indice, setIndiceActual] = useState(currentPage - 1);
+  const [indiceActual, setIndiceActual] = useState(0);
   const [selectedMovimiento, setSelectedMovimiento] =
     useState<MovimientosFiltroData>();
   const formatDate = (dateString: Date) => {
@@ -57,22 +54,14 @@ export default function Table({
     }`;
     return formattedTime;
   };
-
-  const createPageURL = (page: string | number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", page.toString());
-    return `${pathname}?${params.toString()}`;
-  };
-  const changeIndicePagina = () => {
+  const changeIndicePagina = (indice: number) => {
     setIndiceActual(indice);
-    createPageURL(indice + 1);
-    console.log("indice actual", currentPage);
     if (upTo) {
       setFilter({
         cajaId,
         fechaDesde,
         fechaHasta,
-        skip: (currentPage - 1) * upTo,
+        skip: indice * upTo,
         upTo,
         incluirDocumentacion,
       });
@@ -256,7 +245,7 @@ export default function Table({
         </div>
       )}
       <Pagination
-        indiceActual={indice}
+        indiceActual={indiceActual}
         indicesPagina={totalPaginas}
         changeIndicePagina={changeIndicePagina}
       />
