@@ -16,6 +16,8 @@ export async function GET(request: NextRequest) {
 
   const incluirDocumentacion = searchParams.get("incluirDocumentacion");
 
+  const identificadorDocumento = searchParams.get("identificadorDocumento");
+
   const montoDesde = searchParams.get("montoDesde");
   const montoHasta = searchParams.get("montoHasta");
 
@@ -69,6 +71,27 @@ export async function GET(request: NextRequest) {
         ? false
         : undefined
       : undefined,
+    OR:identificadorDocumento?[
+        {factura:{
+          numeroFactura:{contains:identificadorDocumento}
+        }},
+        {
+          comprobantes:{
+            some:{
+              numeroComprobante:Number(identificadorDocumento)
+            }
+          }
+        },
+        {
+          factura:{
+            recibos:{
+              some:{
+                numeroRecibo:Number(identificadorDocumento)
+              }
+            }
+          }
+        }
+      ]: undefined
   };
 
   //Asignar los elementos encontrados a los valores
@@ -93,7 +116,17 @@ export async function GET(request: NextRequest) {
                 },
               },
             },
-            factura: true,
+            factura: {
+              include: {
+                recibos:true, 
+                cliente: {
+                  select: {
+                    nombre: true,
+                    docIdentidad: true,
+                  },
+                },
+              },
+            },
           }
         : undefined,
     orderBy: {
