@@ -8,7 +8,7 @@ import {
 
 import { Movimiento, MovimientoDetalle, Recibos } from "@prisma/client";
 import reflejarMovimiento from "@/lib/moduloCaja/movimiento/reflejarMovimiento";
-import pagarFactura from "@/lib/moduloCaja/factura/services/pagarFactura";
+import pagarFactura from "@/lib/moduloCaja/factura/pagarFactura";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import ApiError from "@/lib/api/ApiError";
 import crearComprobanteDesdeMovimiento from "@/lib/moduloCaja/comprobante/services/crearComprobanteDesdeMovimiento";
@@ -96,8 +96,15 @@ export async function POST(req: NextRequest) {
         || movimientoTx.apertura.caja.saldoTarjeta.lessThan(sumSaldoTarjeta))
       ) throw new ApiError("Saldo insuficiente para realizar el movimiento", 400)
 
+
+      if(mov.esIngreso && movimientoTx.factura) {
+        await pagarFactura(tx, movimientoTx.factura.totalSaldoPagado, movimientoTx.factura.total, movimientoTx.factura?.id, new Decimal(sum))
+      }
+
       return movimientoTx;
     });
+
+    if(!result) throw new ApiError("No se pudo registrar el movimiento", 500)
 
     //Se refleja el movimiento dentro de la caja
     await reflejarMovimiento(
@@ -120,11 +127,10 @@ export async function POST(req: NextRequest) {
     let recibo:Recibos|null = null
 
     //Si es egreso, crear un comprobante
-    if (!mov.esIngreso) await crearComprobanteDesdeMovimiento(result.id, result.apertura.saldoInicial, sum, username, password, concepto);
+    if (!mov.esIngreso) crearComprobanteDesdeMovimiento(result.id, result.apertura.saldoInicial, sum, username, password, concepto);
     else{ //Si es ingreso, generar un recibo
       if (!result.factura) throw new ApiError("No se pudo crear el recivo debido a que la factura no existe", 404)
       recibo = await generarReciboDeMovimiento(sum, result.factura.id, result.factura.clienteId)
-      await pagarFactura(result.factura.id, new Decimal(result.factura.totalSaldoPagado), new Decimal(result.factura.total), new Decimal(sum));
     }
 
     return generateApiSuccessResponse(
