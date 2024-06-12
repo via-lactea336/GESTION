@@ -11,9 +11,9 @@ import { Recibos } from "@prisma/client";
 export async function POST(req: NextRequest) {
   const body: Recibos = await req.json();
 
-  const { clienteId, facturaId, totalPagado } = body;
+  const { clienteId, facturaId, totalPagado, movimientoId } = body;
 
-  if (!clienteId || !facturaId || !totalPagado)
+  if (!clienteId || !facturaId || !totalPagado || !movimientoId)
     return generateApiErrorResponse(
       "Faltan datos para la creacion de el recibo",
       400
@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
   try {
     const recibo = await prisma.recibos.create({
       data: {
+        movimientoId,
         clienteId,
         facturaId,
         totalPagado: totalPagado,
