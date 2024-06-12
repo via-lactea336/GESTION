@@ -1,5 +1,3 @@
-import obtenerComprobantePorId from "@/lib/moduloCaja/comprobante/obtenerComprobantePorId";
-import obtenerComprobantes from "@/lib/moduloCaja/comprobante/obtenerComprobantes";
 import obtenerMovimientosFiltro, {
   MovimientosFiltroData,
   ParamsReportes,
@@ -9,14 +7,16 @@ import {
   ArrowDownLeftIcon,
   EyeIcon,
 } from "@heroicons/react/24/outline";
-import { Comprobante } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Modal } from "./Modal";
 import Pagination from "./Pagination";
+import TableSkeleton from "./skeleton/TableSkeleton";
+import { usePathname, useSearchParams } from "next/navigation";
 
 interface Props extends ParamsReportes {
   currentPage: number;
   setFilter: (filter: ParamsReportes) => void;
+  query: string;
 }
 
 export default function Table({
@@ -26,13 +26,18 @@ export default function Table({
   skip,
   upTo,
   incluirDocumentacion,
-  currentPage,
+  identificadorDocumento,
+  query,
   setFilter,
 }: Props) {
   const [movimientos, setMovimientos] = useState<MovimientosFiltroData[]>();
   const [showModal, setShowModal] = useState(false);
   const [totalPaginas, setTotalPaginas] = useState(0);
   const [indiceActual, setIndiceActual] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [selectedMovimiento, setSelectedMovimiento] =
     useState<MovimientosFiltroData>();
   const formatDate = (dateString: Date) => {
@@ -64,11 +69,18 @@ export default function Table({
         skip: indice * upTo,
         upTo,
         incluirDocumentacion,
+        identificadorDocumento,
       });
     }
   };
+  const createPageURL = (page: string | number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", page.toString());
+    return `${pathname}?${params.toString()}`;
+  };
 
   useEffect(() => {
+    setLoading(true);
     obtenerMovimientosFiltro({
       cajaId,
       fechaDesde,
@@ -76,13 +88,24 @@ export default function Table({
       skip,
       upTo,
       incluirDocumentacion,
+      identificadorDocumento: query,
     }).then((res) => {
       setMovimientos(res.data?.values);
       if (res.data?.totalQuantity && upTo) {
         setTotalPaginas(Math.ceil(res.data.totalQuantity / upTo));
       }
+      setLoading(false);
     });
-  }, [cajaId, fechaDesde, fechaHasta, skip, upTo, incluirDocumentacion]);
+  }, [
+    cajaId,
+    fechaDesde,
+    fechaHasta,
+    skip,
+    upTo,
+    incluirDocumentacion,
+    identificadorDocumento,
+    query,
+  ]);
 
   return (
     <div className="mt-6 flow-root relative">
@@ -93,84 +116,88 @@ export default function Table({
             : "inline-block min-w-full align-middle "
         }
       >
-        <table className="hidden min-w-full bg-gray-900 rounded-md text-white md:table">
-          <thead className="rounded-lg text-left text-sm font-normal">
-            <tr>
-              <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
-                Operación
-              </th>
-              <th scope="col" className="px-3 py-5 font-medium">
-                Fecha
-              </th>
-              <th scope="col" className="px-3 py-5 font-medium">
-                Hora
-              </th>
-              <th scope="col" className="px-3 py-5 font-medium">
-                Monto
-              </th>
-              <th scope="col" className="px-3 py-5 font-medium">
-                Concepto
-              </th>
-              <th scope="col" className="px-3 py-5 font-medium">
-                Detalles
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-gray-800 text-white text-left">
-            {movimientos?.map((mov) => (
-              <tr
-                key={mov.id}
-                className="w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-t-none  [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"
-              >
-                <td className="whitespace-nowrap py-3 pl-6">
-                  <div className="flex items-center gap-3">
-                    {mov.esIngreso ? (
-                      <>
-                        <ArrowDownLeftIcon className="text-green-500 w-6 h-6" />
-                        <span>
-                          Cobro de Factura{" "}
-                          {mov.factura.esContado ? "al Contado" : "a Crédito"}
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <ArrowUpRightIcon className="text-red-500 w-6 h-6" />
-                        <span>Extracción de Dinero</span>
-                      </>
-                    )}
-                  </div>
-                </td>
-                <td className="whitespace-nowrap px-3 py-3">
-                  {formatDate(mov.createdAt)} {formatTime(mov.createdAt)}
-                </td>
-                <td className="whitespace-nowrap px-3 py-3">
-                  {formatTime(mov.createdAt)}
-                </td>
-                <td className="whitespace-nowrap px-3 py-3">
-                  {Number(mov.monto).toLocaleString("es-PY")}
-                </td>
-                <td className="whitespace-nowrap px-3 py-3">
-                  {mov.esIngreso
-                    ? mov?.factura?.esContado
-                      ? `Factura N° ${mov.factura.numeroFactura} pagada por Pedro Meza`
-                      : `Factura N° ${mov.factura.numeroFactura} pagada por Pedro Meza`
-                    : mov?.comprobantes[0]?.concepto}
-                </td>
-                <td className="whitespace-nowrap py-3 pl-6">
-                  <div className="flex justify-center gap-3">
-                    <EyeIcon
-                      onClick={() => {
-                        setShowModal(true);
-                        setSelectedMovimiento(mov);
-                      }}
-                      className="w-5 h-5 text-white hover:cursor-pointer hover:text-primary-300"
-                    />
-                  </div>
-                </td>
+        {loading ? (
+          <TableSkeleton />
+        ) : (
+          <table className="hidden min-w-full bg-gray-900 rounded-md text-white md:table">
+            <thead className="rounded-lg text-left text-sm font-normal">
+              <tr>
+                <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
+                  Operación
+                </th>
+                <th scope="col" className="px-3 py-5 font-medium">
+                  Fecha
+                </th>
+                <th scope="col" className="px-3 py-5 font-medium">
+                  Hora
+                </th>
+                <th scope="col" className="px-3 py-5 font-medium">
+                  Monto
+                </th>
+                <th scope="col" className="px-3 py-5 font-medium">
+                  Concepto
+                </th>
+                <th scope="col" className="px-3 py-5 font-medium">
+                  Detalles
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-gray-800 text-white text-left">
+              {movimientos?.map((mov) => (
+                <tr
+                  key={mov.id}
+                  className="w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-t-none  [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"
+                >
+                  <td className="whitespace-nowrap py-3 pl-6">
+                    <div className="flex items-center gap-3">
+                      {mov.esIngreso ? (
+                        <>
+                          <ArrowDownLeftIcon className="text-green-500 w-6 h-6" />
+                          <span>
+                            Cobro de Factura{" "}
+                            {mov.factura.esContado ? "al Contado" : "a Crédito"}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <ArrowUpRightIcon className="text-red-500 w-6 h-6" />
+                          <span>Extracción de Dinero</span>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-3">
+                    {formatDate(mov.createdAt)} {formatTime(mov.createdAt)}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-3">
+                    {formatTime(mov.createdAt)}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-3">
+                    {Number(mov.monto).toLocaleString("es-PY")}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-3">
+                    {mov.esIngreso
+                      ? mov?.factura?.esContado
+                        ? `Factura N° ${mov.factura.numeroFactura} pagada por Pedro Meza`
+                        : `Factura N° ${mov.factura.numeroFactura} pagada por Pedro Meza`
+                      : mov?.comprobantes[0]?.concepto}
+                  </td>
+                  <td className="whitespace-nowrap py-3 pl-6">
+                    <div className="flex justify-center gap-3">
+                      <EyeIcon
+                        onClick={() => {
+                          setShowModal(true);
+                          setSelectedMovimiento(mov);
+                        }}
+                        className="w-5 h-5 text-white hover:cursor-pointer hover:text-primary-300"
+                      />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
       {showModal && selectedMovimiento && (
         <div className="absolute top-0 w-full">
@@ -248,6 +275,7 @@ export default function Table({
         indiceActual={indiceActual}
         indicesPagina={totalPaginas}
         changeIndicePagina={changeIndicePagina}
+        changeUrl={createPageURL}
       />
     </div>
   );
