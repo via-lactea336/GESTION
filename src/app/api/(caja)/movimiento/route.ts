@@ -6,7 +6,7 @@ import {
   generateApiSuccessResponse,
 } from "@/lib/apiResponse";
 
-import { Movimiento, MovimientoDetalle } from "@prisma/client";
+import { Movimiento, MovimientoDetalle, Recibos } from "@prisma/client";
 import reflejarMovimiento from "@/lib/moduloCaja/movimiento/reflejarMovimiento";
 import pagarFactura from "@/lib/moduloCaja/factura/pagarFactura";
 import verifyUser from "@/lib/auth/verifyUser";
@@ -44,11 +44,12 @@ export async function POST(req: NextRequest) {
 
     if (sum !== +mov.monto) {
       throw new ApiError(
-        "La suma de los movimientos detalle no coincide con el monto del movimiento", 400
+        "La suma de los montos detallados no coincide con el monto total del movimiento", 400
       );
     }
 
-    await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
+      let reciboTx:Recibos | null = null
       const movimientoTx = await tx.movimiento.create({
         data: {
           monto: mov.monto,
@@ -86,7 +87,7 @@ export async function POST(req: NextRequest) {
       if (!movimientoTx.esIngreso) {
         if (movimientoTx.apertura.caja.saldoEfectivo.lessThan(sum))
           throw new ApiError(
-            "La suma de los movimientos detalle excede el saldo de la caja", 400
+            "El monto que se desea extraer excede al saldo de la caja", 400
           );
         if (!username || !password)
           throw new ApiError("Faltan credenciales para crear el comprobante", 400);
@@ -111,7 +112,7 @@ export async function POST(req: NextRequest) {
 
         //Si la factura es a credito, entonces se genera un recibo
         if (!movimientoTx.factura.esContado) {
-          await tx.recibos.create({
+          reciboTx = await tx.recibos.create({
             data: {
               clienteId: movimientoTx.factura.clienteId,
               totalPagado: mov.monto,
@@ -142,7 +143,7 @@ export async function POST(req: NextRequest) {
         mov.esIngreso
       );
 
-      return movimientoTx;
+      return {movimientoTx, reciboTx};
     }, {
       maxWait: 6000,
       timeout: 6000
@@ -150,7 +151,8 @@ export async function POST(req: NextRequest) {
 
     return generateApiSuccessResponse(
       200,
-      "El movimiento fue generado correctamente"
+      "El movimiento fue generado correctamente",
+      {recibo: result.reciboTx}
     );
   } catch (err) {
     console.error(err);

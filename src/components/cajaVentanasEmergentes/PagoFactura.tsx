@@ -69,7 +69,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
         const cliente = responseCliente.data;
         const facturaConRuc = { ...data, cliente };
         setFactura(facturaConRuc);
-        setImporte(+facturaConRuc.total);
+        setImporte(+facturaConRuc.total - +facturaConRuc.totalSaldoPagado);
       } else {
         setFactura(null);
         setError(error || null);
@@ -89,13 +89,24 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
 
   useEffect(() => {
     if (factura) {
-      if (Number(factura.total) - (importe + totalPagado) < 0) {
+      if (
+        Number(factura.total) -
+          (importe + totalPagado + Number(factura.totalSaldoPagado)) <
+        0
+      ) {
         setError("No se puede exceder el monto total de la factura");
       }
-      if (Number(factura.total) - totalPagado <= 0) {
+      if (
+        Number(factura.total) -
+          (totalPagado + Number(factura.totalSaldoPagado)) <=
+        0
+      ) {
         setDisabled(true);
       }
-      if (importe + totalPagado <= Number(factura.total)) {
+      if (
+        importe + totalPagado + Number(factura.totalSaldoPagado) <=
+        Number(factura.total)
+      ) {
         setError(null);
       }
     }
@@ -125,8 +136,8 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
     const movsDetalles = pagos.map((pago) => ({
       metodoPago: pago.metodoPago,
       monto: pago.importe,
+      concepto: pago.detalle,
     }));
-    console.log(movsDetalles);
     try {
       setLoading(true);
       const response = await crearMovimiento({
@@ -137,7 +148,9 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
           facturaId: idFactura,
         },
         movsDetalles,
-        concepto: "Pago de factura",
+        concepto: `Pago de factura ${
+          factura?.numeroFactura
+        } por valor de ${totalPagado.toLocaleString("es-PY")} Gs.`,
       });
       if (response === undefined || typeof response === "string") {
         throw new Error(response || "Error al pagar la factura");
@@ -145,6 +158,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
       if (response.error) {
         throw new Error(response.error);
       }
+      console.log(response.data);
       setLoading(false);
       toast.success("Factura pagada exitosamente!");
       router.push("./");
@@ -189,11 +203,15 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
     },
     {
       label: "Monto:",
-      value: Number(factura.total).toLocaleString() + " Gs.",
+      value: Number(factura.total).toLocaleString("es-PY") + " Gs.",
     },
     {
       label: "Falta:",
-      value: (Number(factura.total) - totalPagado).toLocaleString() + " Gs.",
+      value:
+        (
+          Number(factura.total) -
+          (totalPagado + Number(factura.totalSaldoPagado))
+        ).toLocaleString("es-PY") + " Gs.",
     },
   ];
   return (
@@ -240,7 +258,10 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
                 disabled={disabled}
                 placeholder="Ingrese el importe del pago"
                 onChange={(e) => setImporte(Number(e.target.value))}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-primary-600 sm:text-sm"
+                className={
+                  "mt-1 block w-full px-3 py-2  rounded-md shadow-sm focus:outline-none  sm:text-sm border border-gray-300 " +
+                  (error ? "border-red-500" : " focus:border-primary-600")
+                }
               />
               {error && (
                 <p
@@ -268,11 +289,11 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
           </div>
           <div className="w-full flex justify-end items-center gap-4">
             <button
-              disabled={disabled}
+              disabled={disabled || loading}
               onClick={agregarMetodoPago}
               className={
                 " text-white py-2 px-4 rounded-md shadow-sm " +
-                (error
+                (error || loading
                   ? " cursor-not-allowed bg-primary-900"
                   : "bg-primary-800 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-900")
               }
@@ -296,45 +317,64 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
         <table className="w-full border-collapse border border-gray-300">
           <thead>
             <tr>
-              <th className="border border-gray-300 px-4 py-2">Método</th>
-              <th className="border border-gray-300 px-4 py-2">Detalle</th>
-              <th className="border border-gray-300 px-4 py-2">Importe</th>
-              <th className="border border-gray-300 px-4 py-2">Delete</th>
+              <th className="border border-gray-300 font-semibold px-4 py-2">
+                Método
+              </th>
+              <th className="border border-gray-300 font-semibold px-4 py-2">
+                Detalle
+              </th>
+              <th className="border border-gray-300 font-semibold px-4 py-2">
+                Importe
+              </th>
+              <th className="border border-gray-300 font-semibold px-4 py-2">
+                Delete
+              </th>
             </tr>
           </thead>
           <tbody>
-            {pagos.map((pago, index) => (
-              <tr key={index}>
-                <td className="border text-center border-gray-300 px-4 py-2">
-                  {pago.metodoPago}
-                </td>
-                <td className="border text-center border-gray-300 px-4 py-2">
-                  {pago.detalle}
-                </td>
-                <td className="border text-center border-gray-300 px-4 py-2">
-                  {pago.importe.toLocaleString()}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 flex justify-center items-center">
-                  <button onClick={() => eliminarMetodoPago(index)}>
-                    <TrashIcon className="h-6 w-6 hover:text-red-600 text-gray-500" />
-                  </button>
+            {pagos.length > 0 ? (
+              pagos.map((pago, index) => (
+                <tr key={index}>
+                  <td className="border text-center border-gray-300 px-4 py-2">
+                    {pago.metodoPago}
+                  </td>
+                  <td className="border text-center border-gray-300 px-4 py-2">
+                    {pago.detalle}
+                  </td>
+                  <td className="border text-center border-gray-300 px-4 py-2">
+                    {pago.importe.toLocaleString("es-PY")}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 flex justify-center items-center">
+                    <button onClick={() => eliminarMetodoPago(index)}>
+                      <TrashIcon className="h-6 w-6 hover:text-red-600 text-gray-500" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  className="border text-center border-gray-300 px-4 py-2"
+                  colSpan={4}
+                >
+                  No hay métodos de pago
                 </td>
               </tr>
-            ))}
+            )}
             <tr>
-              <td className="border border-gray-300 px-4 py-2" colSpan={3}>
+              <td
+                className="border font-semibold border-gray-300 px-4 py-2"
+                colSpan={3}
+              >
                 Total
               </td>
-              <td className="border border-gray-300 px-4 py-2">
-                {totalPagado.toLocaleString()}
+              <td className="border text-center font-semibold border-gray-300 px-4 py-2">
+                {totalPagado.toLocaleString()} Gs.
               </td>
             </tr>
           </tbody>
         </table>
-        <div className="w-full flex justify-center items-end flex-col">
-          <div className="my-4 text-xl font-semibold">
-            <span>Total: {totalPagado.toLocaleString()} Gs.</span>
-          </div>
+        <div className="w-full mt-4 flex justify-center items-end flex-col">
           <button
             className={
               "bg-primary-800 text-white py-2 px-4 rounded-md shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-900 " +

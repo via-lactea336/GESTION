@@ -71,7 +71,7 @@ export default function ContenedorCajas({ cajeroId, cajeroNombre }: Props) {
         className={showModal ? "blur-sm brightness-50" : ""}
       />
       {showModal && (
-        <div className="absolute top-1/3 w-full">
+        <div className="absolute top-1/4 w-full">
           <Modal setShowModal={setShowModal}>
             <FormApertura
               caja={selectedCaja}
