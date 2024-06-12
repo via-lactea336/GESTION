@@ -108,7 +108,7 @@ const detalleCheques = ({
         <View style={styles.table}>
           <View style={styles.tableRow}>
             <View style={styles.tableColHeader}>
-              <Text style={styles.tableCellHeader}>Operacion</Text>
+              <Text style={styles.tableCellHeader}>Operación</Text>
             </View>
             <View style={styles.tableColHeader}>
               <Text style={styles.tableCellHeader}>Fecha</Text>
