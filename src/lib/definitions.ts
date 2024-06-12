@@ -1,9 +1,14 @@
 import {
+  AperturaCaja,
+  ArqueoDeCaja,
   Banco,
   Cheque,
+  Comprobante,
   CuentaBancaria,
   Entidad,
+  Factura,
   Movimiento,
+  MovimientoDetalle,
   Operacion,
   RegistroCaja,
   TipoOperacion,
@@ -88,3 +93,16 @@ export type DatosExtendidosRegistroCaja = RegistroCaja & {
     }
   }
 }
+
+export type RegistroDiarioFullData = RegistroCaja & {
+  apertura: AperturaCaja & {
+    arqueo: ArqueoDeCaja;
+    movimiento: (Movimiento &
+      {
+        factura:Factura|null
+        comprobantes: Comprobante & {user: {nombre: string, apellido: string, docIdentidad: string}}[];
+        movimientoDetalles: MovimientoDetalle[];
+      }
+    )[];
+  };
+};  

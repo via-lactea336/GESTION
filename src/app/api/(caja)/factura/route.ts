@@ -18,7 +18,8 @@ export async function POST(req: NextRequest) {
     fechaEmision,
     fechaVencimiento,
     pagado,
-    numeroFactura
+    numeroFactura,
+    concepto
    } = body.factura;
   
 
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
         esContado,
         total,
         ivaTotal,
+        concepto
       }
     })
   

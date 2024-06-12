@@ -13,7 +13,6 @@ export default async function Page() {
         <div key={apertura.id}>
           <p>{apertura.id}</p>
           <p>{apertura.cajeroId}</p>
-          <p>{apertura.apertura.toISOString()}</p>
         </div>
       ))}
     </div>

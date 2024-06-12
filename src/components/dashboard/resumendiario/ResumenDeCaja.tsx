@@ -9,8 +9,33 @@ const ResumenDeCaja: React.FC<DatosExtendidosRegistroCaja> = ({
   montoIngresoTarjeta,
   createdAt,
   apertura,
-  montoInicial
+  montoInicial,
+  montoEsperado
 }) => {
+
+
+  const formatDate = (dateString: Date) => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const formattedDate = `${day < 10 ? "0" + day : day}-${
+      month < 10 ? "0" + month : month
+    }-${year}`;
+    return formattedDate;
+  };
+
+
+  const formatTime = (dateString: Date) => {
+    const date = new Date(dateString);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const formattedTime = `${hours < 10 ? "0" + hours : hours}:${
+      minutes < 10 ? "0" + minutes : minutes
+    }`;
+    return formattedTime;
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between">
@@ -19,15 +44,10 @@ const ResumenDeCaja: React.FC<DatosExtendidosRegistroCaja> = ({
         <p>
           <span className="font-semibold mr-2">Generado el </span>
           <span className="font-semibold mr-2">
-            {new Date(createdAt)
-              .toISOString()
-              .split("T")[0]
-              .split("-")
-              .reverse()
-              .join("/")}{" "} a las 
+            {formatDate(createdAt)}{" "} a las 
           </span>
           <span className="font-semibold mr-2"> 
-            {new Date(createdAt).getHours()}:{new Date(createdAt).getMinutes()}
+            {formatTime(createdAt)}
           </span>
         </p>
       </div>
@@ -40,13 +60,19 @@ const ResumenDeCaja: React.FC<DatosExtendidosRegistroCaja> = ({
             </td>
           </tr>
           <tr className="bg-gray-900 py-1 px-2 border-b-2 border-gray-700">
-            <td className="p-2 text-primary-300">Dinero en Caja</td>
+            <td className="p-2 text-primary-300">Efectivo Tras Operaciones</td>
+            <td className="p-2">
+              {Number(montoEsperado).toLocaleString()} Gs.
+            </td>
+          </tr>
+          <tr className="bg-gray-900 py-1 px-2 border-b-2 border-gray-700">
+            <td className="p-2 text-primary-300">Dinero registrado por el Cajero</td>
             <td className="p-2">
               {Number(montoRegistrado).toLocaleString()} Gs.
             </td>
           </tr>
           <tr className="bg-gray-900 py-1 px-2 rounded">
-            <td className="p-2 text-primary-300">Oberservaciones</td>
+            <td className="p-2 text-primary-300">Observaciones</td>
             <td className="p-2">
               {apertura.observaciones == ""? "Sin observaciones durante el cierre" :  apertura.observaciones}
             </td>

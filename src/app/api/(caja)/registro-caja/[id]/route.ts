@@ -2,6 +2,51 @@ import { generateApiErrorResponse, generateApiSuccessResponse } from "@/lib/apiR
 import prisma from "@/lib/prisma";
 import { NextRequest } from "next/server";
 
+export async function GET(req:NextRequest, { params }: { params: { id: string } }) {
+  const id = params.id;
+  try {
+    const registroCaja = await prisma.registroCaja.findUnique({
+      where: {
+        id
+      },
+      include: {
+        apertura:{
+          include:{
+            arqueo: true,
+            movimiento: {
+              include:{
+                factura: true,
+                comprobantes:{
+                  include:{
+                    user:{
+                      select:{
+                        nombre: true,
+                        apellido: true,
+                        docIdentidad: true
+                      }
+                    }
+                  }
+                },
+                movimientoDetalles: {
+                  include:{
+                    tarjeta: true,
+                    chequeCaja: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+    if(!registroCaja) return generateApiErrorResponse("No se ha podido encontrar el registro de caja", 500)
+    return generateApiSuccessResponse(200, `Registro de caja encontrada exitosamente`, registroCaja);
+  } catch (error) {
+    // Si hay un error al buscar, devuelve un mensaje de error
+    return generateApiErrorResponse("Error buscando el registro de caja caja", 500);
+  }
+}
+
 export async function DELETE(req:NextRequest, { params }: { params: { id: string } }) {
   const id = params.id;
   const {deleteFromDB}:{deleteFromDB:boolean} = await req.json();

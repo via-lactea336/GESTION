@@ -2,9 +2,13 @@
 /* eslint-disable indent */
 
 import SideNav from "@/components/dashboard/SideNav";
+import crearAsientoRoutine from "@/lib/asientos/services/asiento/createAsientoRoutine";
 
 // eslint-disable-next-line space-before-function-paren, no-undef
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
+
+  await crearAsientoRoutine();
+
   return (
     <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">
       <div className="w-full flex-none md:w-64 md:sticky">
