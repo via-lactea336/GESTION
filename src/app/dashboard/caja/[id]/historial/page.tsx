@@ -4,19 +4,33 @@ import useCookies from "@/lib/hooks/useCookies";
 import Link from "next/link";
 import Table from "@/components/global/Table";
 import { useState } from "react";
+import Search from "@/components/global/Search";
+import Pagination from "@/components/global/Pagination";
+import { ParamsReportes } from "@/lib/moduloCaja/movimiento/obtenerMovimientosFiltro";
 
-export default function Page({ params }: { params: { id: string } }) {
+type Props = {
+  searchParams?: {
+    query?: string;
+    page?: string;
+  };
+  params: {
+    id: string;
+  };
+};
+
+export default function Page({ params, searchParams }: Props) {
   const { id } = params;
   const { cajero, caja } = useCookies();
+  const currentPage = Number(searchParams?.page) || 1;
+  const query = searchParams?.query || "";
   const links = [
     { href: `/dashboard/caja/${id}/arqueo`, text: "Arqueo" },
     { href: `/dashboard/caja/reportes`, text: "Reportes" },
     { href: `/dashboard/caja/${id}/egreso`, text: "Egreso" },
   ];
 
-  const [filter, setFilter] = useState({
+  const [filter, setFilter] = useState<ParamsReportes>({
     cajaId: id,
-    esIngreso: false,
     fechaDesde: "",
     fechaHasta: "",
     skip: 0,
@@ -47,8 +61,10 @@ export default function Page({ params }: { params: { id: string } }) {
           <h3>Caja N° {caja.numero}</h3>
         )}
       </Header>
-
-      <Table {...filter} />
+      <div className="flex justify-center items-center gap-8 mt-8">
+        <Search placeholder="Buscar por N° de Factura o N° de Comprobante. Ej: 001-001-000123" />
+      </div>
+      <Table {...filter} currentPage={currentPage} setFilter={setFilter} />
     </div>
   );
 }
