@@ -18,10 +18,10 @@ export type ParamsReportes = {
   upTo?: number;
 };
 
-export type MovimientosFiltroData = Movimiento & {
-  comprobantes: Comprobante[] &
-    { user: { nombre: string; apellido: string; docIdentidad: string } }[];
-} & { movimientoDetalles: MovimientoDetalle[] } & { factura: Factura & {recibos:Recibos[]} &{cliente: {nombre: string; docIdentidad: string} }};
+export type MovimientosFiltroData = Movimiento & {recibo : Recibos} & {
+    comprobante: Comprobante &
+    { user: { nombre: string; apellido: string; docIdentidad: string } };
+} & { movimientoDetalles: MovimientoDetalle[] } & { factura: Factura &{cliente: {nombre: string; docIdentidad: string} }};
 
 export default async function obtenerMovimientosFiltro({
   fechaDesde,

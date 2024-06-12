@@ -130,8 +130,10 @@ export async function POST(req: NextRequest) {
     if (!mov.esIngreso) crearComprobanteDesdeMovimiento(result.id, result.apertura.saldoInicial, sum, username, password, concepto);
     else{ //Si es ingreso, generar un recibo
       if (!result.factura) throw new ApiError("No se pudo crear el recivo debido a que la factura no existe", 404)
-      recibo = await generarReciboDeMovimiento(sum, result.factura.id, result.factura.clienteId)
+      recibo = await generarReciboDeMovimiento(result.id, sum, result.factura.id, result.factura.clienteId)
     }
+
+
 
     return generateApiSuccessResponse(
       200,

@@ -248,7 +248,8 @@ model Movimiento{
   monto               Decimal @db.Money
 
   movimientoDetalles  MovimientoDetalle[]
-  comprobantes        Comprobante[]
+  comprobante         Comprobante?
+  recibo              Recibos?
 
   esIngreso           Boolean
 
@@ -322,6 +323,9 @@ model Recibos {
   factura     Factura @relation(references: [id], fields: [facturaId], onDelete: NoAction)
   facturaId   String 
 
+  movimiento  Movimiento @relation(references: [id], fields: [movimientoId], onDelete: NoAction)
+  movimientoId  String @unique
+
   totalPagado Decimal @db.Money
 
   deleted   DateTime?
@@ -344,7 +348,7 @@ model Comprobante {
   userId        String
   
   movimiento    Movimiento @relation(references: [id], fields: [movimientoId], onDelete: NoAction)
-  movimientoId  String
+  movimientoId  String @unique
 
   deleted       DateTime?
 
@@ -415,10 +419,16 @@ model RegistroCaja {
   updatedAt DateTime @updatedAt
 }
 
+enum AsientoDesc {
+  COBRO_FACTURAS
+  EXTRACCION_CAJA
+
+}
+
 //ASIENTOS
 model Asiento {
   id          String     @id @default(uuid())
-  fecha       DateTime
+  fecha       DateTime   @db.Date
   descripcion String
   detalles    DetalleAsiento[]
 

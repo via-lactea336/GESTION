@@ -1,8 +1,7 @@
-import { Factura, Movimiento } from "@prisma/client";
 import prisma from "@/lib/prisma";
-import ApiError from "@/lib/api/ApiError";
 
 const generarReciboDeMovimiento = async (
+  movimientoId:string,
   monto:number,
   facturaId:string,
   clienteId:string,
@@ -10,6 +9,7 @@ const generarReciboDeMovimiento = async (
 
   const recibo = await prisma.recibos.create({
     data: {
+      movimientoId,
       clienteId: clienteId,
       totalPagado: monto,
       facturaId: facturaId,

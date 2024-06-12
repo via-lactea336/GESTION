@@ -43,7 +43,7 @@ export default function ModalDetalleMovimiento({
             <span className="text-md font-medium text-gray-400 text-left border-b border-gray-700 w-full">
               {selectedMovimiento.esIngreso
                 ? `Al Cliente ${selectedMovimiento.factura.cliente.nombre} con RUC : ${selectedMovimiento.factura.cliente.docIdentidad}`
-                : `Por ${selectedMovimiento.comprobantes[0].user.nombre} ${selectedMovimiento.comprobantes[0].user.apellido}`}
+                : `Por ${selectedMovimiento.comprobante.user.nombre} ${selectedMovimiento.comprobante.user.apellido}`}
             </span>
             {selectedMovimiento.esIngreso && (
               <div className="flex justify-between w-full text-gray-100">
@@ -62,7 +62,7 @@ export default function ModalDetalleMovimiento({
                     N° de recibo:
                   </span>
                   <span>
-                    {selectedMovimiento.factura.recibos.at(-1)?.numeroRecibo}
+                    {selectedMovimiento.recibo.numeroRecibo}
                   </span>
                 </div>
               )}
@@ -84,7 +84,7 @@ export default function ModalDetalleMovimiento({
                   N° de Comprobante:
                 </span>
                 <span>
-                  {selectedMovimiento.comprobantes[0].numeroComprobante}
+                  {selectedMovimiento.comprobante.numeroComprobante}
                 </span>
               </div>
             )}
@@ -110,7 +110,7 @@ export default function ModalDetalleMovimiento({
           {!selectedMovimiento.esIngreso && (
             <div className="flex justify-between w-full text-gray-100">
               <span className="font-medium text-gray-400">Concepto:</span>
-              <span>{selectedMovimiento?.comprobantes[0]?.concepto}</span>
+              <span>{selectedMovimiento?.comprobante.concepto}</span>
             </div>
           )}
           <div className="flex flex-col justify-center items-center gap-4">
@@ -134,7 +134,7 @@ export default function ModalDetalleMovimiento({
               !selectedMovimiento.factura.esContado && (
                 <button
                   onClick={() => {
-                    const recibo = selectedMovimiento.factura.recibos.at(-1);
+                    const recibo = selectedMovimiento.recibo;
                     if (!recibo) return;
                     const generatePDF = async () => {
                       if (recibo) {
@@ -171,13 +171,13 @@ export default function ModalDetalleMovimiento({
               <button
                 onClick={() => {
                   if (!caja || !cajero) return;
-                  const time = selectedMovimiento.comprobantes[0].fechaEmision;
+                  const time = selectedMovimiento.comprobante.fechaEmision;
                   generatePDF({
                     cajero: cajero.nombre,
                     caja: caja.numero,
                     dateTime: `${formatDate(time)} ${formatTime(time)}`,
                     monto: Number(selectedMovimiento.monto),
-                    observaciones: selectedMovimiento.comprobantes[0].concepto,
+                    observaciones: selectedMovimiento.comprobante.concepto,
                   });
                 }}
                 className=" bg-[#6f42c1] flex text-base font-medium w-full gap-1 justify-center items-center p-2 rounded-md hover:bg-[#8753e7]"

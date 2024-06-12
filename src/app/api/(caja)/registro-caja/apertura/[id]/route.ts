@@ -17,7 +17,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
           movimiento: {
             include:{
               factura: true,
-              comprobantes:{
+              comprobante:{
                 include:{
                   user:{
                     select:{

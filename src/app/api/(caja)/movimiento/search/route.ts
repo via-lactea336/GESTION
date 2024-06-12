@@ -79,20 +79,10 @@ export async function GET(request: NextRequest) {
 
     if (!isNaN(Number(identificadorDocumento))) {
       orConditions.push({
-        comprobantes: {
-          some: {
-            numeroComprobante: Number(identificadorDocumento),
-          },
-        },
+        comprobante: {numeroComprobante: Number(identificadorDocumento)},
       });
       orConditions.push({
-        factura: {
-          recibos: {
-            some: {
-              numeroRecibo: Number(identificadorDocumento),
-            },
-          },
-        },
+        recibo: {numeroRecibo: Number(identificadorDocumento)},
       });
     }
 
@@ -117,8 +107,9 @@ export async function GET(request: NextRequest) {
     include:
       incluirDocumentacion === "true"
         ? {
+            recibo:true,
             movimientoDetalles: true,
-            comprobantes: {
+            comprobante: {
               include: {
                 user: {
                   select: {
@@ -131,7 +122,6 @@ export async function GET(request: NextRequest) {
             },
             factura: {
               include: {
-                recibos: true,
                 cliente: {
                   select: {
                     nombre: true,
