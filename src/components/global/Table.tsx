@@ -125,7 +125,7 @@ export default function Table({
   ]);
 
   return (
-    <div className="mt-6 flow-root relative">
+    <div className=" flow-root relative">
       <div
         className={
           showModal
@@ -135,6 +135,10 @@ export default function Table({
       >
         {loading ? (
           <TableSkeleton />
+        ) : movimientos?.length === 0 ? (
+          <h3 className="text-center w-full text-primary-300 text-xl">
+            Sin resultados. ¿Te gustaría intentar con otros filtros?
+          </h3>
         ) : (
           <table className="hidden min-w-full bg-gray-900 rounded-md text-white md:table">
             <thead className="rounded-lg text-left text-sm font-normal">
@@ -223,7 +227,7 @@ export default function Table({
         />
       )}
 
-      {!showModal && (
+      {!showModal && movimientos && movimientos.length > 0 && (
         <Pagination
           indiceActual={indiceActual}
           indicesPagina={totalPaginas}
