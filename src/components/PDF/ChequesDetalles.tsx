@@ -102,8 +102,8 @@ const detalleCheques = ({
         </View>
         <View style={styles.section}>
           <Text>Cuenta: {cuenta.numeroCuenta}</Text>
-          <Text>Saldo: {cuenta.saldo}</Text>
-          <Text>Saldo Disponible: {cuenta.saldoDisponible}</Text>
+          <Text>Saldo: {Number(cuenta.saldo).toLocaleString('es-ES')}</Text>
+          <Text>Saldo Disponible: {Number(cuenta.saldoDisponible).toLocaleString('es-ES')}</Text>
         </View>
         <View style={styles.table}>
           <View style={styles.tableRow}>
@@ -142,7 +142,7 @@ const detalleCheques = ({
                 <Text style={styles.tableCell}>{cheque.estado}</Text>
               </View>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{cheque.monto.toString()}</Text>
+                <Text style={styles.tableCell}>{Number(cheque.monto).toLocaleString('es-ES')}</Text>
               </View>
             </View>
           ))}

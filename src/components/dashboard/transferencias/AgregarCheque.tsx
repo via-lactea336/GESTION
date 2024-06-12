@@ -186,7 +186,7 @@
                   <Input
                     value={cheque.numeroCheque}
                     onChange={onChange}
-                    placeholder='12345678-A132-098'
+                    placeholder='Numero del cheque'
                     id='numeroCheque'
                     type='text'
                     className='bg-gray-800 text-white py-1 px-2 rounded-md'
@@ -204,7 +204,7 @@
           }
           <div className='flex justify-between bg-gray-800 opacity-80 text-white p-2 rounded'>
             <p>Total de la Operacion</p>
-            <p>{monto} Gs.</p>
+            <p>{monto.toLocaleString('es-ES')} Gs.</p>
           </div>
         </div>
       </>
