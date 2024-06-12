@@ -7,7 +7,7 @@ import { obtenerCookie } from "@/lib/obtenerCookie";
 type TransferReceiptProps = {
   tipoOperacion: string;
   dateTime: string;
-  monto: number;
+  monto: string;
   numComprobante: string;
   concepto: string;
   nombreDestino: string;
@@ -100,7 +100,7 @@ function TransferReceipt({
         <View style={[styles.container, styles.section]}>
           <View style={styles.view}>
             <Text style={styles.subtitle}>Monto:</Text>
-            <Text style={styles.text}>{monto.toLocaleString('es-ES')}</Text>
+            <Text style={styles.text}>{Number(monto).toLocaleString('es-ES')}</Text>
           </View>
           <View style={styles.view}>
             <Text style={styles.subtitle}>Comprobante:</Text>

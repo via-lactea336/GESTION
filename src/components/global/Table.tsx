@@ -198,7 +198,7 @@ export default function Table({
                       ? mov?.factura?.esContado
                         ? `Factura N° ${mov.factura.numeroFactura} pagado al contado`
                         : `Factura N° ${mov.factura.numeroFactura} pagado a crédito`
-                      : mov?.comprobantes[0]?.concepto}
+                      : mov?.comprobante.concepto}
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6">
                     <div className="flex justify-center gap-3">
