@@ -125,12 +125,12 @@ function DetalleCuentaReceipt({
             <View>
               <View style={styles.section}>
                 <Text style={styles.subtitle}>Saldo Disponible:</Text>
-                <Text style={styles.text}>{Number(cuenta.saldo)}</Text>
+                <Text style={styles.text}>{Number(cuenta.saldo).toLocaleString('es-ES')}</Text>
               </View>
               <View style={styles.section}>
                 <Text style={styles.subtitle}>Saldo Retenido:</Text>
                 <Text style={styles.text}>
-                  {Number(cuenta.saldoDisponible)}
+                  {Number(cuenta.saldoDisponible).toLocaleString('es-ES')}
                 </Text>
               </View>
               <View style={styles.section}>
@@ -211,8 +211,8 @@ function DetalleCuentaReceipt({
                     ]}
                   >
                     {operacion.tipoOperacion.esDebito
-                      ? `- ${Number(operacion.monto).toLocaleString()} Gs.`
-                      : `+ ${Number(operacion.monto).toLocaleString()} Gs.`}
+                      ? `- ${Number(operacion.monto).toLocaleString('es-ES')} Gs.`
+                      : `+ ${Number(operacion.monto).toLocaleString('es-ES')} Gs.`}
                   </Text>
                 </View>
               </View>
