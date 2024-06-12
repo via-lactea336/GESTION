@@ -24,9 +24,10 @@ export default function Page({ params, searchParams }: Props) {
   const query = searchParams?.query || "";
   console.log("query", query);
   const links = [
+    { href: `/dashboard/caja/${id}/ingreso`, text: "Ingreso" },
+    { href: `/dashboard/caja/${id}/egreso`, text: "Egreso" },
     { href: `/dashboard/caja/${id}/arqueo`, text: "Arqueo" },
     { href: `/dashboard/caja/reportes`, text: "Reportes" },
-    { href: `/dashboard/caja/${id}/egreso`, text: "Egreso" },
   ];
 
   const [filter, setFilter] = useState<ParamsReportes>({
@@ -70,6 +71,8 @@ export default function Page({ params, searchParams }: Props) {
         query={query}
         currentPage={currentPage}
         setFilter={setFilter}
+        caja={caja}
+        cajero={cajero}
       />
     </div>
   );

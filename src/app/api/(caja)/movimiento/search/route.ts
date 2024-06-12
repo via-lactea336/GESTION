@@ -4,6 +4,7 @@ import {
   generateApiErrorResponse,
   generateApiSuccessResponse,
 } from "@/lib/apiResponse";
+import { Prisma } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -11,7 +12,7 @@ export async function GET(request: NextRequest) {
   const fechaDesde = searchParams.get("fechaDesde");
   const fechaHasta = searchParams.get("fechaHasta");
 
-  const caja = searchParams.get("caja");
+  const caja = searchParams.get("cajaId");
   const esIngreso = searchParams.get("esIngreso");
 
   const incluirDocumentacion = searchParams.get("incluirDocumentacion");
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest) {
       )
     : undefined;
 
-  const where = {
+  const where: Prisma.MovimientoWhereInput = {
     createdAt: {
       gte: fechaDesde ? new Date(fechaDesde) : undefined,
       lte: fechaHastaDateTime ? fechaHastaDateTime : undefined,
@@ -71,28 +72,40 @@ export async function GET(request: NextRequest) {
         ? false
         : undefined
       : undefined,
-    OR:identificadorDocumento?[
-        {factura:{
-          numeroFactura:{contains:identificadorDocumento}
-        }},
-        {
-          comprobantes:{
-            some:{
-              numeroComprobante:Number(identificadorDocumento)
-            }
-          }
-        },
-        {
-          factura:{
-            recibos:{
-              some:{
-                numeroRecibo:Number(identificadorDocumento)
-              }
-            }
-          }
-        }
-      ]: undefined
   };
+
+  if (identificadorDocumento) {
+    const orConditions: Prisma.MovimientoWhereInput[] = [];
+
+    if (!isNaN(Number(identificadorDocumento))) {
+      orConditions.push({
+        comprobantes: {
+          some: {
+            numeroComprobante: Number(identificadorDocumento),
+          },
+        },
+      });
+      orConditions.push({
+        factura: {
+          recibos: {
+            some: {
+              numeroRecibo: Number(identificadorDocumento),
+            },
+          },
+        },
+      });
+    }
+
+    orConditions.push({
+      factura: {
+        numeroFactura: {
+          search: identificadorDocumento,
+        },
+      },
+    });
+
+    where.OR = orConditions;
+  }
 
   //Asignar los elementos encontrados a los valores
   const values = await prisma.movimiento.findMany({
@@ -118,7 +131,7 @@ export async function GET(request: NextRequest) {
             },
             factura: {
               include: {
-                recibos:true, 
+                recibos: true,
                 cliente: {
                   select: {
                     nombre: true,

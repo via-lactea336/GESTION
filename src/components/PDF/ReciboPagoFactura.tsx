@@ -74,10 +74,10 @@ const styles = StyleSheet.create({
 type TransferReceiptProps = {
   numeroRecibo: string;
   fechaEmision: Date;
-  cliente: Cliente;
+  cliente: { nombre: string; docIdentidad: string };
   numeroFactura: string;
   totalPagado: Decimal;
-  createdAt: Date;
+  createdAt?: Date;
 };
 
 const TransferReceipt: React.FC<TransferReceiptProps> = ({

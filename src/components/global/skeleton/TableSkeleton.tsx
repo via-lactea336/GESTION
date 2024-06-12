@@ -1,5 +1,5 @@
 export default function TableSkeleton() {
-  const skeletonRows = Array.from({ length: 7 }); // Create 5 skeleton rows
+  const skeletonRows = Array.from({ length: 6 }); // Create 6 skeleton rows
 
   return (
     <table className="hidden min-w-full bg-gray-900 rounded-md text-white md:table">

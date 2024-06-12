@@ -6,17 +6,28 @@ import {
   ArrowUpRightIcon,
   ArrowDownLeftIcon,
   EyeIcon,
+  ArrowDownIcon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import { Suspense, useEffect, useState } from "react";
 import { Modal } from "./Modal";
 import Pagination from "./Pagination";
 import TableSkeleton from "./skeleton/TableSkeleton";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { generatePDF } from "@/components/PDF/ComprobanteEgreso";
+import { CajaData, Cajero } from "@/lib/definitions";
+
+import TransferReceipt from "../PDF/ReciboPagoFactura";
+import { pdf } from "@react-pdf/renderer";
+import saveAs from "file-saver";
+import ModalDetalleMovimiento from "../cajaVentanasEmergentes/ModalDetalleMovimiento";
 
 interface Props extends ParamsReportes {
   currentPage: number;
   setFilter: (filter: ParamsReportes) => void;
   query: string;
+  cajero: Cajero | undefined;
+  caja: CajaData | undefined;
 }
 
 export default function Table({
@@ -28,13 +39,15 @@ export default function Table({
   incluirDocumentacion,
   identificadorDocumento,
   query,
+  caja,
+  cajero,
   setFilter,
 }: Props) {
   const [movimientos, setMovimientos] = useState<MovimientosFiltroData[]>();
   const [showModal, setShowModal] = useState(false);
   const [totalPaginas, setTotalPaginas] = useState(0);
   const [indiceActual, setIndiceActual] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const pathname = usePathname();
   const { replace } = useRouter();
   console.log("pathname", pathname);
@@ -92,13 +105,14 @@ export default function Table({
       upTo,
       incluirDocumentacion,
       identificadorDocumento: query,
-    }).then((res) => {
-      setMovimientos(res.data?.values);
-      if (res.data?.totalQuantity && upTo) {
-        setTotalPaginas(Math.ceil(res.data.totalQuantity / upTo));
-      }
-      setLoading(false);
-    });
+    })
+      .then((res) => {
+        setMovimientos(res.data?.values);
+        if (res.data?.totalQuantity && upTo) {
+          setTotalPaginas(Math.ceil(res.data.totalQuantity / upTo));
+        }
+      })
+      .finally(() => setLoading(false));
   }, [
     cajaId,
     fechaDesde,
@@ -156,10 +170,7 @@ export default function Table({
                       {mov.esIngreso ? (
                         <>
                           <ArrowDownLeftIcon className="text-green-500 w-6 h-6" />
-                          <span>
-                            Cobro de Factura{" "}
-                            {mov.factura.esContado ? "al Contado" : "a Crédito"}
-                          </span>
+                          <span>Cobro de Factura </span>
                         </>
                       ) : (
                         <>
@@ -170,7 +181,7 @@ export default function Table({
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {formatDate(mov.createdAt)} {formatTime(mov.createdAt)}
+                    {formatDate(mov.createdAt)}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     {formatTime(mov.createdAt)}
@@ -181,8 +192,8 @@ export default function Table({
                   <td className="whitespace-nowrap px-3 py-3">
                     {mov.esIngreso
                       ? mov?.factura?.esContado
-                        ? `Factura N° ${mov.factura.numeroFactura} pagada por Pedro Meza`
-                        : `Factura N° ${mov.factura.numeroFactura} pagada por Pedro Meza`
+                        ? `Factura N° ${mov.factura.numeroFactura} pagado al contado`
+                        : `Factura N° ${mov.factura.numeroFactura} pagado a crédito`
                       : mov?.comprobantes[0]?.concepto}
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6">
@@ -203,82 +214,22 @@ export default function Table({
         )}
       </div>
       {showModal && selectedMovimiento && (
-        <div className="absolute top-0 w-full">
-          <Modal
-            setShowModal={setShowModal}
-            className="flex flex-col items-center justify-center p-6 bg-gray-800 rounded-lg shadow-lg max-w-lg mx-auto"
-          >
-            <div className="flex flex-col justify-center items-center gap-4">
-              <span className="font-semibold text-xl text-white">
-                {selectedMovimiento.esIngreso
-                  ? `Cobro de Factura N° ${selectedMovimiento.factura.numeroFactura}`
-                  : `Extracción de Dinero por ${selectedMovimiento.comprobantes[0].user.nombre} ${selectedMovimiento.comprobantes[0].user.apellido}`}
-              </span>
-              <div className="flex flex-col justify-between items-center gap-2">
-                {selectedMovimiento.esIngreso && (
-                  <span className="text-center text-gray-100">
-                    Tipo de Venta:{" "}
-                    {selectedMovimiento.factura.esContado
-                      ? "Contado"
-                      : "Crédito"}
-                  </span>
-                )}
-                <span className="text-center text-gray-100">
-                  Cliente: {selectedMovimiento.factura.clienteId}
-                </span>
-                <span className="text-center text-gray-100">
-                  {selectedMovimiento.esIngreso
-                    ? `Monto Total de la Factura: ${Number(
-                        selectedMovimiento.factura.total
-                      ).toLocaleString("es-PY")} Gs.`
-                    : `N° de Comprobante: ${selectedMovimiento.comprobantes[0].id}`}
-                </span>
-                <span className="text-center text-gray-100">
-                  Monto de la Operación:{" "}
-                  {Number(selectedMovimiento.monto).toLocaleString("es-PY")} Gs.
-                </span>
-              </div>
-              <div className="flex justify-center items-center gap-4">
-                <span className="text-gray-100">
-                  Fecha: {formatDate(selectedMovimiento.createdAt)}
-                </span>
-                <span className="text-gray-100">
-                  Hora: {formatTime(selectedMovimiento.createdAt)}
-                </span>
-              </div>
-              <span className="text-center text-gray-100">
-                Concepto:{" "}
-                {selectedMovimiento.esIngreso
-                  ? selectedMovimiento?.factura?.concepto
-                  : selectedMovimiento?.comprobantes[0]?.concepto}
-              </span>
-              <div className="flex flex-col justify-center items-center gap-4">
-                <span className="text-center text-gray-100">Detalles:</span>
-                <div className="flex flex-col justify-between items-center gap-2">
-                  {selectedMovimiento.movimientoDetalles.map((detalle) => (
-                    <div
-                      key={detalle.id}
-                      className="flex justify-between items-center gap-4 bg-gray-100 p-2 rounded-md w-full"
-                    >
-                      <span className="font-medium text-gray-800">
-                        {Number(detalle.monto).toLocaleString("es-PY")} Gs.
-                      </span>
-                      <span className="text-gray-600">
-                        Pagado con {detalle.metodoPago.toLocaleLowerCase()}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </Modal>
-        </div>
+        <ModalDetalleMovimiento
+          caja={caja}
+          cajero={cajero}
+          selectedMovimiento={selectedMovimiento}
+          setLoading={setLoading}
+          setShowModal={setShowModal}
+        />
       )}
-      <Pagination
-        indiceActual={indiceActual}
-        indicesPagina={totalPaginas}
-        changeIndicePagina={changeIndicePagina}
-      />
+
+      {!showModal && (
+        <Pagination
+          indiceActual={indiceActual}
+          indicesPagina={totalPaginas}
+          changeIndicePagina={changeIndicePagina}
+        />
+      )}
     </div>
   );
 }
