@@ -4,9 +4,15 @@ type ModalProps = {
   children: React.ReactNode;
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   className?: string;
+  padding?: string;
 };
 
-export function Modal({ children, setShowModal, className }: ModalProps) {
+export function Modal({
+  children,
+  setShowModal,
+  className,
+  padding = "p-12",
+}: ModalProps) {
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setShowModal(false);
@@ -14,8 +20,10 @@ export function Modal({ children, setShowModal, className }: ModalProps) {
   return (
     <div
       className={
-        "w-1/2 z-50 relative mx-auto align-middle h-full p-12 bg-gray-700 rounded-md " +
-        className
+        "w-1/2 z-50 relative mx-auto align-middle h-full bg-gray-700 rounded-md " +
+        className +
+        " " +
+        padding
       }
     >
       <button

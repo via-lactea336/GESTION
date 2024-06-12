@@ -5,8 +5,8 @@ import Link from "next/link";
 import Table from "@/components/global/Table";
 import { useState } from "react";
 import Search from "@/components/global/Search";
-import Pagination from "@/components/global/Pagination";
 import { ParamsReportes } from "@/lib/moduloCaja/movimiento/obtenerMovimientosFiltro";
+import Filtros from "@/components/dashboard/caja/Filtros";
 
 type Props = {
   searchParams?: {
@@ -24,9 +24,10 @@ export default function Page({ params, searchParams }: Props) {
   const currentPage = Number(searchParams?.page) || 1;
   const query = searchParams?.query || "";
   const links = [
+    { href: `/dashboard/caja/${id}/ingreso`, text: "Ingreso" },
+    { href: `/dashboard/caja/${id}/egreso`, text: "Egreso" },
     { href: `/dashboard/caja/${id}/arqueo`, text: "Arqueo" },
     { href: `/dashboard/caja/reportes`, text: "Reportes" },
-    { href: `/dashboard/caja/${id}/egreso`, text: "Egreso" },
   ];
 
   const [filter, setFilter] = useState<ParamsReportes>({
@@ -36,6 +37,7 @@ export default function Page({ params, searchParams }: Props) {
     skip: 0,
     upTo: 8,
     incluirDocumentacion: true,
+    identificadorDocumento: query,
   });
 
   return (
@@ -61,10 +63,18 @@ export default function Page({ params, searchParams }: Props) {
           <h3>Caja N° {caja.numero}</h3>
         )}
       </Header>
-      <div className="flex justify-center items-center gap-8 mt-8">
+      <Filtros filter={filter} setFilter={setFilter} />
+      <div className="flex justify-center items-center gap-8 my-4">
         <Search placeholder="Buscar por N° de Factura o N° de Comprobante. Ej: 001-001-000123" />
       </div>
-      <Table {...filter} currentPage={currentPage} setFilter={setFilter} />
+      <Table
+        {...filter}
+        query={query}
+        currentPage={currentPage}
+        setFilter={setFilter}
+        caja={caja}
+        cajero={cajero}
+      />
     </div>
   );
 }

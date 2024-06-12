@@ -4,7 +4,7 @@ import { useState } from "react";
 
 type InputCalendarProps = {
   id: string;
-  withTime?:boolean;
+  withTime?: boolean;
   required?: boolean;
   className?: string;
   value?: string;
@@ -12,6 +12,7 @@ type InputCalendarProps = {
   setValue?: (value: string) => void;
   handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   limit?: Date;
+  min?: string;
 };
 
 export default function InputCalendar({
@@ -23,13 +24,13 @@ export default function InputCalendar({
   handleChange,
   placeholder,
   withTime,
-  limit
+  limit,
+  min,
 }: InputCalendarProps) {
   const { maxDate, maxDateTime } = useCalendar();
   const [error, setError] = useState<string>("");
- 
-  return withTime?
-  (
+
+  return withTime ? (
     <div>
       <input
         className={`${className} ${error && "border border-red-500"}`}
@@ -41,10 +42,8 @@ export default function InputCalendar({
         value={value}
         placeholder={placeholder}
         onChange={(e) => {
-          if(
-            e.target.value.length < 0 
-            || e.target.value.split("-").length < 3
-          ) return
+          if (e.target.value.length < 0 || e.target.value.split("-").length < 3)
+            return;
           if (new Date(e.currentTarget.value).toISOString() > maxDateTime) {
             setError(`Por favor, seleccione una fecha válida.`);
           } else {
@@ -60,9 +59,7 @@ export default function InputCalendar({
         </p>
       )}
     </div>
-  )
-  :
-  (
+  ) : (
     <div>
       <input
         className={`${className} ${error && "border border-red-500"}`}
@@ -71,12 +68,20 @@ export default function InputCalendar({
         type="date"
         required={required || false}
         max={maxDate}
+        min={min}
         value={value}
         placeholder={placeholder}
         onChange={(e) => {
-          if(limit && new Date(e.currentTarget.value).toISOString() > limit.toISOString()) {
-            setError(`Por favor, seleccione una fecha anterior a ${limit.toISOString().split("T")[0]}.`);
-            return
+          if (
+            limit &&
+            new Date(e.currentTarget.value).toISOString() > limit.toISOString()
+          ) {
+            setError(
+              `Por favor, seleccione una fecha anterior a ${
+                limit.toISOString().split("T")[0]
+              }.`
+            );
+            return;
           }
           if (e.currentTarget.value > maxDate) {
             setError(`Por favor, seleccione una fecha válida.`);

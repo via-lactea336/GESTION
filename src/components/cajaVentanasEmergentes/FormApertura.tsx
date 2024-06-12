@@ -10,14 +10,14 @@ import LoadingCirleIcon from "../global/LoadingCirleIcon";
 import Cookie from "js-cookie";
 import { AperturaCaja, Caja } from "@prisma/client";
 import { obtenerCookie } from "@/lib/obtenerCookie";
-const caja: Caja = obtenerCookie("caja");
-
 type Params = {
   caja: Caja;
   cajeroId: string;
   cajeroNombre: string;
 };
 
+
+const caja: Caja = obtenerCookie("caja");
 export default function FormApertura({ caja, cajeroId, cajeroNombre }: Params) {
   const initialData = {
     cajaId: caja.id,
@@ -68,6 +68,7 @@ export default function FormApertura({ caja, cajeroId, cajeroNombre }: Params) {
   return (
     <form className="flex flex-col w-full gap-4" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-2">
+    
         <p className="font-sans text-xl mb-4 text-white  text-center">
           Caja N° {caja.numero}
         </p>
@@ -75,16 +76,16 @@ export default function FormApertura({ caja, cajeroId, cajeroNombre }: Params) {
         <Input
           className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
           id="saldoInicial"
-          type="formattedNumber"
           placeholder="Ingrese el monto de apertura"
           value={dataApertura.saldoInicial}
+          type="formattedNumber"
           required
           onChange={(e) => {
             setDataApertura({
               ...dataApertura,
               saldoInicial: Number(e.target.value),
             });
-          }}
+          }}       
         />
       </div>
       <div className="flex flex-col gap-2">
@@ -92,7 +93,7 @@ export default function FormApertura({ caja, cajeroId, cajeroNombre }: Params) {
         <Input
           id="observaciones"
           type="text"
-          placeholder="Caja abierta luego de actualizar el sistema"
+          placeholder="Observaciones..."
           onChange={handleChange}
           className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [max-h-40] resize-none"
         />
