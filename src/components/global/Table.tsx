@@ -11,7 +11,7 @@ import { Suspense, useEffect, useState } from "react";
 import { Modal } from "./Modal";
 import Pagination from "./Pagination";
 import TableSkeleton from "./skeleton/TableSkeleton";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface Props extends ParamsReportes {
   currentPage: number;
@@ -36,6 +36,8 @@ export default function Table({
   const [indiceActual, setIndiceActual] = useState(0);
   const [loading, setLoading] = useState(false);
   const pathname = usePathname();
+  const { replace } = useRouter();
+  console.log("pathname", pathname);
   const searchParams = useSearchParams();
 
   const [selectedMovimiento, setSelectedMovimiento] =
@@ -59,7 +61,13 @@ export default function Table({
     }`;
     return formattedTime;
   };
+  const createPageURL = (page: string | number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", page.toString());
+    replace(`${pathname}?${params.toString()}`);
+  };
   const changeIndicePagina = (indice: number) => {
+    createPageURL(indice + 1);
     setIndiceActual(indice);
     if (upTo) {
       setFilter({
@@ -72,11 +80,6 @@ export default function Table({
         identificadorDocumento,
       });
     }
-  };
-  const createPageURL = (page: string | number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", page.toString());
-    return `${pathname}?${params.toString()}`;
   };
 
   useEffect(() => {
@@ -275,7 +278,6 @@ export default function Table({
         indiceActual={indiceActual}
         indicesPagina={totalPaginas}
         changeIndicePagina={changeIndicePagina}
-        changeUrl={createPageURL}
       />
     </div>
   );

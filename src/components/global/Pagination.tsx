@@ -10,12 +10,10 @@ type Prop = {
   changeIndicePagina: (indice: number) => void;
   indicesPagina: number;
   indiceActual: number;
-  changeUrl?: (url: string) => void;
 };
 
 export default function Pagination({
   changeIndicePagina,
-  changeUrl,
   indiceActual,
   indicesPagina,
 }: Prop) {
