@@ -98,7 +98,11 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const recibos = await prisma.recibos.findMany();
+  const recibos = await prisma.recibos.findMany({
+    orderBy:{
+      fechaEmision:"desc",
+    }
+  });
   return generateApiSuccessResponse(
     200,
     "Exito al obtener la lista de recibos",

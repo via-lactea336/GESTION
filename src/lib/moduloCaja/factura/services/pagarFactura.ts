@@ -7,8 +7,6 @@ const pagarFactura = async (facturaId:string, totalPagado:Decimal, totalFactura:
   
   const nuevoMonto = totalPagado.plus(monto)
   
-  if(nuevoMonto.greaterThan(totalFactura)) throw new ApiError("Lo pagado no puede superar el total de la factura", 400)
-
   const facturas = await prisma.factura.update({
       where:{
         id:facturaId
@@ -20,9 +18,6 @@ const pagarFactura = async (facturaId:string, totalPagado:Decimal, totalFactura:
         pagado: nuevoMonto.equals(totalFactura) ? new Date() : null,
       }
     })
-
-    if(!facturas) throw new ApiError("Error al pagar la factura", 500)
-    if(facturas.totalSaldoPagado.greaterThan(facturas.total)) throw new ApiError("Lo pagado no puede superar el total de la factura", 400)
     
     return facturas
 }
