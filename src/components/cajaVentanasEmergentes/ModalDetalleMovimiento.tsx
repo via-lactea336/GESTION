@@ -1,4 +1,7 @@
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowDownTrayIcon,
+  ChevronDownIcon,
+} from "@heroicons/react/24/outline";
 import { pdf } from "@react-pdf/renderer";
 import saveAs from "file-saver";
 import { generatePDF } from "../PDF/ComprobanteEgreso";
@@ -158,9 +161,9 @@ export default function ModalDetalleMovimiento({
 
                     generatePDF();
                   }}
-                  className=" bg-[#6f42c1] flex text-sm font-medium w-full gap-1 justify-center items-center p-2 rounded-md hover:bg-[#8753e7]"
+                  className=" bg-[#6f42c1] flex text-base font-medium w-full gap-1 justify-center items-center p-2 rounded-md hover:bg-[#8753e7]"
                 >
-                  <ChevronDownIcon className="w-4 h-4" />
+                  <ArrowDownTrayIcon className="w-5 h-5 text-white " />
                   Recibo
                 </button>
               )}
@@ -177,9 +180,9 @@ export default function ModalDetalleMovimiento({
                     observaciones: selectedMovimiento.comprobantes[0].concepto,
                   });
                 }}
-                className=" bg-[#6f42c1] flex text-sm font-medium w-full gap-1 justify-center items-center p-2 rounded-md hover:bg-[#8753e7]"
+                className=" bg-[#6f42c1] flex text-base font-medium w-full gap-1 justify-center items-center p-2 rounded-md hover:bg-[#8753e7]"
               >
-                <ChevronDownIcon className="w-4 h-4" />
+                <ArrowDownTrayIcon className="w-5 h-5" />
                 Comprobante
               </button>
             )}
