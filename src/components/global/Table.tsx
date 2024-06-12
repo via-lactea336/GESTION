@@ -12,9 +12,12 @@ import {
 import { Comprobante } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { Modal } from "./Modal";
+import Pagination from "./Pagination";
+import { usePathname, useSearchParams } from "next/navigation";
 
 interface Props extends ParamsReportes {
-  esIngreso: boolean;
+  currentPage: number;
+  setFilter: (filter: ParamsReportes) => void;
 }
 
 export default function Table({
@@ -23,11 +26,16 @@ export default function Table({
   fechaHasta,
   skip,
   upTo,
-  esIngreso,
   incluirDocumentacion,
+  currentPage,
+  setFilter,
 }: Props) {
   const [movimientos, setMovimientos] = useState<MovimientosFiltroData[]>();
   const [showModal, setShowModal] = useState(false);
+  const [totalPaginas, setTotalPaginas] = useState(0);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const [indice, setIndiceActual] = useState(currentPage - 1);
   const [selectedMovimiento, setSelectedMovimiento] =
     useState<MovimientosFiltroData>();
   const formatDate = (dateString: Date) => {
@@ -50,6 +58,27 @@ export default function Table({
     return formattedTime;
   };
 
+  const createPageURL = (page: string | number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", page.toString());
+    return `${pathname}?${params.toString()}`;
+  };
+  const changeIndicePagina = () => {
+    setIndiceActual(indice);
+    createPageURL(indice + 1);
+    console.log("indice actual", currentPage);
+    if (upTo) {
+      setFilter({
+        cajaId,
+        fechaDesde,
+        fechaHasta,
+        skip: (currentPage - 1) * upTo,
+        upTo,
+        incluirDocumentacion,
+      });
+    }
+  };
+
   useEffect(() => {
     obtenerMovimientosFiltro({
       cajaId,
@@ -60,6 +89,9 @@ export default function Table({
       incluirDocumentacion,
     }).then((res) => {
       setMovimientos(res.data?.values);
+      if (res.data?.totalQuantity && upTo) {
+        setTotalPaginas(Math.ceil(res.data.totalQuantity / upTo));
+      }
     });
   }, [cajaId, fechaDesde, fechaHasta, skip, upTo, incluirDocumentacion]);
 
@@ -79,7 +111,10 @@ export default function Table({
                 Operación
               </th>
               <th scope="col" className="px-3 py-5 font-medium">
-                Fecha y Hora
+                Fecha
+              </th>
+              <th scope="col" className="px-3 py-5 font-medium">
+                Hora
               </th>
               <th scope="col" className="px-3 py-5 font-medium">
                 Monto
@@ -103,7 +138,10 @@ export default function Table({
                     {mov.esIngreso ? (
                       <>
                         <ArrowDownLeftIcon className="text-green-500 w-6 h-6" />
-                        <span>Cobro de Factura</span>
+                        <span>
+                          Cobro de Factura{" "}
+                          {mov.factura.esContado ? "al Contado" : "a Crédito"}
+                        </span>
                       </>
                     ) : (
                       <>
@@ -117,11 +155,16 @@ export default function Table({
                   {formatDate(mov.createdAt)} {formatTime(mov.createdAt)}
                 </td>
                 <td className="whitespace-nowrap px-3 py-3">
+                  {formatTime(mov.createdAt)}
+                </td>
+                <td className="whitespace-nowrap px-3 py-3">
                   {Number(mov.monto).toLocaleString("es-PY")}
                 </td>
                 <td className="whitespace-nowrap px-3 py-3">
                   {mov.esIngreso
-                    ? mov?.factura?.concepto
+                    ? mov?.factura?.esContado
+                      ? `Factura N° ${mov.factura.numeroFactura} pagada por Pedro Meza`
+                      : `Factura N° ${mov.factura.numeroFactura} pagada por Pedro Meza`
                     : mov?.comprobantes[0]?.concepto}
                 </td>
                 <td className="whitespace-nowrap py-3 pl-6">
@@ -144,52 +187,79 @@ export default function Table({
         <div className="absolute top-0 w-full">
           <Modal
             setShowModal={setShowModal}
-            className="flex-col items-center justify-center"
+            className="flex flex-col items-center justify-center p-6 bg-gray-800 rounded-lg shadow-lg max-w-lg mx-auto"
           >
             <div className="flex flex-col justify-center items-center gap-4">
-              <span className="font-semibold text-lg">
+              <span className="font-semibold text-xl text-white">
                 {selectedMovimiento.esIngreso
                   ? `Cobro de Factura N° ${selectedMovimiento.factura.numeroFactura}`
                   : `Extracción de Dinero por ${selectedMovimiento.comprobantes[0].user.nombre} ${selectedMovimiento.comprobantes[0].user.apellido}`}
               </span>
-              <div className="flex flex-col justify-between items-center gap-4">
+              <div className="flex flex-col justify-between items-center gap-2">
                 {selectedMovimiento.esIngreso && (
-                  <span className="text-center">
+                  <span className="text-center text-gray-100">
                     Tipo de Venta:{" "}
                     {selectedMovimiento.factura.esContado
                       ? "Contado"
                       : "Crédito"}
                   </span>
                 )}
-                <span className="text-center">
-                  {selectedMovimiento.esIngreso
-                    ? "Monto Total de la Factura: " +
-                      Number(selectedMovimiento.factura.total).toLocaleString(
-                        "es-PY"
-                      ) +
-                      " Gs."
-                    : "N° de Comprobante: " +
-                      selectedMovimiento.comprobantes[0].id}
+                <span className="text-center text-gray-100">
+                  Cliente: {selectedMovimiento.factura.clienteId}
                 </span>
-                <span className="text-center">
+                <span className="text-center text-gray-100">
+                  {selectedMovimiento.esIngreso
+                    ? `Monto Total de la Factura: ${Number(
+                        selectedMovimiento.factura.total
+                      ).toLocaleString("es-PY")} Gs.`
+                    : `N° de Comprobante: ${selectedMovimiento.comprobantes[0].id}`}
+                </span>
+                <span className="text-center text-gray-100">
                   Monto de la Operación:{" "}
                   {Number(selectedMovimiento.monto).toLocaleString("es-PY")} Gs.
                 </span>
               </div>
               <div className="flex justify-center items-center gap-4">
-                <span>Fecha: {formatDate(selectedMovimiento.createdAt)}</span>
-                <span>Hora: {formatTime(selectedMovimiento.createdAt)}</span>
+                <span className="text-gray-100">
+                  Fecha: {formatDate(selectedMovimiento.createdAt)}
+                </span>
+                <span className="text-gray-100">
+                  Hora: {formatTime(selectedMovimiento.createdAt)}
+                </span>
               </div>
-              <span className="text-center">
+              <span className="text-center text-gray-100">
                 Concepto:{" "}
                 {selectedMovimiento.esIngreso
                   ? selectedMovimiento?.factura?.concepto
                   : selectedMovimiento?.comprobantes[0]?.concepto}
               </span>
+              <div className="flex flex-col justify-center items-center gap-4">
+                <span className="text-center text-gray-100">Detalles:</span>
+                <div className="flex flex-col justify-between items-center gap-2">
+                  {selectedMovimiento.movimientoDetalles.map((detalle) => (
+                    <div
+                      key={detalle.id}
+                      className="flex justify-between items-center gap-4 bg-gray-100 p-2 rounded-md w-full"
+                    >
+                      <span className="font-medium text-gray-800">
+                        {Number(detalle.monto).toLocaleString("es-PY")} Gs.
+                      </span>
+                      <span className="text-gray-600">
+                        Pagado con {detalle.metodoPago.toLocaleLowerCase()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </Modal>
         </div>
       )}
+      <Pagination
+        indiceActual={indice}
+        indicesPagina={totalPaginas}
+        changeIndicePagina={changeIndicePagina}
+      />
     </div>
   );
 }
