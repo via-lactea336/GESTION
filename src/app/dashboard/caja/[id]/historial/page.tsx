@@ -5,7 +5,10 @@ import Link from "next/link";
 import Table from "@/components/global/Table";
 import { useEffect, useState } from "react";
 import Search from "@/components/global/Search";
-import { ParamsReportes } from "@/lib/moduloCaja/movimiento/obtenerMovimientosFiltro";
+import {
+  MovimientosFiltroData,
+  ParamsReportes,
+} from "@/lib/moduloCaja/movimiento/obtenerMovimientosFiltro";
 import Filtros from "@/components/dashboard/caja/Filtros";
 import { CajeroWithRole } from "@/components/dashboard/caja/HistorialData";
 
@@ -23,6 +26,8 @@ export default function Page({ params, searchParams }: Props) {
   const { id } = params;
   const { cajero, caja, loading } = useCookies();
   const currentPage = Number(searchParams?.page) || 1;
+  const [selectedMovimiento, setSelectedMovimiento] =
+    useState<MovimientosFiltroData>();
   const query = searchParams?.query || "";
   const links = [
     { href: `/dashboard/caja/${id}/ingreso`, text: "Ingreso" },
@@ -89,6 +94,9 @@ export default function Page({ params, searchParams }: Props) {
         cajero={cajero}
         setShowModal={setShowModal}
         showModal={showModal}
+        initialMovimientoId=""
+        selectedMovimiento={selectedMovimiento}
+        setSelectedMovimiento={setSelectedMovimiento}
       />
     </div>
   );
