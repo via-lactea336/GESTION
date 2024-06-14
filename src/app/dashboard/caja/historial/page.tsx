@@ -25,14 +25,13 @@ export default function Page({ params, searchParams }: Props) {
   const currentPage = Number(searchParams?.page) || 1;
   const query = searchParams?.query || "";
   const links = [
-    { href: `/dashboard/caja/${id}/ingreso`, text: "Ingreso" },
-    { href: `/dashboard/caja/${id}/egreso`, text: "Egreso" },
-    { href: `/dashboard/caja/${id}/arqueo`, text: "Arqueo" },
+    { href: `/dashboard/caja/inicio`, text: "Inicio" },
+    { href: `/dashboard/caja/resumen`, text: "Resumen" },
     { href: `/dashboard/caja/reportes`, text: "Reportes" },
   ];
 
   const [filter, setFilter] = useState<ParamsReportes>({
-    cajaId: "",
+    cajaId: id,
     fechaDesde: "",
     fechaHasta: "",
     skip: (currentPage - 1) * 8,
@@ -61,17 +60,8 @@ export default function Page({ params, searchParams }: Props) {
             {link.text}
           </Link>
         ))}
-        {!cajero ? (
-          <div className="animate-pulse bg-gray-300 py-2 px-10 rounded-md mx-2" />
-        ) : (
-          <h3 className="ml-8">{cajero.nombre}</h3>
-        )}
-        {!caja ? (
-          <div className="animate-pulse bg-gray-300 py-2 px-10 rounded-md mx-2" />
-        ) : (
-          <h3>Caja N° {caja.numero}</h3>
-        )}
       </Header>
+      <Filtros showModal={showModal} filter={filter} setFilter={setFilter} />
       <div
         className={
           "flex justify-center items-center gap-8 my-4" +
@@ -89,6 +79,7 @@ export default function Page({ params, searchParams }: Props) {
         cajero={cajero}
         setShowModal={setShowModal}
         showModal={showModal}
+        isAdmin={true}
       />
     </div>
   );

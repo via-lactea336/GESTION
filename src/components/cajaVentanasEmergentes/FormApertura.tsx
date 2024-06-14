@@ -16,7 +16,6 @@ type Params = {
   cajeroNombre: string;
 };
 
-
 const caja: Caja = obtenerCookie("caja");
 export default function FormApertura({ caja, cajeroId, cajeroNombre }: Params) {
   const initialData = {
@@ -68,7 +67,6 @@ export default function FormApertura({ caja, cajeroId, cajeroNombre }: Params) {
   return (
     <form className="flex flex-col w-full gap-4" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-2">
-    
         <p className="font-sans text-xl mb-4 text-white  text-center">
           Caja N° {caja.numero}
         </p>
@@ -85,7 +83,7 @@ export default function FormApertura({ caja, cajeroId, cajeroNombre }: Params) {
               ...dataApertura,
               saldoInicial: Number(e.target.value),
             });
-          }}       
+          }}
         />
       </div>
       <div className="flex flex-col gap-2">

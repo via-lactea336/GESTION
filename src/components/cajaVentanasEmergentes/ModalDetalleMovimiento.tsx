@@ -27,7 +27,7 @@ export default function ModalDetalleMovimiento({
   cajero,
 }: Props) {
   return (
-    <div className="absolute top-0 w-full">
+    <div className="absolute top-1/4 w-full">
       <Modal
         setShowModal={setShowModal}
         className="flex flex-col justify-center bg-gray-950 border-white border rounded-lg shadow-lg max-w-lg mx-auto"
@@ -61,9 +61,7 @@ export default function ModalDetalleMovimiento({
                   <span className="font-medium text-gray-400">
                     N° de recibo:
                   </span>
-                  <span>
-                    {selectedMovimiento.recibo.numeroRecibo}
-                  </span>
+                  <span>{selectedMovimiento.recibo.numeroRecibo}</span>
                 </div>
               )}
             {selectedMovimiento.esIngreso ? (
@@ -83,9 +81,7 @@ export default function ModalDetalleMovimiento({
                 <span className="font-medium text-gray-400">
                   N° de Comprobante:
                 </span>
-                <span>
-                  {selectedMovimiento.comprobante.numeroComprobante}
-                </span>
+                <span>{selectedMovimiento.comprobante.numeroComprobante}</span>
               </div>
             )}
             <div className="flex justify-between w-full text-gray-100">

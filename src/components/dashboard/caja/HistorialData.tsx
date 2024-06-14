@@ -1,29 +1,37 @@
 "use client";
-import Header from "@/components/global/Header";
-import useCookies from "@/lib/hooks/useCookies";
-import Link from "next/link";
-import Table from "@/components/global/Table";
-import { useEffect, useState } from "react";
+
 import Search from "@/components/global/Search";
+import Table from "@/components/global/Table";
+import Header from "@/components/global/Header";
+import Link from "next/link";
+import Filtros from "./Filtros";
+import useCookies from "@/lib/hooks/useCookies";
 import { ParamsReportes } from "@/lib/moduloCaja/movimiento/obtenerMovimientosFiltro";
-import Filtros from "@/components/dashboard/caja/Filtros";
-import { CajeroWithRole } from "@/components/dashboard/caja/HistorialData";
+import { useState } from "react";
+import { CajaData, Cajero } from "@/lib/definitions";
+import { User } from "@prisma/client";
+
+export interface CajeroWithRole extends Cajero {
+  isAdmin: boolean;
+}
 
 type Props = {
-  searchParams?: {
-    query?: string;
-    page?: string;
-  };
-  params: {
-    id: string;
-  };
+  id: string;
+  currentPage: number;
+  query: string;
+  caja: CajaData;
+  cajero: CajeroWithRole;
+  loading: boolean;
 };
 
-export default function Page({ params, searchParams }: Props) {
-  const { id } = params;
-  const { cajero, caja, loading } = useCookies();
-  const currentPage = Number(searchParams?.page) || 1;
-  const query = searchParams?.query || "";
+export default function HistorialData({
+  query,
+  currentPage,
+  id,
+  caja,
+  cajero,
+  loading,
+}: Props) {
   const links = [
     { href: `/dashboard/caja/${id}/ingreso`, text: "Ingreso" },
     { href: `/dashboard/caja/${id}/egreso`, text: "Egreso" },
@@ -32,7 +40,7 @@ export default function Page({ params, searchParams }: Props) {
   ];
 
   const [filter, setFilter] = useState<ParamsReportes>({
-    cajaId: "",
+    cajaId: cajero.isAdmin ? "" : caja.id,
     fechaDesde: "",
     fechaHasta: "",
     skip: (currentPage - 1) * 8,
@@ -41,7 +49,6 @@ export default function Page({ params, searchParams }: Props) {
     identificadorDocumento: query,
   });
   const [showModal, setShowModal] = useState(false);
-
   return (
     <div className="relative">
       <Header
@@ -72,6 +79,12 @@ export default function Page({ params, searchParams }: Props) {
           <h3>Caja N° {caja.numero}</h3>
         )}
       </Header>
+      <Filtros
+        loading={loading}
+        showModal={showModal}
+        filter={filter}
+        setFilter={setFilter}
+      />
       <div
         className={
           "flex justify-center items-center gap-8 my-4" +

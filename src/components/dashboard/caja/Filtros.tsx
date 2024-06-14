@@ -8,9 +8,16 @@ import React, { useEffect, useState } from "react";
 type Props = {
   filter: ParamsReportes;
   setFilter: React.Dispatch<React.SetStateAction<ParamsReportes>>;
+  showModal?: boolean;
+  loading?: boolean;
 };
 
-export default function Filtros({ filter, setFilter }: Props) {
+export default function Filtros({
+  filter,
+  setFilter,
+  showModal,
+  loading,
+}: Props) {
   const [cajas, setCajas] = useState<Caja[]>([]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,15 +46,20 @@ export default function Filtros({ filter, setFilter }: Props) {
   }, []);
 
   return (
-    <div className="flex w-full gap-8 items-center bg-gray-800 p-4 mt-4 rounded-md">
+    <div
+      className={
+        "flex w-full gap-8 items-center bg-gray-800 p-4 mt-4 rounded-md" +
+        (showModal ? " blur-sm brightness-50" : "")
+      }
+    >
       <div className="flex gap-2 items-center">
         <select
           name="cajaId"
-          value={filter.cajaId || ""}
+          value={loading ? "cargando..." : filter.cajaId}
           onChange={onChangeSelect}
           className="bg-gray-900 text-white py-1 px-2 rounded-md "
         >
-          <option value={""}>Seleccione una caja</option>
+          <option value={""}>Todas las cajas</option>
           {cajas.map((caja) => (
             <option
               key={caja.id}

@@ -6,20 +6,12 @@ import {
   ArrowUpRightIcon,
   ArrowDownLeftIcon,
   EyeIcon,
-  ArrowDownIcon,
-  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
-import { Suspense, useEffect, useState } from "react";
-import { Modal } from "./Modal";
+import React, { useEffect, useState } from "react";
 import Pagination from "./Pagination";
 import TableSkeleton from "./skeleton/TableSkeleton";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { generatePDF } from "@/components/PDF/ComprobanteEgreso";
 import { CajaData, Cajero } from "@/lib/definitions";
-
-import TransferReceipt from "../PDF/ReciboPagoFactura";
-import { pdf } from "@react-pdf/renderer";
-import saveAs from "file-saver";
 import ModalDetalleMovimiento from "../cajaVentanasEmergentes/ModalDetalleMovimiento";
 
 interface Props extends ParamsReportes {
@@ -28,6 +20,9 @@ interface Props extends ParamsReportes {
   query: string;
   cajero: Cajero | undefined;
   caja: CajaData | undefined;
+  showModal: boolean;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  isAdmin?: boolean;
 }
 
 export default function Table({
@@ -42,15 +37,17 @@ export default function Table({
   caja,
   cajero,
   setFilter,
+  showModal,
+  setShowModal,
+  currentPage,
+  isAdmin,
 }: Props) {
   const [movimientos, setMovimientos] = useState<MovimientosFiltroData[]>();
-  const [showModal, setShowModal] = useState(false);
   const [totalPaginas, setTotalPaginas] = useState(0);
-  const [indiceActual, setIndiceActual] = useState(0);
+  const [indiceActual, setIndiceActual] = useState(currentPage - 1);
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
   const { replace } = useRouter();
-  console.log("pathname", pathname);
   const searchParams = useSearchParams();
 
   const [selectedMovimiento, setSelectedMovimiento] =
@@ -77,10 +74,11 @@ export default function Table({
   const createPageURL = (page: string | number) => {
     const params = new URLSearchParams(searchParams);
     params.set("page", page.toString());
-    replace(`${pathname}?${params.toString()}`);
+    // replace(`${pathname}?${params.toString()}`);
+    return `${pathname}?${params.toString()}`;
   };
   const changeIndicePagina = (indice: number) => {
-    createPageURL(indice + 1);
+    // createPageURL(indice + 1);
     setIndiceActual(indice);
     if (upTo) {
       setFilter({
@@ -125,7 +123,7 @@ export default function Table({
   ]);
 
   return (
-    <div className=" flow-root relative">
+    <div className="flow-root">
       <div
         className={
           showModal
@@ -135,9 +133,11 @@ export default function Table({
       >
         {loading ? (
           <TableSkeleton />
-        ) : movimientos?.length === 0 ? (
+        ) : movimientos && movimientos.length === 0 ? (
           <h3 className="text-center w-full text-primary-300 text-xl">
-            Sin resultados. ¿Te gustaría intentar con otros filtros?
+            {isAdmin
+              ? "Sin resultados. ¿Te gustaría intentar con otros filtros?"
+              : "No se encontraron movimientos en esta caja"}
           </h3>
         ) : (
           <table className="hidden min-w-full bg-gray-900 rounded-md text-white md:table">
@@ -232,6 +232,7 @@ export default function Table({
           indiceActual={indiceActual}
           indicesPagina={totalPaginas}
           changeIndicePagina={changeIndicePagina}
+          createPageURL={createPageURL}
         />
       )}
     </div>
