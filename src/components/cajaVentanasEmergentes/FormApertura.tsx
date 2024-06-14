@@ -1,23 +1,22 @@
 "use client";
 import Input from "@/components/global/Input";
 import crearApertura from "@/lib/moduloCaja/aperturaCaja/crearApertura";
-import { AperturaCajaData, CajaData } from "@/lib/definitions";
+import { AperturaCajaData } from "@/lib/definitions";
 import verificarApiResponse from "@/lib/verificarApiResponse";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Toaster, toast } from "sonner";
 import LoadingCirleIcon from "../global/LoadingCirleIcon";
 import Cookie from "js-cookie";
-import { AperturaCaja, ArqueoDeCaja, Caja } from "@prisma/client";
+import { AperturaCaja, Caja } from "@prisma/client";
 import { obtenerCookie } from "@/lib/obtenerCookie";
-const caja: Caja = obtenerCookie("caja");
-
 type Params = {
   caja: Caja;
   cajeroId: string;
   cajeroNombre: string;
 };
 
+const caja: Caja = obtenerCookie("caja");
 export default function FormApertura({ caja, cajeroId, cajeroNombre }: Params) {
   const initialData = {
     cajaId: caja.id,
@@ -75,9 +74,9 @@ export default function FormApertura({ caja, cajeroId, cajeroNombre }: Params) {
         <Input
           className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
           id="saldoInicial"
-          type="formattedNumber"
           placeholder="Ingrese el monto de apertura"
           value={dataApertura.saldoInicial}
+          type="formattedNumber"
           required
           onChange={(e) => {
             setDataApertura({
@@ -92,7 +91,7 @@ export default function FormApertura({ caja, cajeroId, cajeroNombre }: Params) {
         <Input
           id="observaciones"
           type="text"
-          placeholder="Caja abierta luego de actualizar el sistema"
+          placeholder="Observaciones..."
           onChange={handleChange}
           className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [max-h-40] resize-none"
         />

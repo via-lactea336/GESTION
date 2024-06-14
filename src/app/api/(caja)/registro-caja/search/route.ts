@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
           movimiento: {
             include:{
               factura: true,
-              comprobantes:{
+              comprobante:{
                 include:{
                   user:{
                     select:{

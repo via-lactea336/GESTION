@@ -17,7 +17,7 @@ export default function LoginForm() {
     const password = target.password.value;
     const error = await login({ username, password });
     if (!error) {
-      router.push("/dashboard/account");
+      router.push("/dashboard/caja/panelDeAdministracion");
     } else {
       throw new Error(error);
     }

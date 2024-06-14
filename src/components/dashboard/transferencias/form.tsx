@@ -299,7 +299,7 @@ export default function FormTransferencias() {
             onChange={handleOnChange}
             required
             type="text"
-            placeholder="22-187805"
+            placeholder="Cuenta del involucrado"
           />
         </div>
       }
@@ -318,7 +318,7 @@ export default function FormTransferencias() {
             onChange={handleOnChange}
             type="text"
             required
-            placeholder="Pedro Meza"
+            placeholder="Ingrese el nombre"
           />
         </div>
         <div className="flex flex-col ">
@@ -329,7 +329,7 @@ export default function FormTransferencias() {
             onChange={handleOnChange}
             type="text"
             required
-            placeholder="123456-1"
+            placeholder="Ingrese el RUC"
           />
         </div>
         <div className="flex flex-col ">
@@ -341,9 +341,10 @@ export default function FormTransferencias() {
             className={'block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none'}
             id="montoParcial"
             onChange={(e) => setMontoParcial(Number(e.target.value))} 
-            type="number"
+            value={montoParcial}
+            type="formattedNumber"
             required
-            placeholder="150000"
+            placeholder="Ingrese el monto"
           />
         </div>
         <div className="flex flex-col ">
@@ -354,7 +355,7 @@ export default function FormTransferencias() {
             type="text"
             onChange={handleOnChange}
             required
-            placeholder="012345"
+            placeholder="Ingrese el numero de comprobante"
           />
         </div>
 
@@ -377,7 +378,7 @@ export default function FormTransferencias() {
             type="text"
             onChange={handleOnChange}
             required
-            placeholder="Pago de servicios básicos"
+            placeholder="Ingrese el concepto"
           />
         </div>
 

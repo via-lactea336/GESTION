@@ -23,7 +23,8 @@
     "react": "^18",
     "react-dom": "^18",
     "react-to-print": "^2.15.1",
-    "sonner": "^1.4.41"
+    "sonner": "^1.4.41",
+    "use-debounce": "^10.0.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

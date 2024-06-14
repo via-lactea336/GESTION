@@ -100,7 +100,7 @@ function TransferReceipt({
         <View style={[styles.container, styles.section]}>
           <View style={styles.view}>
             <Text style={styles.subtitle}>Monto:</Text>
-            <Text style={styles.text}>{monto}</Text>
+            <Text style={styles.text}>{Number(monto).toLocaleString('es-ES')}</Text>
           </View>
           <View style={styles.view}>
             <Text style={styles.subtitle}>Comprobante:</Text>

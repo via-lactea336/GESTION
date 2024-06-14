@@ -8,6 +8,7 @@ export default function useCookies() {
   const [caja, setCaja] = useState<CajaData>();
   const [apertura, setApertura] = useState<AperturaCaja>();
   const [user, setUser] = useState<User>();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const cajero = obtenerCookie("cajero");
@@ -26,7 +27,8 @@ export default function useCookies() {
     if (usuario) {
       setUser(usuario);
     }
+    setLoading(false);
   }, []);
 
-  return { cajero, caja, apertura, user };
+  return { cajero, caja, apertura, user, loading };
 }
