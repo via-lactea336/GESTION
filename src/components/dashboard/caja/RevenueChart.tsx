@@ -30,14 +30,18 @@ export default async function RevenueChart() {
             {revenue?.map((month) => (
               <div
                 key={month.month}
-                className="flex flex-col items-center gap-2"
+                className="flex flex-col items-center gap-2 relative group"
               >
                 <div
-                  className="w-full rounded-md bg-[#542e9b]"
+                  className="w-full rounded-md bg-[#542e9b] hover:bg-[#6d48b6] transition-colors duration-300 ease-in-out"
                   style={{
                     height: `${(chartHeight / topLabel) * month.revenue}px`,
                   }}
-                />
+                >
+                  <div className="absolute z-50 left-1/2 transform -translate-x-1/2 -translate-y-full px-2 py-1 text-xs text-white bg-gray-700 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                    ₲{month.revenue.toLocaleString("es-PY")}
+                  </div>
+                </div>
                 <p className="-rotate-90 text-sm text-gray-400 sm:rotate-0">
                   {month.month}
                 </p>
