@@ -25,8 +25,11 @@ export default function Page({ params, searchParams }: Props) {
   const currentPage = Number(searchParams?.page) || 1;
   const query = searchParams?.query || "";
   const links = [
-    { href: `/dashboard/caja/inicio`, text: "Inicio" },
-    { href: `/dashboard/caja/resumen`, text: "Resumen" },
+    { href: `/dashboard/caja`, text: "Cajas" },
+    {
+      href: `/dashboard/caja/panelDeAdministracion`,
+      text: "Panel de Administración",
+    },
     { href: `/dashboard/caja/reportes`, text: "Reportes" },
   ];
 

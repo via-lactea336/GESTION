@@ -85,24 +85,35 @@ export type UserWithName = {
 };
 
 export type DatosExtendidosRegistroCaja = RegistroCaja & {
-  apertura:{
-    movimiento: Movimiento[]
-    observaciones: string|null
-    arqueo:{
-      observaciones: string|null
-    }
-  }
-}
+  apertura: {
+    movimiento: Movimiento[];
+    observaciones: string | null;
+    arqueo: {
+      observaciones: string | null;
+    };
+  };
+};
 
 export type RegistroDiarioFullData = RegistroCaja & {
   apertura: AperturaCaja & {
     arqueo: ArqueoDeCaja;
-    movimiento: (Movimiento &
-      {
-        factura:Factura|null
-        comprobantes: Comprobante & {user: {nombre: string, apellido: string, docIdentidad: string}}[];
-        movimientoDetalles: MovimientoDetalle[];
-      }
-    )[];
+    movimiento: (Movimiento & {
+      factura: Factura | null;
+      comprobantes: Comprobante &
+        { user: { nombre: string; apellido: string; docIdentidad: string } }[];
+      movimientoDetalles: MovimientoDetalle[];
+    })[];
   };
-};  
+};
+
+export type Revenue = {
+  month: string;
+  revenue: number;
+};
+
+export type LatestInvoice = {
+  id: string;
+  name: string;
+  ruc: string;
+  amount: number;
+};
