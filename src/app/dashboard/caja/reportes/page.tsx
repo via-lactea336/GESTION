@@ -1,11 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-
 import Header from '@/components/global/Header'
 import InputCalendar from '@/components/global/InputCalendar';
 import LoadingPage from '@/components/global/LoadingPage';
-import { EyeIcon } from '@heroicons/react/24/outline';
-
+import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { fetchPlus } from "@/lib/verificarApiResponse";
 import { Caja } from "@prisma/client";
 import React, { useEffect } from "react";
@@ -153,7 +151,7 @@ export default function Reportes() {
                 <td className='border-b border-gray-300 px-4 py-2'>{Number(registro.registro.montoEgresoTotal)}</td>
                 <td className='border-b border-gray-300 px-4 py-2'>
                   <button onClick={() => redirecting(registro.id)}>
-                  {<EyeIcon className='w-6 h-6 ml-auto mr-auto'/>}
+                  {<ArrowTopRightOnSquareIcon className='w-6 h-6 ml-auto mt-2 mr-auto'/>}
                   </button>
                 </td>
               </tr>
