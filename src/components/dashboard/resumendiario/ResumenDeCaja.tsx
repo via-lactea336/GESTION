@@ -54,13 +54,13 @@ const ResumenDeCaja: React.FC<DatosExtendidosRegistroCaja> = ({
       <table className="border-collapse bg-gray-700 table-fixed mx-auto w-full">
         <tbody>
           <tr className="bg-gray-900 py-1 px-2 border-b-2 border-gray-700">
-            <td className="p-2 text-primary-300">Caja Inicial</td>
+            <td className="p-2 text-primary-300">Apertura de Caja</td>
             <td className="p-2">
               {Number(montoInicial).toLocaleString()} Gs.
             </td>
           </tr>
           <tr className="bg-gray-900 py-1 px-2 border-b-2 border-gray-700">
-            <td className="p-2 text-primary-300">Efectivo Tras Operaciones</td>
+            <td className="p-2 text-primary-300">Monto Esperado en Caja</td>
             <td className="p-2">
               {Number(montoEsperado).toLocaleString()} Gs.
             </td>
