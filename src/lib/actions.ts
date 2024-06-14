@@ -132,6 +132,7 @@ export async function fetchLatestInvoices(): Promise<LatestInvoice[]> {
       total: true,
       totalSaldoPagado: true,
       numeroFactura: true,
+      movimientos: true,
     },
   });
   const latestInvoices = latestInvoicesData.map((invoice) => ({
@@ -140,6 +141,7 @@ export async function fetchLatestInvoices(): Promise<LatestInvoice[]> {
     ruc: invoice.cliente.docIdentidad,
     amount: invoice.total.toNumber(),
     invoiceNumber: invoice.numeroFactura,
+    movId: invoice.movimientos?.at(-1)?.id,
     paymentStatus:
       +invoice.totalSaldoPagado === +invoice.total ? "pagado" : "pendiente",
   }));

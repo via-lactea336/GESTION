@@ -22,7 +22,12 @@ interface Props extends ParamsReportes {
   caja: CajaData | undefined;
   showModal: boolean;
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedMovimiento: MovimientosFiltroData | undefined;
+  setSelectedMovimiento: React.Dispatch<
+    React.SetStateAction<MovimientosFiltroData | undefined>
+  >;
   isAdmin?: boolean;
+  initialMovimientoId: string;
 }
 
 export default function Table({
@@ -40,6 +45,9 @@ export default function Table({
   showModal,
   setShowModal,
   currentPage,
+  selectedMovimiento,
+  setSelectedMovimiento,
+  initialMovimientoId,
   isAdmin,
 }: Props) {
   const [movimientos, setMovimientos] = useState<MovimientosFiltroData[]>();
@@ -50,8 +58,6 @@ export default function Table({
   const { replace } = useRouter();
   const searchParams = useSearchParams();
 
-  const [selectedMovimiento, setSelectedMovimiento] =
-    useState<MovimientosFiltroData>();
   const formatDate = (dateString: Date) => {
     const date = new Date(dateString);
     const day = date.getDate();
@@ -121,6 +127,13 @@ export default function Table({
     identificadorDocumento,
     query,
   ]);
+
+  if (movimientos && movimientos.length > 0) {
+    const mov = movimientos.find((mov) => mov.id === initialMovimientoId);
+    if (mov) {
+      setSelectedMovimiento(mov);
+    }
+  }
 
   return (
     <div className="flow-root">

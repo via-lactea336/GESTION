@@ -31,7 +31,7 @@ export default async function LatestInvoices() {
                   <div className="min-w-0">
                     <Link
                       title="Ver detalles del cobro de la factura"
-                      href={`/dashboard/caja/historial?query=${invoice.invoiceNumber}&page=1`}
+                      href={`/dashboard/caja/historial?query=${invoice.invoiceNumber}&page=1&showModal=true&movimientoId=${invoice.movId}`}
                       className="truncate text-sm font-semibold md:text-base hover:cursor-pointer hover:text-primary-300"
                     >
                       Factura N° {invoice.invoiceNumber}
