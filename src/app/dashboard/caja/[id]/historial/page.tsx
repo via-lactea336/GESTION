@@ -10,7 +10,6 @@ import {
   ParamsReportes,
 } from "@/lib/moduloCaja/movimiento/obtenerMovimientosFiltro";
 import Filtros from "@/components/dashboard/caja/Filtros";
-import { CajeroWithRole } from "@/components/dashboard/caja/HistorialData";
 
 type Props = {
   searchParams?: {
