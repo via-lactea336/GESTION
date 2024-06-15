@@ -31,6 +31,18 @@ export default function Page() {
   const [registros, setRegistros] = useState<RegistroDiarioFullData>();
   const [detalle, setDetalle] = useState<movimientoDetallado>()
 
+  const [items, setItems] = useState<movimientoDetallado[]>([]);
+
+  const toggleItem = (item : movimientoDetallado) => {
+    if (items.includes(item)) {
+      setItems(items.filter(i => i !== item));
+      console.log("eliminando")
+    } else {
+      setItems([...items, item]);
+      console.log("agregando")
+    }
+  };
+
   useEffect(() => {
     const fetchRegistro = async () => {
       try {
@@ -46,6 +58,10 @@ export default function Page() {
     };
     fetchRegistro();
   }, [id]);
+
+  useEffect(()=>{
+    console.log(items)
+  }, [items])
 
   const formatDate = (dateString: Date) => {
     const date = new Date(dateString);
@@ -99,7 +115,7 @@ export default function Page() {
                 montoIngreso={Number(registros.montoIngresoEfectivo)}
                 montoIngresoCheque={Number(registros.montoIngresoCheque)}
                 montoIngresoTarjeta={Number(registros.montoIngresoTarjeta)}
-                movimientos={registros.apertura.movimiento}
+                movimientos={items}
                 observaciones={
                   registros.apertura.observaciones
                     ? registros.apertura.observaciones
@@ -126,6 +142,7 @@ export default function Page() {
           <table className="border-collapse table-auto mx-auto text-center w-full">
             <thead>
               <tr className="bg-gray-900 ">
+                <th className="p-2 w-1/5 text-primary-300 font-normal">Imprimir</th>
                 <th className="p-2 w-1/5 text-primary-300 font-normal">
                   Operacion
                 </th>
@@ -138,6 +155,11 @@ export default function Page() {
             <tbody>
               {registros.apertura.movimiento?.map((mov, i) => (
                 <tr key={mov.id} className="border-b-2 border-gray-700">
+                  <td>
+                    <button onClick={()=>toggleItem(mov)}>
+                      Agregar
+                    </button>
+                  </td>
                   <td
                     className={
                       mov.esIngreso ? "p-2 text-green-400" : "p-2 text-red-400"
