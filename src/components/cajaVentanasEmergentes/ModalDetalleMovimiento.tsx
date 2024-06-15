@@ -43,7 +43,7 @@ export default function ModalDetalleMovimiento({
             <span className="text-md font-medium text-gray-400 text-left border-b border-gray-700 w-full">
               {selectedMovimiento.esIngreso
                 ? `Al Cliente ${selectedMovimiento.factura.cliente.nombre} con RUC : ${selectedMovimiento.factura.cliente.docIdentidad}`
-                : `Por ${selectedMovimiento.comprobante.user.nombre} ${selectedMovimiento.comprobante.user.apellido}`}
+                : `Por ${selectedMovimiento.comprobante?.user.nombre} ${selectedMovimiento.comprobante?.user.apellido}`}
             </span>
             {selectedMovimiento.esIngreso && (
               <div className="flex justify-between w-full text-gray-100">
@@ -81,7 +81,7 @@ export default function ModalDetalleMovimiento({
                 <span className="font-medium text-gray-400">
                   N° de Comprobante:
                 </span>
-                <span>{selectedMovimiento.comprobante.numeroComprobante}</span>
+                <span>{selectedMovimiento.comprobante?.numeroComprobante}</span>
               </div>
             )}
             <div className="flex justify-between w-full text-gray-100">
@@ -106,7 +106,7 @@ export default function ModalDetalleMovimiento({
           {!selectedMovimiento.esIngreso && (
             <div className="flex justify-between w-full text-gray-100">
               <span className="font-medium text-gray-400">Concepto:</span>
-              <span>{selectedMovimiento?.comprobante.concepto}</span>
+              <span>{selectedMovimiento?.comprobante?.concepto}</span>
             </div>
           )}
           <div className="flex flex-col justify-center items-center gap-4">

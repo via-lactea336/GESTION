@@ -13,9 +13,14 @@ import { useRouter } from "next/navigation";
 type Props = {
   cajeroId: string;
   cajeroNombre: string;
+  cajaId: string;
 };
 
-export default function ContenedorCajas({ cajeroId, cajeroNombre }: Props) {
+export default function ContenedorCajas({
+  cajeroId,
+  cajeroNombre,
+  cajaId,
+}: Props) {
   const [showModal, setShowModal] = useState(false);
   const [selectedCaja, setSelectedCaja] = useState<Caja>({} as Caja);
   const [data, setData] = useState<Caja[]>([]);
@@ -27,7 +32,11 @@ export default function ContenedorCajas({ cajeroId, cajeroNombre }: Props) {
     e.preventDefault();
     const id = e.currentTarget.id;
     const caja = data.find((c) => c.id === id);
-    if (caja) setSelectedCaja(caja);
+    if (caja) {
+      setSelectedCaja(caja);
+      if (caja.id === cajaId)
+        return router.push(`/dashboard/caja/${cajaId}/ingreso`);
+    }
     if (caja?.estaCerrado) {
       setShowModal(true);
     }
@@ -68,6 +77,7 @@ export default function ContenedorCajas({ cajeroId, cajeroNombre }: Props) {
         mensaje={mensaje}
         loading={loading}
         handleClick={handleClick}
+        cajaId={cajaId}
         className={showModal ? "blur-sm brightness-50" : ""}
       />
       {showModal && (

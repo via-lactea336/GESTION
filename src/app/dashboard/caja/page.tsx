@@ -1,15 +1,23 @@
 import ContenedorCajas from "@/components/dashboard/caja/ContenedorCajas";
 import Header from "@/components/global/Header";
+import { obtenerAperturaPorUserId } from "@/lib/actions";
 import authOptions from "@/lib/auth/options";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
   const session = await getServerSession(authOptions);
   const links = [
-    { href: `/dashboard/caja`, text: "Inicio" },
+    { href: `/dashboard/caja/panelDeAdministracion`, text: "Panel" },
+    { href: `/dashboard/caja/historial`, text: "Historial" },
     { href: `/dashboard/caja/reportes`, text: "Reportes" },
   ];
+  if (!session) return redirect("/login");
+
+  const { cajaId } = (await obtenerAperturaPorUserId(session.user.id)) ?? {
+    cajaId: "",
+  };
 
   return (
     <div className="relative">
@@ -37,6 +45,7 @@ export default async function Page() {
         <ContenedorCajas
           cajeroId={session.user.id}
           cajeroNombre={session.user.nombre}
+          cajaId={cajaId}
         />
       ) : (
         <div className="flex justify-center items-center h-96">

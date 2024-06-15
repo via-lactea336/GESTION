@@ -5,12 +5,10 @@ import { obtenerCookie } from "@/lib/obtenerCookie";
 import { useEffect, useState } from "react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import ResumenCajaPDF from "@/components/PDF/ResumenDiario";
-import DetalleMovimiento, { movimientoDetallado } from "@/components/cajaVentanasEmergentes/ResumenDetalle";
-import {
-  CajaData,
-  Cajero,
-  RegistroDiarioFullData,
-} from "@/lib/definitions";
+import DetalleMovimiento, {
+  movimientoDetallado,
+} from "@/components/cajaVentanasEmergentes/ResumenDetalle";
+import { CajaData, Cajero, RegistroDiarioFullData } from "@/lib/definitions";
 import Link from "next/link";
 import LoadingCirleIcon from "@/components/global/LoadingCirleIcon";
 import obtenerRegistroDeCajaPorAperturaId from "@/lib/moduloCaja/resumenDiario/obtenerRegistroDeCajaPorAperturaId";
@@ -20,26 +18,22 @@ import { Modal } from "@/components/global/Modal";
 
 export default function Page() {
   const { id } = useParams();
-  const links = [
-    { href: `/dashboard/caja`, text: "Inicio" },
-    { href: `/dashboard/caja/reportes`, text: "Reportes" },
-  ];
-  
+
   const [showModal, setShowModal] = useState(false);
   const caja = obtenerCookie("caja") as CajaData;
   const cajero = obtenerCookie("cajero") as Cajero;
   const [registros, setRegistros] = useState<RegistroDiarioFullData>();
-  const [detalle, setDetalle] = useState<movimientoDetallado>()
+  const [detalle, setDetalle] = useState<movimientoDetallado>();
 
   const [items, setItems] = useState<movimientoDetallado[]>([]);
 
-  const toggleItem = (item : movimientoDetallado) => {
+  const toggleItem = (item: movimientoDetallado) => {
     if (items.includes(item)) {
-      setItems(items.filter(i => i !== item));
-      console.log("eliminando")
+      setItems(items.filter((i) => i !== item));
+      console.log("eliminando");
     } else {
       setItems([...items, item]);
-      console.log("agregando")
+      console.log("agregando");
     }
   };
 
@@ -59,9 +53,9 @@ export default function Page() {
     fetchRegistro();
   }, [id]);
 
-  useEffect(()=>{
-    console.log(items)
-  }, [items])
+  useEffect(() => {
+    console.log(items);
+  }, [items]);
 
   const formatDate = (dateString: Date) => {
     const date = new Date(dateString);
@@ -89,17 +83,19 @@ export default function Page() {
     </div>
   ) : (
     <div>
-      <div className={showModal? "blur-sm brightness-50" : ""}>
+      <div className={showModal ? "blur-sm brightness-50" : ""}>
         <Header title="Resumen diario" className="-mt-8">
-          {links.map((link, index) => (
-            <Link
-              key={index}
-              href={link.href}
-              className="bg-gray-800 py-1 px-2 rounded-md hover:text-primary-100 hover:bg-gray-900 mx-2"
-            >
-              {link.text}
-            </Link>
-          ))}
+          <h3 className="ml-8">{cajero.nombre}</h3>
+          <h3>Caja N° {caja.numero}</h3>
+        </Header>
+
+        <div className="bg-gray-800 py-4 px-4 rounded-md mt-5">
+          <div className="w-full">
+            <ResumenDeCaja {...registros} />
+          </div>
+        </div>
+        <div className="flex my-5 justify-between items-center">
+          <h2 className=" font-semibold text-lg">Movimientos</h2>
           <PDFDownloadLink
             className="bg-gray-800 py-1 px-2 rounded-md hover:text-primary-100 hover:bg-gray-900 mx-2"
             document={
@@ -127,37 +123,35 @@ export default function Page() {
           >
             Descargar
           </PDFDownloadLink>
-          <h3 className="ml-8">{cajero.nombre}</h3>
-          <h3>Caja N° {caja.numero}</h3>
-        </Header>
-
-        <div className="bg-gray-800 py-4 px-4 rounded-md mt-5">
-          <div className="w-full">
-            <ResumenDeCaja {...registros} />
-          </div>
         </div>
-        <h2 className="my-5 font-semibold text-lg">Movimientos</h2>
-
         <div className="bg-gray-800 py-6 px-4 rounded-md shadow-md mt-5">
           <table className="border-collapse table-auto mx-auto text-center w-full">
             <thead>
               <tr className="bg-gray-900 ">
-                <th className="p-2 w-1/5 text-primary-300 font-normal">Imprimir</th>
+                <th className="p-2 w-1/5 text-primary-300 font-normal">
+                  Imprimir
+                </th>
                 <th className="p-2 w-1/5 text-primary-300 font-normal">
                   Operacion
                 </th>
-                <th className="p-2 w-1/5 text-primary-300 font-normal">Monto</th>
-                <th className="p-2 w-1/5 text-primary-300 font-normal">Fecha</th>
+                <th className="p-2 w-1/5 text-primary-300 font-normal">
+                  Monto
+                </th>
+                <th className="p-2 w-1/5 text-primary-300 font-normal">
+                  Fecha
+                </th>
                 <th className="p-2 w-1/5 text-primary-300 font-normal">Hora</th>
-                <th className="p-2 w-1/5 text-primary-300 font-normal">Detalles</th>
+                <th className="p-2 w-1/5 text-primary-300 font-normal">
+                  Detalles
+                </th>
               </tr>
             </thead>
             <tbody>
               {registros.apertura.movimiento?.map((mov, i) => (
                 <tr key={mov.id} className="border-b-2 border-gray-700">
                   <td>
-                    <button onClick={()=>toggleItem(mov)}>
-                      Agregar
+                    <button onClick={() => toggleItem(mov)}>
+                      {items.includes(mov) ? "Quitar" : "Agregar"}
                     </button>
                   </td>
                   <td
@@ -170,18 +164,18 @@ export default function Page() {
                   <td className="p-2">
                     {Number(mov.monto).toLocaleString("es-PY")} Gs.
                   </td>
-                  <td className="p-2">
-                      {formatDate(mov.createdAt)}
-                  </td>
-                  <td className="p-2">
-                    {formatTime(mov.createdAt)}
-                  </td>
+                  <td className="p-2">{formatDate(mov.createdAt)}</td>
+                  <td className="p-2">{formatTime(mov.createdAt)}</td>
                   <td>
-                    <button 
+                    <button
                       className="mt-4 mb-4"
-                      onClick={() => {setDetalle(mov), setShowModal(true)}}
+                      onClick={() => {
+                        setDetalle(mov), setShowModal(true);
+                      }}
                     >
-                      {<ArrowTopRightOnSquareIcon className='w-6 h-6 ml-auto mr-auto'/>}
+                      {
+                        <ArrowTopRightOnSquareIcon className="w-6 h-6 ml-auto mr-auto" />
+                      }
                     </button>
                   </td>
                 </tr>
@@ -194,11 +188,7 @@ export default function Page() {
         <div className="flex items-center justify-center">
           <div className="absolute top-20">
             <Modal className="w-full" setShowModal={setShowModal}>
-              {detalle?
-                <DetalleMovimiento {...detalle}
-                /> : ""
-              }
-              
+              {detalle ? <DetalleMovimiento {...detalle} /> : ""}
             </Modal>
           </div>
         </div>

@@ -19,6 +19,7 @@ import Input from "../global/Input";
 import { pdf } from "@react-pdf/renderer";
 import TransferReceipt from "../PDF/ReciboPagoFactura";
 import { saveAs } from "file-saver";
+import { formatDate } from "@/lib/utils";
 
 type Tarjeta = {
   tipo: string;
@@ -284,6 +285,9 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
       <div className="px-6 rounded-md flex flex-col mx-auto mt-4">
         <h2 className="text-xl font-semibold mb-4">
           Detalles de la Factura N° {factura.numeroFactura}
+          {!factura.esContado &&
+            factura.fechaVencimiento &&
+            " - Vencimiento: " + formatDate(factura.fechaVencimiento)}
         </h2>
         <div className="flex gap-4 items-center">
           {detallesFactura.map((detalle, index) => (

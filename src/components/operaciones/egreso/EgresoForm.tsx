@@ -163,7 +163,7 @@ const Extraccion: React.FC = () => {
           <Input
             type="text"
             id="observaciones"
-            placeholder="Observaciones..."
+            placeholder="Ej: Extracción de efectivo para pagar proveedores"
             value={observaciones}
             onChange={handleObservacionesChange}
             className="text-white py-2 px-4 bg-gray-900 mt-1 mb-5 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
