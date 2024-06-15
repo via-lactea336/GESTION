@@ -1,6 +1,5 @@
-import { AperturaCaja, ArqueoDeCaja, ChequeCaja, Comprobante, Factura, Movimiento, MovimientoDetalle, RegistroCaja, Tarjeta } from "@prisma/client";
 import { fetchPlus } from "../../verificarApiResponse"
-import { DatosFiltrados } from "@/lib/definitions";
+import { DatosFiltrados, RegistroDiarioFullData } from "@/lib/definitions";
 
 export type ParamsReportes = {
   cajaId?: string,
@@ -10,19 +9,6 @@ export type ParamsReportes = {
   skip:number,
   upTo:number
 }
-
-export type Reportes = RegistroCaja & {
-  apertura: AperturaCaja & {
-    arqueo: ArqueoDeCaja;
-    movimiento: (Movimiento &
-      {
-        factura:Factura|null
-        comprobante: Comprobante|null;
-        movimientoDetalles: MovimientoDetalle[];
-      }
-    )[];
-  };
-};  
 
 export default async function obtenerRegistrosDiariosFiltro({fechaDesde, fechaHasta, cajaId, documentacion, skip, upTo}:ParamsReportes) {
   
@@ -41,5 +27,5 @@ export default async function obtenerRegistrosDiariosFiltro({fechaDesde, fechaHa
 
   const queryString = searchParams.toString()
 
-  return await fetchPlus<DatosFiltrados<Reportes>>(`${url}/api/registro-caja/search?${queryString}`)
+  return await fetchPlus<DatosFiltrados<RegistroDiarioFullData>>(`${url}/api/registro-caja/search?${queryString}`)
 }
