@@ -3,10 +3,10 @@
 import Header from '@/components/global/Header'
 import InputCalendar from '@/components/global/InputCalendar';
 import LoadingPage from '@/components/global/LoadingPage';
-import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
+import { ArrowTopRightOnSquareIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { fetchPlus } from "@/lib/verificarApiResponse";
 import { Caja } from "@prisma/client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import obtenerAperturasFiltro from '@/lib/moduloCaja/aperturaCaja/obtenerAperturasFiltro';
 import { Data } from "@/lib/moduloCaja/aperturaCaja/obtenerAperturasFiltro";
 import { useRouter } from "next/navigation";
@@ -19,6 +19,7 @@ type ReporteParams = {
   upto: number;
 };
 export default function Reportes() {
+  const reportesPorPagina = 8;
   const router = useRouter();
   const [loading, setLoading] = React.useState(true);
   const [cajas, setCajas] = React.useState<Caja[]>([]);
@@ -29,8 +30,21 @@ export default function Reportes() {
     fechaDesde: null,
     fechaHasta: null,
     skip: 0,
-    upto: 8,
+    upto: reportesPorPagina,
   });
+
+  
+  const [indicesPagina, setindicesPagina] = useState(0);
+  const [indiceActual, setIndiceActual] = useState(0);
+
+  
+  const changeIndicePagina = async (indice: number) => {
+    setIndiceActual(indice);
+    setReporteParam({
+      ...reporteParam,
+      skip: indice * reportesPorPagina,
+    });
+  };
 
   const getCajasEffect = async () => {
     const { data, error } = await fetchPlus<Caja[]>("/api/caja", {
@@ -46,11 +60,18 @@ export default function Reportes() {
       fechaHasta: reporteParam.fechaHasta?.toDateString(),
       cerrada: true,
       cajaId: reporteParam.cajaId,
-      skip: 0,
-      upTo: 10,
+      skip: reporteParam.skip,
+      upTo: reporteParam.upto,
     });
     if (error) setError(error);
-    setRegistros(data?.values)
+    setRegistros(data?.values);
+    if(data != undefined){
+      setindicesPagina(
+        data.totalQuantity % reportesPorPagina === 0
+          ? data.totalQuantity / reportesPorPagina
+          : Math.floor(data.totalQuantity / reportesPorPagina) + 1
+      );
+    }
     console.log(data);
   };
 
@@ -158,6 +179,39 @@ export default function Reportes() {
             ))}
           </tbody>
         </table>
+        <div className="flex justify-around items-center mt-2 ">
+          <button
+            onClick={async () => await changeIndicePagina(indiceActual - 1)}
+            disabled={indiceActual - 1 === -1}
+            className="w-8 bg-gray-700 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded"
+          >
+            <ChevronLeftIcon />
+          </button>
+          <div className="gap-2 flex">
+            {[...Array(indicesPagina)].map((_, index) => (
+              <button
+                key={index}
+                onClick={async () => await changeIndicePagina(index)}
+                className={
+                  (index === indiceActual
+                    ? "opacity-50 cursor-not-allowed "
+                    : "hover:bg-gray-900 ") + "px-6 py-2 bg-gray-700 rounded"
+                }
+              >
+                <span className={"cursor-pointer m-auto"}>{index + 1}</span>
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={async () => await changeIndicePagina(indiceActual + 1)}
+            disabled={indiceActual + 1 === indicesPagina}
+            className={
+              "w-8 bg-gray-700 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700 rounded"
+            }
+          >
+            <ChevronRightIcon />
+          </button>
+        </div>
       </div>
     </div>
   );
