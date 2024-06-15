@@ -3,7 +3,7 @@ import { Comprobante, Factura, Movimiento, MovimientoDetalle } from "@prisma/cli
 
 export type movimientoDetallado = Movimiento & {
     factura:Factura|null
-    comprobantes: Comprobante & {user: {nombre: string, apellido: string, docIdentidad: string}}[];
+    comprobante: Comprobante & {user: {nombre: string, apellido: string, docIdentidad: string}} | null;
     movimientoDetalles: MovimientoDetalle[];
 }
 
@@ -78,11 +78,11 @@ export default function DetalleMovimiento(movimiento : movimientoDetallado | nul
                 </div>
                 <div className="ml-20">
                     <h1 className="mb-2">Encargado: {"  "}
-                        {movimiento.comprobantes[0].user.nombre}{"  "}
-                        {movimiento.comprobantes[0].user.apellido}  
+                        {movimiento.comprobante?.user.nombre}{"  "}
+                        {movimiento.comprobante?.user.apellido}  
                     </h1>
-                    <h1 className="mb-2">RUC: {movimiento.comprobantes[0].user.docIdentidad}</h1>
-                    <h1 className="mb-2">Observaciones: {movimiento.comprobantes.concepto}</h1>
+                    <h1 className="mb-2">RUC: {movimiento.comprobante?.user.docIdentidad}</h1>
+                    <h1 className="mb-2">Observaciones: {movimiento.comprobante?.concepto}</h1>
                 </div>
             </div>
         </div>

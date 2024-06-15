@@ -99,8 +99,7 @@ export type RegistroDiarioFullData = RegistroCaja & {
     arqueo: ArqueoDeCaja;
     movimiento: (Movimiento & {
       factura: Factura | null;
-      comprobantes: Comprobante &
-        { user: { nombre: string; apellido: string; docIdentidad: string } }[];
+      comprobante: Comprobante & {user: {nombre: string, apellido: string, docIdentidad: string}} | null;
       movimientoDetalles: MovimientoDetalle[];
     })[];
   };
