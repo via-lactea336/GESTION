@@ -17,7 +17,7 @@ export type Reportes = RegistroCaja & {
     movimiento: (Movimiento &
       {
         factura:Factura|null
-        comprobantes: Comprobante[];
+        comprobante: Comprobante|null;
         movimientoDetalles: MovimientoDetalle[];
       }
     )[];

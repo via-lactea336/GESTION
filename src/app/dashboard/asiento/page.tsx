@@ -15,7 +15,6 @@ export default async function Asiento({}: Props) {
     }
   })
 
-  console.log(asientos)
 
   return (
     <div className="container mx-auto p-4">
