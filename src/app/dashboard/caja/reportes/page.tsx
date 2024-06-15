@@ -1,20 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import Header from '@/components/global/Header'
-import InputCalendar from '@/components/global/InputCalendar';
-import LoadingPage from '@/components/global/LoadingPage';
-import { ArrowTopRightOnSquareIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import Header from "@/components/global/Header";
+import InputCalendar from "@/components/global/InputCalendar";
+import LoadingPage from "@/components/global/LoadingPage";
+import {
+  ArrowTopRightOnSquareIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@heroicons/react/24/outline";
 import { fetchPlus } from "@/lib/verificarApiResponse";
 import { Caja } from "@prisma/client";
 import React, { useEffect, useState } from "react";
-import obtenerAperturasFiltro from '@/lib/moduloCaja/aperturaCaja/obtenerAperturasFiltro';
+import obtenerAperturasFiltro from "@/lib/moduloCaja/aperturaCaja/obtenerAperturasFiltro";
 import { Data } from "@/lib/moduloCaja/aperturaCaja/obtenerAperturasFiltro";
 import { useRouter } from "next/navigation";
+import LoadingCirleIcon from "@/components/global/LoadingCirleIcon";
 
 type ReporteParams = {
   cajaId: string | undefined;
-  fechaDesde: Date | null;
-  fechaHasta: Date | null;
+  fechaDesde: string;
+  fechaHasta: string;
   skip: number;
   upto: number;
 };
@@ -22,22 +27,21 @@ export default function Reportes() {
   const reportesPorPagina = 8;
   const router = useRouter();
   const [loading, setLoading] = React.useState(true);
+  const [auxLoading, setAuxLoading] = React.useState(false);
   const [cajas, setCajas] = React.useState<Caja[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [registros, setRegistros] = React.useState<Data[]>();
   const [reporteParam, setReporteParam] = React.useState<ReporteParams>({
     cajaId: undefined,
-    fechaDesde: null,
-    fechaHasta: null,
+    fechaDesde: "",
+    fechaHasta: "",
     skip: 0,
     upto: reportesPorPagina,
   });
 
-  
   const [indicesPagina, setindicesPagina] = useState(0);
   const [indiceActual, setIndiceActual] = useState(0);
 
-  
   const changeIndicePagina = async (indice: number) => {
     setIndiceActual(indice);
     setReporteParam({
@@ -55,9 +59,11 @@ export default function Reportes() {
   };
 
   const getRegistrosEffect = async () => {
+    setAuxLoading(true);
+
     const { data, error } = await obtenerAperturasFiltro({
-      fechaDesde: reporteParam.fechaDesde?.toDateString(),
-      fechaHasta: reporteParam.fechaHasta?.toDateString(),
+      fechaDesde: reporteParam.fechaDesde,
+      fechaHasta: reporteParam.fechaHasta,
       cerrada: true,
       cajaId: reporteParam.cajaId,
       skip: reporteParam.skip,
@@ -65,20 +71,21 @@ export default function Reportes() {
     });
     if (error) setError(error);
     setRegistros(data?.values);
-    if(data != undefined){
+    if (data != undefined) {
       setindicesPagina(
         data.totalQuantity % reportesPorPagina === 0
           ? data.totalQuantity / reportesPorPagina
           : Math.floor(data.totalQuantity / reportesPorPagina) + 1
       );
     }
+    setAuxLoading(false);
     console.log(data);
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, id, type } = e.target;
     setReporteParam((prev) => {
-      if (type === "date") return { ...prev, [name || id]: new Date(value) };
+      if (type === "date") return { ...prev, [name || id]: value };
       return { ...prev, [name || id]: value };
     });
   };
@@ -88,15 +95,15 @@ export default function Reportes() {
     setReporteParam((prev) => ({ ...prev, [name || id]: value }));
   };
 
-  const redirecting = (id : string) =>{
-    router.push(`/dashboard/caja/reportes/${id}`)
-  }
+  const redirecting = (id: string) => {
+    router.push(`/dashboard/caja/reportes/${id}`);
+  };
 
   useEffect(() => {
-    getRegistrosEffect()
-    getCajasEffect()
-    setLoading(false)
-  }, [reporteParam])
+    getRegistrosEffect();
+    getCajasEffect();
+    setLoading(false);
+  }, [reporteParam]);
 
   if (loading) return <LoadingPage />;
 
@@ -138,6 +145,7 @@ export default function Reportes() {
             <InputCalendar
               value={reporteParam.fechaHasta?.toString() || ""}
               handleChange={onChange}
+              min={reporteParam.fechaDesde}
               className="bg-gray-800 text-white py-1 px-2 rounded-md"
               id="fechaHasta"
             />
@@ -146,39 +154,69 @@ export default function Reportes() {
       </Header>
 
       <div>
-        <table className="table-auto mx-auto text-center w-full border-separate border-spacing-0">
-          <thead className="bg-primary-500">
-            <tr>
-              <td className="border-b border-gray-400 px-4 py-2">Fecha</td>
-              <td className="border-b border-gray-400 px-4 py-2">N° Caja</td>
-              <td className="border-b border-gray-400 px-4 py-2">Cajero</td>
-              <td className="border-b border-gray-400 px-4 py-2">Total Ingresos</td>
-              <td className="border-b border-gray-400 px-4 py-2">Total Egresos</td>
-              <td className="border-b border-gray-400 px-4 py-2">Ver Detalle</td>
-            </tr>
-          </thead>
-          <tbody>
-            {registros?.map((registro, index) =>(
-              <tr key={index}>
-                <td className='border-b border-gray-300 px-4 py-2'>{new Date(registro.createdAt)
-                            .toISOString()
-                            .split("T")[0]
-                            .split("-")
-                            .reverse()
-                            .join("/")}</td>
-                <td className='border-b border-gray-300 px-4 py-2'>{registro.caja.numero}</td>
-                <td className='border-b border-gray-300 px-4 py-2'>{registro.cajero.nombre + " " + registro.cajero.apellido}</td>
-                <td className='border-b border-gray-300 px-4 py-2'>{Number(registro.registro.montoIngresoTotal)}</td>
-                <td className='border-b border-gray-300 px-4 py-2'>{Number(registro.registro.montoEgresoTotal)}</td>
-                <td className='border-b border-gray-300 px-4 py-2'>
-                  <button onClick={() => redirecting(registro.id)}>
-                  {<ArrowTopRightOnSquareIcon className='w-6 h-6 ml-auto mt-2 mr-auto'/>}
-                  </button>
+        {auxLoading ? (
+          <div className="flex justify-center items-center">
+            <LoadingCirleIcon className="animate-spin h-10 w-10 text-center text-gray-100" />
+          </div>
+        ) : (
+          <table className="table-auto mx-auto text-center w-full border-separate border-spacing-0">
+            <thead className="bg-primary-500">
+              <tr>
+                <td className="border-b border-gray-400 px-4 py-2">Fecha</td>
+                <td className="border-b border-gray-400 px-4 py-2">N° Caja</td>
+                <td className="border-b border-gray-400 px-4 py-2">Cajero</td>
+                <td className="border-b border-gray-400 px-4 py-2">
+                  Total Ingresos
+                </td>
+                <td className="border-b border-gray-400 px-4 py-2">
+                  Total Egresos
+                </td>
+                <td className="border-b border-gray-400 px-4 py-2">
+                  Ver Detalle
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {registros?.map((registro, index) => (
+                <tr key={index}>
+                  <td className="border-b border-gray-300 px-4 py-2">
+                    {new Date(registro.createdAt)
+                      .toISOString()
+                      .split("T")[0]
+                      .split("-")
+                      .reverse()
+                      .join("/")}
+                  </td>
+                  <td className="border-b border-gray-300 px-4 py-2">
+                    {registro.caja.numero}
+                  </td>
+                  <td className="border-b border-gray-300 px-4 py-2">
+                    {registro.cajero.nombre + " " + registro.cajero.apellido}
+                  </td>
+                  <td className="border-b border-gray-300 px-4 py-2">
+                    {Number(registro.registro.montoIngresoTotal).toLocaleString(
+                      "es-PY"
+                    )}{" "}
+                    Gs.
+                  </td>
+                  <td className="border-b border-gray-300 px-4 py-2">
+                    {Number(registro.registro.montoEgresoTotal).toLocaleString(
+                      "es-PY"
+                    )}{" "}
+                    Gs.
+                  </td>
+                  <td className="border-b border-gray-300 px-4 py-2">
+                    <button onClick={() => redirecting(registro.id)}>
+                      {
+                        <ArrowTopRightOnSquareIcon className="w-6 h-6 ml-auto mt-2 mr-auto" />
+                      }
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
         <div className="flex justify-around items-center mt-2 ">
           <button
             onClick={async () => await changeIndicePagina(indiceActual - 1)}

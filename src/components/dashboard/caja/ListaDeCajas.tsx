@@ -7,6 +7,7 @@ type Props = {
   loading: boolean;
   handleClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
+  cajaId: string;
 };
 
 export default function ListaDeCajas({
@@ -15,6 +16,7 @@ export default function ListaDeCajas({
   loading,
   handleClick,
   className,
+  cajaId,
 }: Props) {
   return (
     <div
@@ -33,19 +35,29 @@ export default function ListaDeCajas({
             Caja {caja.numero}
           </p>
           <p className="flex-1 px-4 pt-3 text-center rounded-md bg-gray-700">
-            {caja.estaCerrado ? "Cerrado" : "Abierto"}
+            {cajaId === caja.id
+              ? "Abierto"
+              : caja.estaCerrado
+              ? "Cerrado"
+              : "Abierto"}
           </p>
           <button
             onClick={handleClick}
             id={caja.id}
             className={
               "flex-1 px-4 py-3 rounded-md bg-gray-700 hover:bg-gray-800 " +
-              (caja.estaCerrado
+              (cajaId === caja.id
+                ? "cursor-pointer"
+                : caja.estaCerrado
                 ? "cursor-pointer"
                 : "bg-gray-800 cursor-not-allowed")
             }
           >
-            {caja.estaCerrado ? "Abrir Caja" : "Cajero Trabajando"}
+            {cajaId === caja.id
+              ? "Continuar Trabajando"
+              : caja.estaCerrado
+              ? "Abrir Caja"
+              : "Cajero Trabajando"}
           </button>
         </div>
       ))}

@@ -91,7 +91,7 @@ export default function FormApertura({ caja, cajeroId, cajeroNombre }: Params) {
         <Input
           id="observaciones"
           type="text"
-          placeholder="Observaciones..."
+          placeholder="Ej: Caja abierta por la mañana"
           onChange={handleChange}
           className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none [max-h-40] resize-none"
         />

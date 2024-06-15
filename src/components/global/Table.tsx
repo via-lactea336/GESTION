@@ -209,9 +209,13 @@ export default function Table({
                   <td className="whitespace-nowrap px-3 py-3">
                     {mov.esIngreso
                       ? mov?.factura?.esContado
-                        ? `Factura N° ${mov.factura.numeroFactura} pagado al contado`
-                        : `Factura N° ${mov.factura.numeroFactura} pagado a crédito`
-                      : mov?.comprobante.concepto}
+                        ? `Factura al contado N° ${mov.factura.numeroFactura}`
+                        : `Factura a crédito N° ${mov.factura.numeroFactura}`
+                      : mov?.comprobante?.concepto}
+                    {mov?.comprobante?.numeroComprobante &&
+                      ` - Comprobante N° ${mov.comprobante.numeroComprobante}`}
+                    {mov?.recibo?.numeroRecibo &&
+                      ` - Recibo N° ${mov.recibo.numeroRecibo}`}
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6">
                     <div className="flex justify-center gap-3">

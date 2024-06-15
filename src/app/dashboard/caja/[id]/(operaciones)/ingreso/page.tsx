@@ -10,7 +10,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
   const links = [
     { href: `/dashboard/caja/${id}/arqueo`, text: "Arqueo" },
-    { href: `/dashboard/caja/reportes`, text: "Reportes" },
+    { href: `/dashboard/caja/${id}/historial`, text: "Historial" },
     { href: `/dashboard/caja/${id}/egreso`, text: "Egreso" },
   ];
 

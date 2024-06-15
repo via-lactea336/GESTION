@@ -17,7 +17,6 @@ import calcularSaldosMovimiento from "@/lib/moduloCaja/movimiento/calcularSaldos
 import generarAsiento from "@/lib/asientos/services/asiento/generarAsiento";
 
 export async function POST(req: NextRequest) {
-
   const body: {
     mov: Movimiento;
     movsDetalles?: MovimientoDetalle[];
@@ -27,18 +26,33 @@ export async function POST(req: NextRequest) {
   } = await req.json();
   const { mov, movsDetalles, username, password, concepto } = body;
 
-  if (!mov || !movsDetalles || mov.esIngreso === undefined || !mov.monto || !mov.aperturaId)
+  if (
+    !mov ||
+    !movsDetalles ||
+    mov.esIngreso === undefined ||
+    !mov.monto ||
+    !mov.aperturaId
+  )
     return generateApiErrorResponse("Faltan datos para el movimiento", 400);
 
   if (movsDetalles.length === 0) {
-    return generateApiErrorResponse(
-      "Faltan los detalles del movimiento",
-      400
-    );
+    return generateApiErrorResponse("Faltan los detalles del movimiento", 400);
   }
-
+  if (!mov.esIngreso) {
+    if (!username || !password)
+      return generateApiErrorResponse(
+        "Faltan credenciales para crear el comprobante",
+        400
+      );
+    if (!concepto || concepto.trim().length === 0)
+      return generateApiErrorResponse(
+        "Falta el concepto para crear el comprobante",
+        400
+      );
+  }
   movsDetalles.forEach((m) => {
-    if (!m.metodoPago || !m.monto) return generateApiErrorResponse("Faltan detalles del movimiento", 400);
+    if (!m.metodoPago || !m.monto)
+      return generateApiErrorResponse("Faltan detalles del movimiento", 400);
   });
 
   const montoDecimal = new Decimal(mov.monto);
@@ -47,10 +61,15 @@ export async function POST(req: NextRequest) {
     return generateApiErrorResponse("El monto debe ser mayor a 0", 400);
   }
 
-  const { sumSaldoEfectivo, sumSaldoCheque, sumSaldoTarjeta } = calcularSaldosMovimiento(movsDetalles)
-  const sum = sumSaldoEfectivo + sumSaldoCheque + sumSaldoTarjeta
+  const { sumSaldoEfectivo, sumSaldoCheque, sumSaldoTarjeta } =
+    calcularSaldosMovimiento(movsDetalles);
+  const sum = sumSaldoEfectivo + sumSaldoCheque + sumSaldoTarjeta;
 
-  if (sum !== +mov.monto) return generateApiErrorResponse("La suma de los montos diferentes metodos de pago no coincide con el monto total del movimiento", 400);
+  if (sum !== +mov.monto)
+    return generateApiErrorResponse(
+      "La suma de los montos diferentes metodos de pago no coincide con el monto total del movimiento",
+      400
+    );
 
   try {
     const result = await prisma.$transaction(async (tx) => {
@@ -70,7 +89,7 @@ export async function POST(req: NextRequest) {
               esContado: true,
               numeroFactura: true,
               totalSaldoPagado: true,
-              total: true
+              total: true,
             },
           },
           apertura: {
@@ -89,24 +108,49 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      if(movimientoTx.factura?.esContado && movimientoTx.factura.total.greaterThan(sum)) throw new ApiError("Una factura al contado debe pagarse en su totalidad con un movimiento", 400)
+      if (
+        movimientoTx.factura?.esContado &&
+        movimientoTx.factura.total.greaterThan(sum)
+      )
+        throw new ApiError(
+          "Una factura al contado debe pagarse en su totalidad con un movimiento",
+          400
+        );
 
-      if(
+      if (
         !mov.esIngreso &&
-        (movimientoTx.apertura.caja.saldoEfectivo.lessThan(sumSaldoEfectivo)
-        || movimientoTx.apertura.caja.saldoCheque.lessThan(sumSaldoCheque)
-        || movimientoTx.apertura.caja.saldoTarjeta.lessThan(sumSaldoTarjeta))
-      ) throw new ApiError("Saldo insuficiente para realizar el movimiento", 400)
+        (movimientoTx.apertura.caja.saldoEfectivo.lessThan(sumSaldoEfectivo) ||
+          movimientoTx.apertura.caja.saldoCheque.lessThan(sumSaldoCheque) ||
+          movimientoTx.apertura.caja.saldoTarjeta.lessThan(sumSaldoTarjeta))
+      )
+        throw new ApiError(
+          "Saldo insuficiente para realizar el movimiento",
+          400
+        );
 
-
-      if(mov.esIngreso && movimientoTx.factura) {
-        await pagarFactura(tx, movimientoTx.factura.totalSaldoPagado, movimientoTx.factura.total, movimientoTx.factura?.id, new Decimal(sum))
+      if (mov.esIngreso && movimientoTx.factura) {
+        await pagarFactura(
+          tx,
+          movimientoTx.factura.totalSaldoPagado,
+          movimientoTx.factura.total,
+          movimientoTx.factura?.id,
+          new Decimal(sum)
+        );
       }
 
       return movimientoTx;
     });
 
-    if(!result) throw new ApiError("No se pudo registrar el movimiento", 500)
+    if (!result) throw new ApiError("No se pudo registrar el movimiento", 500);
+    if (!mov.esIngreso && username && password && concepto)
+      await crearComprobanteDesdeMovimiento(
+        result.id,
+        result.apertura.saldoInicial,
+        sum,
+        username,
+        password,
+        concepto
+      );
 
     //Se refleja el movimiento dentro de la caja
     await reflejarMovimiento(
@@ -126,44 +170,56 @@ export async function POST(req: NextRequest) {
       skipDuplicates: true,
     });
 
-    let recibo:Recibos|null = null
+    let recibo: Recibos | null = null;
 
     //Si es egreso, crear un comprobante
-    if (!mov.esIngreso) crearComprobanteDesdeMovimiento(result.id, result.apertura.saldoInicial, sum, username, password, concepto);
-    else if(result.factura && !result.factura.esContado){ //Si es ingreso y es una factura a credito, generar un recibo
-      if (!result.factura) throw new ApiError("No se pudo crear el recivo debido a que la factura no existe", 404)
-      recibo = await generarReciboDeMovimiento(result.id, sum, result.factura.id, result.factura.clienteId)
-      generarAsiento([{
-        concepto: `Pago parcial de factura numero ${result.factura.numeroFactura}`,
-        codigo: "103.01.01",
-        monto: sum,
-        esDebe: true,
-        esAsentable: true,
-      },
-      {
-        concepto: `Venta de mercaderia relacionada con la factura numero ${result.factura.numeroFactura}`,
-        codigo: "401.01.01",
-        monto: sum,
-        esDebe: false,
-        esAsentable: true,
-      }
-    ])
-    }else if(result.factura && result.factura.esContado){ //Si es ingreso y es una factura a credito, generar un recibo
-      generarAsiento([ {
-        concepto: `Venta de mercaderia relacionada con la factura numero ${result.factura.numeroFactura}`,
-        codigo: "401.01.01",
-        monto: sum,
-        esDebe: false,
-        esAsentable: true,
-      },
-      {
-        concepto: `Cobro de la factura numero ${result.factura.numeroFactura}`,
-        codigo: "101.01.01",
-        monto: sum,
-        esDebe: true,
-        esAsentable: true,
-      }
-    ])
+    if (result.factura && !result.factura.esContado) {
+      //Si es ingreso y es una factura a credito, generar un recibo
+      if (!result.factura)
+        throw new ApiError(
+          "No se pudo crear el recivo debido a que la factura no existe",
+          404
+        );
+      recibo = await generarReciboDeMovimiento(
+        result.id,
+        sum,
+        result.factura.id,
+        result.factura.clienteId
+      );
+      generarAsiento([
+        {
+          concepto: `Pago parcial de factura numero ${result.factura.numeroFactura}`,
+          codigo: "103.01.01",
+          monto: sum,
+          esDebe: true,
+          esAsentable: true,
+        },
+        {
+          concepto: `Venta de mercaderia relacionada con la factura numero ${result.factura.numeroFactura}`,
+          codigo: "401.01.01",
+          monto: sum,
+          esDebe: false,
+          esAsentable: true,
+        },
+      ]);
+    } else if (result.factura && result.factura.esContado) {
+      //Si es ingreso y es una factura a credito, generar un recibo
+      generarAsiento([
+        {
+          concepto: `Venta de mercaderia relacionada con la factura numero ${result.factura.numeroFactura}`,
+          codigo: "401.01.01",
+          monto: sum,
+          esDebe: false,
+          esAsentable: true,
+        },
+        {
+          concepto: `Cobro de la factura numero ${result.factura.numeroFactura}`,
+          codigo: "101.01.01",
+          monto: sum,
+          esDebe: true,
+          esAsentable: true,
+        },
+      ]);
     }
 
     return generateApiSuccessResponse(
@@ -175,7 +231,8 @@ export async function POST(req: NextRequest) {
     console.error(err);
     if (err instanceof PrismaClientKnownRequestError && err.code === "P2002") {
       return generateApiErrorResponse("El movimiento ya existe", 400);
-    } if (err instanceof ApiError) {
+    }
+    if (err instanceof ApiError) {
       return generateApiErrorResponse(err.message, err.status);
     } else {
       return generateApiErrorResponse(

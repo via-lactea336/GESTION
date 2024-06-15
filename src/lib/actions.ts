@@ -147,3 +147,17 @@ export async function fetchLatestInvoices(): Promise<LatestInvoice[]> {
   }));
   return latestInvoices;
 }
+
+// crear funcion obtenerAperturaPorUserId
+export async function obtenerAperturaPorUserId(userId: string) {
+  const apertura = await prisma.aperturaCaja.findFirst({
+    where: {
+      cajeroId: userId,
+      cierreCaja: null,
+    },
+    select: {
+      cajaId: true,
+    },
+  });
+  return apertura;
+}

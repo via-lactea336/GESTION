@@ -31,7 +31,7 @@ export default function Page({ params }: Props) {
     { href: `/dashboard/caja`, text: "Cajas" },
     {
       href: `/dashboard/caja/panelDeAdministracion`,
-      text: "Panel de Administración",
+      text: "Panel",
     },
     { href: `/dashboard/caja/reportes`, text: "Reportes" },
   ];
