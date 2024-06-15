@@ -18,7 +18,8 @@ export type ParamsReportes = {
   upTo?: number;
 };
 
-export type MovimientosFiltroData = Movimiento & {recibo : Recibos} & {
+export type MovimientosFiltroData = Movimiento & {recibo : Recibos} 
+  & {apertura: {cajaId: {numero: number}, cajero:{nombre: string, apellidos: string, docIdentidad: string}}} & {
     comprobante: Comprobante &
     { user: { nombre: string; apellido: string; docIdentidad: string } };
 } & { movimientoDetalles: MovimientoDetalle[] } & { factura: Factura &{cliente: {nombre: string; docIdentidad: string} }};
