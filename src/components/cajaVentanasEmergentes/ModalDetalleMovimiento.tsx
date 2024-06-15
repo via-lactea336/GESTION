@@ -137,6 +137,8 @@ export default function ModalDetalleMovimiento({
                         const doc = (
                           <TransferReceipt
                             numeroRecibo={`${recibo.numeroRecibo}`}
+                            nombreCajero={`${selectedMovimiento.apertura.cajero.nombre} ${selectedMovimiento.apertura.cajero.apellido}`}
+                            cajaNumero={selectedMovimiento.apertura.caja.numero}
                             fechaEmision={recibo.fechaEmision}
                             cliente={selectedMovimiento.factura.cliente}
                             numeroFactura={
@@ -169,8 +171,8 @@ export default function ModalDetalleMovimiento({
                   if (!caja || !cajero) return;
                   const time = selectedMovimiento.comprobante.fechaEmision;
                   generatePDF({
-                    cajero: cajero.nombre,
-                    caja: caja.numero,
+                    cajero: `${selectedMovimiento.apertura.cajero.nombre} ${selectedMovimiento.apertura.cajero.apellido}`,
+                    caja: selectedMovimiento.apertura.caja.numero,
                     dateTime: `${formatDate(time)} ${formatTime(time)}`,
                     monto: Number(selectedMovimiento.monto),
                     observaciones: selectedMovimiento.comprobante.concepto,
