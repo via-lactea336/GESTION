@@ -1,7 +1,6 @@
 import ApiError from "@/lib/api/ApiError";
 import verifyUser from "@/lib/auth/verifyUser";
 import prisma from "@/lib/prisma";
-import { AperturaCaja, Caja, Movimiento } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 
 const crearComprobanteDesdeMovimiento = async (

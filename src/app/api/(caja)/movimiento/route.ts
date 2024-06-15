@@ -37,6 +37,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  if (!mov.esIngreso) {
+    if (!username || !password) return generateApiErrorResponse("Faltan credenciales para crear el comprobante", 400);
+    if (!concepto || concepto.trim().length === 0) return generateApiErrorResponse("Falta el concepto para crear el comprobante", 400);
+  }
+
   movsDetalles.forEach((m) => {
     if (!m.metodoPago || !m.monto) return generateApiErrorResponse("Faltan detalles del movimiento", 400);
   });
@@ -108,6 +113,8 @@ export async function POST(req: NextRequest) {
 
     if(!result) throw new ApiError("No se pudo registrar el movimiento", 500)
 
+    if (!mov.esIngreso) await crearComprobanteDesdeMovimiento(result.id, result.apertura.saldoInicial, sum, username, password, concepto);
+    
     //Se refleja el movimiento dentro de la caja
     await reflejarMovimiento(
       result.apertura.caja.id,
@@ -129,8 +136,7 @@ export async function POST(req: NextRequest) {
     let recibo:Recibos|null = null
 
     //Si es egreso, crear un comprobante
-    if (!mov.esIngreso) crearComprobanteDesdeMovimiento(result.id, result.apertura.saldoInicial, sum, username, password, concepto);
-    else if(result.factura && !result.factura.esContado){ //Si es ingreso y es una factura a credito, generar un recibo
+    if(result.factura && !result.factura.esContado){ //Si es ingreso y es una factura a credito, generar un recibo
       if (!result.factura) throw new ApiError("No se pudo crear el recivo debido a que la factura no existe", 404)
       recibo = await generarReciboDeMovimiento(result.id, sum, result.factura.id, result.factura.clienteId)
       generarAsiento([{
