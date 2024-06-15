@@ -168,7 +168,6 @@ export default function ModalDetalleMovimiento({
             {!selectedMovimiento.esIngreso && (
               <button
                 onClick={() => {
-                  if (!caja || !cajero) return;
                   const time = selectedMovimiento.comprobante.fechaEmision;
                   generatePDF({
                     cajero: `${selectedMovimiento.apertura.cajero.nombre} ${selectedMovimiento.apertura.cajero.apellido}`,
