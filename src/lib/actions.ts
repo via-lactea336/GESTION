@@ -84,8 +84,15 @@ export async function fetchRevenue(): Promise<Revenue[]> {
       fechaEmision: true,
       total: true,
     },
+    where: {
+      // Only include invoices that have been paid and one year old
+      totalSaldoPagado: { gt: 0 },
+      fechaEmision: {
+        gt: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
+      },
+    },
+    orderBy: { fechaEmision: "asc" },
   });
-
   // Use a map to aggregate revenue by month
   const revenueMap = new Map<string, number>();
 
@@ -118,20 +125,25 @@ export async function fetchRevenue(): Promise<Revenue[]> {
 export async function fetchLatestInvoices(): Promise<LatestInvoice[]> {
   const latestInvoicesData = await prisma.factura.findMany({
     take: 5,
-    orderBy: { fechaEmision: "desc" },
+    orderBy: { updatedAt: "desc" },
     select: {
       id: true,
       cliente: true,
       total: true,
+      totalSaldoPagado: true,
+      numeroFactura: true,
+      movimientos: true,
     },
   });
-
   const latestInvoices = latestInvoicesData.map((invoice) => ({
     id: invoice.id,
     name: invoice.cliente.nombre,
     ruc: invoice.cliente.docIdentidad,
     amount: invoice.total.toNumber(),
+    invoiceNumber: invoice.numeroFactura,
+    movId: invoice.movimientos?.at(-1)?.id,
+    paymentStatus:
+      +invoice.totalSaldoPagado === +invoice.total ? "pagado" : "pendiente",
   }));
-
   return latestInvoices;
 }

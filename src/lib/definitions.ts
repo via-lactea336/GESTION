@@ -116,4 +116,7 @@ export type LatestInvoice = {
   name: string;
   ruc: string;
   amount: number;
+  paymentStatus: string;
+  invoiceNumber: string;
+  movId?: string;
 };

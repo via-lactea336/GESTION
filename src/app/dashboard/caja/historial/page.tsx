@@ -5,25 +5,28 @@ import Link from "next/link";
 import Table from "@/components/global/Table";
 import { useEffect, useState } from "react";
 import Search from "@/components/global/Search";
-import { ParamsReportes } from "@/lib/moduloCaja/movimiento/obtenerMovimientosFiltro";
+import {
+  MovimientosFiltroData,
+  ParamsReportes,
+} from "@/lib/moduloCaja/movimiento/obtenerMovimientosFiltro";
 import Filtros from "@/components/dashboard/caja/Filtros";
-import { CajeroWithRole } from "@/components/dashboard/caja/HistorialData";
+import { useSearchParams, useRouter } from "next/navigation";
 
 type Props = {
-  searchParams?: {
-    query?: string;
-    page?: string;
-  };
   params: {
     id: string;
   };
 };
 
-export default function Page({ params, searchParams }: Props) {
+export default function Page({ params }: Props) {
   const { id } = params;
   const { cajero, caja, loading } = useCookies();
-  const currentPage = Number(searchParams?.page) || 1;
-  const query = searchParams?.query || "";
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get("page")) || 1;
+  const query = searchParams.get("query") || "";
+  const showModalFromParams = searchParams.get("showModal") === "true";
+  const router = useRouter();
+
   const links = [
     { href: `/dashboard/caja`, text: "Cajas" },
     {
@@ -42,7 +45,32 @@ export default function Page({ params, searchParams }: Props) {
     incluirDocumentacion: true,
     identificadorDocumento: query,
   });
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(showModalFromParams);
+  // obtener de la url el movimientoId si es que lo hay
+  const initialMovimientoId = searchParams.get("movimientoId") ?? "";
+  const [selectedMovimiento, setSelectedMovimiento] =
+    useState<MovimientosFiltroData>();
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    if (showModal) {
+      params.set("showModal", "true");
+      if (initialMovimientoId) {
+        params.set("movimientoId", initialMovimientoId);
+      }
+    } else {
+      params.delete("showModal");
+      params.delete("movimientoId");
+    }
+    router.replace(`${window.location.pathname}?${params.toString()}`);
+  }, [
+    showModal,
+    setSelectedMovimiento,
+    initialMovimientoId,
+    selectedMovimiento,
+    router,
+    searchParams,
+  ]);
 
   return (
     <div className="relative">
@@ -83,6 +111,9 @@ export default function Page({ params, searchParams }: Props) {
         setShowModal={setShowModal}
         showModal={showModal}
         isAdmin={true}
+        selectedMovimiento={selectedMovimiento}
+        setSelectedMovimiento={setSelectedMovimiento}
+        initialMovimientoId={initialMovimientoId}
       />
     </div>
   );

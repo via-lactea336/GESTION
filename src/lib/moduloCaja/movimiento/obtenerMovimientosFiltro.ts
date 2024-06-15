@@ -18,10 +18,18 @@ export type ParamsReportes = {
   upTo?: number;
 };
 
-export type MovimientosFiltroData = Movimiento & {recibo : Recibos} & {
-    comprobante: Comprobante &
-    { user: { nombre: string; apellido: string; docIdentidad: string } };
-} & { movimientoDetalles: MovimientoDetalle[] } & { factura: Factura &{cliente: {nombre: string; docIdentidad: string} }};
+export type MovimientosFiltroData = Movimiento & { recibo: Recibos } & {
+  apertura: {
+    caja: { numero: number };
+    cajero: { nombre: string; apellido: string; docIdentidad: string };
+  };
+} & {
+  comprobante: Comprobante & {
+    user: { nombre: string; apellido: string; docIdentidad: string };
+  };
+} & { movimientoDetalles: MovimientoDetalle[] } & {
+  factura: Factura & { cliente: { nombre: string; docIdentidad: string } };
+};
 
 export default async function obtenerMovimientosFiltro({
   fechaDesde,
@@ -40,7 +48,8 @@ export default async function obtenerMovimientosFiltro({
   if (fechaDesde) searchParams.append("fechaDesde", fechaDesde);
   if (fechaHasta) searchParams.append("fechaHasta", fechaHasta);
   if (cajaId) searchParams.append("cajaId", cajaId);
-  if (identificadorDocumento) searchParams.append("identificadorDocumento", identificadorDocumento);
+  if (identificadorDocumento)
+    searchParams.append("identificadorDocumento", identificadorDocumento);
   if (incluirDocumentacion !== undefined && incluirDocumentacion)
     searchParams.append("incluirDocumentacion", "true");
 

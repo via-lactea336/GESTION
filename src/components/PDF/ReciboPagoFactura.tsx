@@ -78,6 +78,8 @@ type TransferReceiptProps = {
   numeroFactura: string;
   totalPagado: Decimal;
   createdAt?: Date;
+  nombreCajero?: string;
+  cajaNumero?: number;
 };
 
 const TransferReceipt: React.FC<TransferReceiptProps> = ({
@@ -87,6 +89,8 @@ const TransferReceipt: React.FC<TransferReceiptProps> = ({
   numeroFactura,
   totalPagado,
   createdAt,
+  nombreCajero,
+  cajaNumero,
 }) => {
   const cajero: Cajero = obtenerCookie("cajero");
   const caja: Caja = obtenerCookie("caja");
@@ -151,7 +155,8 @@ const TransferReceipt: React.FC<TransferReceiptProps> = ({
             Firma: _______________________________
           </Text>
           <Text style={styles.boldText}>
-            Cajero: {cajero?.nombre} - Caja: N°{caja?.numero}
+            Cajero: {nombreCajero ?? cajero?.nombre} - Caja: N°
+            {cajaNumero ?? caja?.numero}
           </Text>
         </View>
         <View style={styles.borde}>

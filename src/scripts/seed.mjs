@@ -227,6 +227,26 @@ async function main() {
     skipDuplicates: true,
   });
   
+  const cuentas = await prisma.cuenta.createMany({
+    data: [
+      {
+        codigo:"101.01.01",
+        nombre:"CAJA",
+        asentable: true
+      },
+      {
+        codigo:"103.01.01",
+        nombre:"CLIENTES NACIONALES",
+        asentable: true
+      },
+      {
+        codigo:"401.01.01",
+        nombre:"VENTA DE MERCADERIAS",
+        asentable: true
+      }
+    ]
+  })
+
   const cajas = await prisma.caja.createMany({
     data: [
       {

@@ -14,6 +14,7 @@ import ApiError from "@/lib/api/ApiError";
 import crearComprobanteDesdeMovimiento from "@/lib/moduloCaja/comprobante/services/crearComprobanteDesdeMovimiento";
 import generarReciboDeMovimiento from "@/lib/moduloCaja/recibo/services/generarReciboDeMovimiento";
 import calcularSaldosMovimiento from "@/lib/moduloCaja/movimiento/calcularSaldosMovimiento";
+import generarAsiento from "@/lib/asientos/services/asiento/generarAsiento";
 
 export async function POST(req: NextRequest) {
 
@@ -67,6 +68,7 @@ export async function POST(req: NextRequest) {
               id: true,
               clienteId: true,
               esContado: true,
+              numeroFactura: true,
               totalSaldoPagado: true,
               total: true
             },
@@ -128,12 +130,41 @@ export async function POST(req: NextRequest) {
 
     //Si es egreso, crear un comprobante
     if (!mov.esIngreso) crearComprobanteDesdeMovimiento(result.id, result.apertura.saldoInicial, sum, username, password, concepto);
-    else{ //Si es ingreso, generar un recibo
+    else if(result.factura && !result.factura.esContado){ //Si es ingreso y es una factura a credito, generar un recibo
       if (!result.factura) throw new ApiError("No se pudo crear el recivo debido a que la factura no existe", 404)
       recibo = await generarReciboDeMovimiento(result.id, sum, result.factura.id, result.factura.clienteId)
+      generarAsiento([{
+        concepto: `Pago parcial de factura numero ${result.factura.numeroFactura}`,
+        codigo: "103.01.01",
+        monto: sum,
+        esDebe: true,
+        esAsentable: true,
+      },
+      {
+        concepto: `Venta de mercaderia relacionada con la factura numero ${result.factura.numeroFactura}`,
+        codigo: "401.01.01",
+        monto: sum,
+        esDebe: false,
+        esAsentable: true,
+      }
+    ])
+    }else if(result.factura && result.factura.esContado){ //Si es ingreso y es una factura a credito, generar un recibo
+      generarAsiento([ {
+        concepto: `Venta de mercaderia relacionada con la factura numero ${result.factura.numeroFactura}`,
+        codigo: "401.01.01",
+        monto: sum,
+        esDebe: false,
+        esAsentable: true,
+      },
+      {
+        concepto: `Cobro de la factura numero ${result.factura.numeroFactura}`,
+        codigo: "101.01.01",
+        monto: sum,
+        esDebe: true,
+        esAsentable: true,
+      }
+    ])
     }
-
-
 
     return generateApiSuccessResponse(
       200,
