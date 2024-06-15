@@ -76,6 +76,13 @@
 
     const handleAddChequeToList = (chequeDatos: ChequeCreate) => {
       if (cheques.find(c => c.numeroCheque === chequeDatos.numeroCheque)) return
+      if (
+        cheque.monto === 0 || 
+        cheque.involucrado === '' || 
+        cheque.bancoChequeId === '' || 
+        cheque.fechaEmision === '' ||
+        cheque.bancoChequeId === ''
+      ) return
       setCheques(prev => [...prev, {...chequeDatos, fechaEmision: new Date(chequeDatos.fechaEmision).toISOString()}])
       setMontos(prev => ({ ...prev, montoCheque: [...cheques, chequeDatos].reduce((init, curr) => init + curr.monto, 0) }))
       console.log(cheques)

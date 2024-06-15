@@ -109,6 +109,22 @@ export async function GET(request: NextRequest) {
         ? {
             recibo:true,
             movimientoDetalles: true,
+            apertura:{
+              select:{
+                cajero:{
+                  select:{
+                    nombre: true,
+                    apellido: true,
+                    docIdentidad: true
+                  }
+                },
+                caja:{
+                  select:{
+                    numero: true
+                  }
+                }
+              }
+            },
             comprobante: {
               include: {
                 user: {
