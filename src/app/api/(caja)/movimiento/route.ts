@@ -145,7 +145,6 @@ export async function POST(req: NextRequest) {
     if (!mov.esIngreso && username && password && concepto)
       await crearComprobanteDesdeMovimiento(
         result.id,
-        result.apertura.saldoInicial,
         sum,
         username,
         password,
