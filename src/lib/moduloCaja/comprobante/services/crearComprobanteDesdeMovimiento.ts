@@ -5,7 +5,6 @@ import { Decimal } from "@prisma/client/runtime/library";
 
 const crearComprobanteDesdeMovimiento = async (
   movimientoId: string,
-  saldoEfectivoApertura: Decimal,
   sum: number,
   username: string,
   password: string,
