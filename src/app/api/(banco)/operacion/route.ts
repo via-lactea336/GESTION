@@ -5,6 +5,7 @@ import {Decimal} from "@prisma/client/runtime/library";
 import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiResponse";
 import reflejarOperacion from "@/lib/moduloBanco/operacion/reflejarOperacion";
 import { ChequeAndOperacion } from "@/lib/definitions";
+import ApiError from "@/lib/api/ApiError";
 
 export async function POST(req: NextRequest) {
   
@@ -76,6 +77,7 @@ export async function POST(req: NextRequest) {
           },
           tipoOperacion: {
             select: {
+              nombre: true,
               afectaSaldo: true,
               afectaSaldoDisponible: true,
               esDebito: true
@@ -84,6 +86,16 @@ export async function POST(req: NextRequest) {
         }
       })
 
+      if(
+        operacionTx.tipoOperacion.nombre.startsWith("TRANSFERENCIA") &&
+        (
+          !operacionTx.bancoInvolucrado ||
+          !operacionTx.cuentaInvolucrado ||
+          !operacionTx.rucInvolucrado
+        )
+      )
+      throw new ApiError("No existe suficiente informacion del involucrado para crear la operacion", 400)
+
       //Validar si los saldos son suficiente
       if (operacionTx.tipoOperacion.esDebito &&
         (
@@ -91,12 +103,12 @@ export async function POST(req: NextRequest) {
           operacionTx.tipoOperacion.afectaSaldoDisponible && operacionTx.cuentaBancariaOrigen.saldoDisponible.sub(monto).lessThanOrEqualTo(0) 
         )
       )
-      throw new Error("Saldo insuficiente para realizar la operacion");
+      throw new ApiError("Saldo insuficiente para realizar la operacion", 400);
 
       if(cheques && cheques.length !== 0){
         for(const cheque of cheques){
           const { numeroCheque, involucrado, monto, esRecibido, bancoChequeId } = cheque
-          if(!numeroCheque || !involucrado || !monto || esRecibido===undefined || esRecibido===null || !bancoChequeId) throw new Error("Uno de los cheques no tiene informacion suficiente para ser procesada la operacion}")
+          if(!numeroCheque || !involucrado || !monto || esRecibido===undefined || esRecibido===null || !bancoChequeId) throw new ApiError("Uno de los cheques no tiene informacion suficiente para ser procesada la operacion", 400)
           await tx.cheque.create({
             data: {
               operacionId: operacionTx.id,
@@ -124,6 +136,7 @@ export async function POST(req: NextRequest) {
     return generateApiSuccessResponse(200, "La operacion se genero correctamente")
   
   }catch(err){
+    if(err instanceof ApiError) return generateApiErrorResponse(err.message, err.status)
     if(err instanceof Error) return generateApiErrorResponse(err.message, 400)
     else return generateApiErrorResponse("Something went wrong", 500)
   }  

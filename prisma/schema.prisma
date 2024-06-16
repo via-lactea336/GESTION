@@ -59,6 +59,8 @@ model TipoOperacion {
   afectaSaldo           Boolean
   afectaSaldoDisponible Boolean
 
+  escondido             Boolean             @default(false)
+
   operaciones           Operacion[]
 
   deleted               DateTime?

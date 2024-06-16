@@ -1,12 +1,15 @@
 import FormTransferencias from "@/components/dashboard/transferencias/form";
 import Header from "@/components/global/Header";
 
-export default async function Page() {
+export default async function Page({ params }: { params: { id: string } }) {
+
+  const { id } = params;
+
   return (
     <div>
       <Header title="Transacciones" className="-mt-8" />
       <div className="flex justify-center items-center mt-6 p-12 bg-gray-700 rounded-md">
-        <FormTransferencias />
+        <FormTransferencias cuentaBancariaId={id} />
       </div>
     </div>
   );

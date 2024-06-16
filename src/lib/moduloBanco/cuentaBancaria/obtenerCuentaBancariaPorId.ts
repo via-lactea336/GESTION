@@ -1,9 +1,16 @@
 import { CuentaBancaria } from "@prisma/client";
 import { ApiResponseData } from "../../definitions";
 
+export type CuentaBancariaAndBanco = CuentaBancaria & {
+  banco: {
+    id: string;
+    nombre: string;
+  };
+}
+
 export default async function obtenerCuentaBancariaPorId(
   id: string
-): Promise<ApiResponseData<CuentaBancaria> | string | undefined> {
+): Promise<ApiResponseData<CuentaBancariaAndBanco> | string | undefined> {
   try {
     const response = await fetch(`/api/cuenta/${id}`, {
       headers: {
@@ -11,7 +18,7 @@ export default async function obtenerCuentaBancariaPorId(
       },
     });
 
-    const data: ApiResponseData<CuentaBancaria> = await response.json();
+    const data: ApiResponseData<CuentaBancariaAndBanco> = await response.json();
 
     return data;
   } catch (error) {
