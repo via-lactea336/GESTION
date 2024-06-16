@@ -17,6 +17,14 @@ export async function GET(req:NextRequest, { params }: { params: { id: string } 
   const accountBank = await prisma.cuentaBancaria.findFirst({
     where: {
       id
+    },
+    include: {
+      banco: {
+        select:{
+          id: true,
+          nombre: true,
+        }
+      }
     }
   })
 

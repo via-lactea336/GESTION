@@ -191,6 +191,14 @@ export default function Data({ userName }: DataProps) {
               </button>
             )}
           </PDFDownloadLink>
+
+          <Link
+            href={`/dashboard/account/${id}/transacciones`}
+            className="bg-gray-800 hover:bg-gray-900 text-white mr-4 py-2 px-4 rounded"
+          >
+            Transaccion
+          </Link>
+
           <Link
             href="/dashboard/account"
             className="bg-gray-800 hover:bg-gray-900 text-white  py-2 px-4 rounded"

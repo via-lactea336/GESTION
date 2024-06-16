@@ -69,7 +69,6 @@
     const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       const { name, value, id } = e.target
       setCheque(prev => {
-        if (name === "montoCheque") return { ...prev, ["monto"]: Number(value) }
         return { ...prev, [name || id]: value }
       })
     }
@@ -85,7 +84,7 @@
       ) return
       setCheques(prev => [...prev, {...chequeDatos, fechaEmision: new Date(chequeDatos.fechaEmision).toISOString()}])
       setMontos(prev => ({ ...prev, montoCheque: [...cheques, chequeDatos].reduce((init, curr) => init + curr.monto, 0) }))
-      console.log(cheques)
+      setCheque(initValueCheque)
     }
 
     return (
@@ -136,7 +135,7 @@
                 ))}
               </tbody>
             </table>
-            <div className="p-2 border-2 w-1/3 border-gray-500 rounded">
+            <div className="p-2 border-2 w-1/2 border-gray-500 rounded">
               <h2 className="text-xl font-bold my-4 text-center">Informacion del Cheque</h2>
               <div className="flex flex-col gap-2 p-4">
                 <div className="flex gap-2">
@@ -157,11 +156,11 @@
                   <label>Monto</label>
                   <Input
                     value={cheque.monto}
-                    onChange={onChange}
+                    onChange={(e) => setCheque({ ...cheque, monto: Number(e.target.value) })}
                     placeholder='Ingrese el monto del cheque'
                     id='montoCheque'
-                    type='number'
-                    className='bg-gray-800 text-white py-1 px-2 rounded-md'
+                    type='formattedNumber'
+                    className='bg-gray-800 text-white py-1 px-2 rounded-md flex-1'
                   />
                 </div>
                 <div className="flex gap-2">
