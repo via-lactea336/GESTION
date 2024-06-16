@@ -16,6 +16,7 @@ import Deposito from "./Deposito";
 import Retiro from "./Retiro";
 import DebitoBancario from "./DebitoBancario";
 import Transferencia from "./Transferencia";
+import EmitirCheque from "./EmitirCheque";
 
 type Operacion = {
   tipoOperacionId: string;
@@ -150,7 +151,7 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
   }, []);
 
   useEffect(() => {
-
+    setCheques([])
     switch (nombreOperacion) {
       case "DEBITO BANCARIO":
         if(!cuentasBancaria) {
@@ -174,7 +175,21 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
           bancoInvolucrado: cuentasBancaria?.banco.nombre,
         })
         break
-
+      
+      case "Emitir Cheque":
+        if(!cuentasBancaria) {
+          alert("No se encontro la cuenta bancaria")
+          break
+        }
+        setCheques(prev => [...prev, {
+          numeroCheque: "",
+          involucrado: "",
+          monto: 0,
+          fechaEmision: "",
+          esRecibido: false,
+          bancoChequeId: cuentasBancaria.banco.id,
+        }])
+      
       default:
         setOperacion({
           ...operacion,
@@ -184,8 +199,7 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
           cuentaInvolucrado: initialValues.cuentaInvolucrado,
         })
         break
-    }
-    setCheques([])
+    }    
   }, [operacion.tipoOperacionId])
 
   useEffect(() => {
@@ -283,6 +297,14 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
           esDebito={esDebito}
           bancos={bancos}
         />
+        :
+        nombreOperacion === "Emitir Cheque"?
+          <EmitirCheque 
+            operacion={operacion}
+            setCheques={setCheques}
+            cheques={cheques}
+            handleOnChange={handleOnChange}
+          />
         :
         null
       }

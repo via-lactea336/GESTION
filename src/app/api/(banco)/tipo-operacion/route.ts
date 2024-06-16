@@ -32,7 +32,11 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
 
-  const tipoOperacion = await prisma.tipoOperacion.findMany()
+  const tipoOperacion = await prisma.tipoOperacion.findMany({
+    where: {
+      escondido: false
+    }
+  })
 
   return generateApiSuccessResponse(200, "Lista de tipos de operaciones", tipoOperacion)
 
