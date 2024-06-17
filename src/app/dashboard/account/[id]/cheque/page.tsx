@@ -31,6 +31,7 @@ export default function Cheque({ params }: { params: { id: string } }) {
     fechaHasta: "",
   };
 
+  const [actionLoading, setActionLoading] = React.useState<{[key:string]:boolean}>({});
   const [cheques, setCheques] = React.useState<ChequeDetails[]>([]);
   const [loadingContentPage, setLoadingContentPage] = React.useState(true);
   const [loadingTable, setLoadingTable] = React.useState(true);
@@ -127,6 +128,8 @@ export default function Cheque({ params }: { params: { id: string } }) {
   };
 
   const handleConciliar = async (id: string, bancoAfectadoId: string) => {
+
+    setActionLoading((prevState) => ({ ...prevState, [id]: true }));
     const response = await concicliarCheque(id, bancoAfectadoId);
 
     if (typeof response === "string" || response === undefined) {
@@ -136,6 +139,8 @@ export default function Cheque({ params }: { params: { id: string } }) {
     }
 
     const prevCheques = [...cheques];
+    setActionLoading((prevState) => ({ ...prevState, [id]: false }));
+
     setCheques(
       prevCheques.map((cheque) =>
         cheque.id === id ? { ...cheque, estado: estadoCheque.PAGADO } : cheque
@@ -144,6 +149,7 @@ export default function Cheque({ params }: { params: { id: string } }) {
   };
 
   const handleAnular = async (id: string, bancoAfectadoId: string) => {
+    setActionLoading((prevState) => ({ ...prevState, [id]: true }));
     const response = await anularCheque(id, bancoAfectadoId);
 
     if (typeof response === "string" || response === undefined) {
@@ -153,6 +159,7 @@ export default function Cheque({ params }: { params: { id: string } }) {
     }
 
     const prevCheques = [...cheques];
+    setActionLoading((prevState) => ({ ...prevState, [id]: false }));
     setCheques(
       prevCheques.map((cheque) =>
         cheque.id === id ? { ...cheque, estado: estadoCheque.ANULADO } : cheque
@@ -356,7 +363,8 @@ export default function Cheque({ params }: { params: { id: string } }) {
                     <td>{cheque.fechaEmision.toString().split("T")[0]}</td>
                     <td>{cheque.bancoCheque.nombre}</td>
                     <td className="flex justify-center">
-                      {cheque.estado === estadoCheque.PAGADO ? (
+                      {
+                      cheque.estado === estadoCheque.PAGADO ? (
                         <span className="bg-green-500 p-1 rounded my-2">
                           {estadoCheque.PAGADO}
                         </span>
@@ -372,16 +380,19 @@ export default function Cheque({ params }: { params: { id: string } }) {
                     </td>
                     <td>{Number(cheque.monto).toLocaleString()}</td>
                     <td className="flex justify-center">
-                      {
-                        (cheque.esRecibido && cheque.bancoChequeId === cheque.cuentaAfectada.bancoId)
-                        ?
-                        <span>-</span>
+                      { 
+                        actionLoading[cheque.id] ? 
+                        <span className="flex items-center gap-2 bg-gray-600 p-1 rounded my-2">
+                          Cargando
+                          <LoadingCirleIcon className="w-6 h-6 mx-auto animate-spin" />
+                        </span>
                         :
                         (
                           <div className="flex gap-2">
 
                           { 
                             !cheque.esRecibido &&
+                            cheque.estado === estadoCheque.EMITIDO &&
                             <button
                               onClick={async () =>
                                 await handleConciliar(
@@ -411,7 +422,9 @@ export default function Cheque({ params }: { params: { id: string } }) {
                               >
                                 Anular
                               </button>
-                            )}
+                            )
+                          }
+                          
                         </div>)
                       }
                     </td>
