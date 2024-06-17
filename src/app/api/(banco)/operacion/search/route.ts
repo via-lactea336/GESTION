@@ -4,7 +4,6 @@ import {
   generateApiErrorResponse,
   generateApiSuccessResponse,
 } from "@/lib/apiResponse";
-import { DateTime } from "next-auth/providers/kakao";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;

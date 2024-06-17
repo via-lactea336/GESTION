@@ -30,11 +30,14 @@ export async function POST(req: NextRequest) {
   
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+
+  const all = searchParams.get("all")
 
   const tipoOperacion = await prisma.tipoOperacion.findMany({
     where: {
-      escondido: false
+      escondido: all && all === "true"? undefined : false
     }
   })
 
