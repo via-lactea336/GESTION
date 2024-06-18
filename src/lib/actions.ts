@@ -161,3 +161,36 @@ export async function obtenerAperturaPorUserId(userId: string) {
   });
   return apertura;
 }
+
+export async function obtenerGastosAgrupados() {
+  // Agrupar operaciones por tipo de gasto
+  const gastos = await prisma.operacion.findMany({
+    select: {
+      tipoOperacion: true,
+      monto: true,
+    },
+    where: {
+      tipoOperacion: {
+        esDebito: true,
+      },
+    },
+  });
+
+  // Agrupar y sumar los montos por tipo de operación
+  const gastosAgrupados = gastos.reduce((acc, gasto) => {
+    const tipo = gasto.tipoOperacion.nombre;
+    if (!acc[tipo]) {
+      acc[tipo] = {
+        tipoOperacion: gasto.tipoOperacion,
+        monto: gasto.monto.toNumber(),
+      };
+    } else {
+      acc[tipo].monto += gasto.monto.toNumber();
+    }
+    return acc;
+  }, {} as Record<string, { tipoOperacion: { nombre: string }; monto: number }>);
+
+  // Convertir el objeto resultante en un array
+  const format = Object.values(gastosAgrupados);
+  return format;
+}
