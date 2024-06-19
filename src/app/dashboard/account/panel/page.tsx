@@ -19,12 +19,7 @@ export default async function Page() {
         </Link>
       </Header>
       <div className="flex gap-8">
-        <div className="flex flex-col gap-4 w-full">
-          <h3 className="mb-4 text-lg">
-            Importe de gastos por tipo de operación
-          </h3>
-          <DonutChart data={gastos} />
-        </div>
+        <DonutChart data={gastos} />
         <BarChart balances={balances} />
       </div>
     </div>

@@ -202,6 +202,10 @@ export async function obtenerSaldoCuentas() {
       saldo: true,
       banco: true,
     },
+    //ordenar por saldo descendente
+    orderBy: {
+      saldo: "asc",
+    },
   });
   const saldos = cuentas.map((cuenta) => {
     return {

@@ -70,21 +70,30 @@ export function DonutChart({ data }: Props) {
   };
 
   return (
-    <section className="bg-gray-900 border border-primary-100 p-4 rounded-md flex items-center">
-      <div className="w-[290px] h-[190px]">
-        <Doughnut className="w-full relative" options={options} data={miData} />
+    <section className="flex flex-col gap-1 w-full">
+      <h3 className="mb-4 text-lg font-semibold">
+        Importe de Gastos por Tipo de Operación
+      </h3>
+      <div className="bg-gray-900 border border-primary-100 p-4 rounded-md flex items-center">
+        <div className="w-[290px] h-[190px]">
+          <Doughnut
+            className="w-full relative"
+            options={options}
+            data={miData}
+          />
+        </div>
+        <ul>
+          {data.map((gasto, index) => (
+            <li key={index} className="flex items-center gap-x-2 gap-y-4">
+              <span
+                className="w-4 h-4 rounded-full"
+                style={{ backgroundColor: backgroundColors[index] }}
+              ></span>
+              <span>{getReplacedName(gasto.tipoOperacion.nombre)}</span>
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul>
-        {data.map((gasto, index) => (
-          <li key={index} className="flex items-center gap-x-2 gap-y-4">
-            <span
-              className="w-4 h-4 rounded-full"
-              style={{ backgroundColor: backgroundColors[index] }}
-            ></span>
-            <span>{getReplacedName(gasto.tipoOperacion.nombre)}</span>
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }

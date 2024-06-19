@@ -8,6 +8,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  ChartOptions,
 } from "chart.js";
 import { Balance } from "@/lib/utils";
 
@@ -48,7 +49,7 @@ export default function BarChart({ balances }: { balances: Balance[] }) {
     labels: balances.map((balance) => balance.cuenta),
     datasets: [
       {
-        label: "Saldo de Cuenta",
+        label: "Saldo Total de Cuenta",
         borderWidth: 0,
         barThickness: 30,
         data: balances.map((balance) => balance.saldo),
@@ -78,6 +79,12 @@ export default function BarChart({ balances }: { balances: Balance[] }) {
             size: 15, // Cambia el tamaño del texto de las etiquetas del eje X
           },
         },
+        grid: {
+          display: false, // Oculta las líneas de la cuadrícula del eje X
+        },
+        border: {
+          display: false, // Oculta la línea del eje X
+        },
       },
       y: {
         beginAtZero: true,
@@ -86,14 +93,23 @@ export default function BarChart({ balances }: { balances: Balance[] }) {
           font: {
             size: 15, // Cambia el tamaño del texto de las etiquetas del eje X
           },
+          crossAlign: "far",
+        },
+        grid: {
+          display: false, // Oculta las líneas de la cuadrícula del eje X
+        },
+        border: {
+          display: false, // Oculta la línea del eje X
         },
       },
     },
-  };
+  } as ChartOptions<"bar">;
 
   return (
-    <div className="w-full flex flex-col gap-4">
-      <h3 className={`mb-4 text-lg text-white`}>Saldo de Cuentas Bancarias</h3>
+    <div className="w-full flex flex-col gap-1">
+      <h3 className={`mb-4 text-lg text-white font-semibold`}>
+        Saldo de Cuentas Bancarias
+      </h3>
       <div className="rounded-md bg-gray-900 p-4 border border-gray-100 h-[224px]">
         <Bar data={data} options={options} height={chartHeight} />
       </div>
