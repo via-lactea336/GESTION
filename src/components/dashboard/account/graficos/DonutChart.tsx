@@ -45,7 +45,6 @@ export function DonutChart({ data }: Props) {
     color: "white",
   };
   const miData = {
-    labels: data.map((gasto) => gasto.tipoOperacion.nombre.toUpperCase()),
     datasets: [
       {
         data: data.map((gasto) => gasto.monto),
@@ -57,9 +56,35 @@ export function DonutChart({ data }: Props) {
     ],
   };
 
+  const replacements: { [key: string]: string } = {
+    Retiro: "Retiro",
+    "DEBITO BANCARIO": "Débito",
+    "TRANSFERENCIA (EMITIDA)": "Transferencia",
+    "Emitir Cheque": "Emisión de cheque",
+    "CONCILIACION DE CHEQUE": "Conciliación",
+    "ANULACION DE CHEQUE": "Anulación de cheque",
+  };
+
+  const getReplacedName = (originalName: string): string => {
+    return replacements[originalName] || originalName;
+  };
+
   return (
-    <div className="w-[450px] h-[350px] flex flex-col  justify-center items-start bg-gray-900 border border-primary-100 p-4 rounded-md">
-      <Doughnut className="w-full" options={options} data={miData} />
-    </div>
+    <section className="bg-gray-900 border border-primary-100 p-4 rounded-md flex items-center">
+      <div className="w-[290px] h-[190px]">
+        <Doughnut className="w-full relative" options={options} data={miData} />
+      </div>
+      <ul>
+        {data.map((gasto, index) => (
+          <li key={index} className="flex items-center gap-x-2 gap-y-4">
+            <span
+              className="w-4 h-4 rounded-full"
+              style={{ backgroundColor: backgroundColors[index] }}
+            ></span>
+            <span>{getReplacedName(gasto.tipoOperacion.nombre)}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

@@ -194,3 +194,20 @@ export async function obtenerGastosAgrupados() {
   const format = Object.values(gastosAgrupados);
   return format;
 }
+
+// obtener el saldo de todas las cuentas
+export async function obtenerSaldoCuentas() {
+  const cuentas = await prisma.cuentaBancaria.findMany({
+    select: {
+      saldo: true,
+      banco: true,
+    },
+  });
+  const saldos = cuentas.map((cuenta) => {
+    return {
+      cuenta: cuenta.banco.nombre,
+      saldo: cuenta.saldo.toNumber(),
+    };
+  });
+  return saldos;
+}
