@@ -106,8 +106,8 @@ export default function BarChart({ balances }: { balances: Balance[] }) {
   } as ChartOptions<"bar">;
 
   return (
-    <div className="w-full flex flex-col gap-1">
-      <h3 className={`mb-4 text-lg text-white font-semibold`}>
+    <div className="w-full flex flex-col gap-2">
+      <h3 className={`text-lg text-white font-semibold`}>
         Saldo de Cuentas Bancarias
       </h3>
       <div className="rounded-md bg-gray-900 p-4 border border-gray-100 h-[224px]">

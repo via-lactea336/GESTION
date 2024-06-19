@@ -70,8 +70,8 @@ export function DonutChart({ data }: Props) {
   };
 
   return (
-    <section className="flex flex-col gap-1 w-full">
-      <h3 className="mb-4 text-lg font-semibold">
+    <section className="flex flex-col gap-2 w-full">
+      <h3 className="text-lg font-semibold">
         Importe de Gastos por Tipo de Operación
       </h3>
       <div className="bg-gray-900 border border-primary-100 p-4 rounded-md flex items-center">

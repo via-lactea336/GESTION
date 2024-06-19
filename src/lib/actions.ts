@@ -215,3 +215,31 @@ export async function obtenerSaldoCuentas() {
   });
   return saldos;
 }
+
+//obtener las ultimas 5 operaciones
+export async function obtenerUltimasOperaciones() {
+  const operaciones = await prisma.operacion.findMany({
+    take: 5,
+    orderBy: {
+      fechaOperacion: "desc",
+    },
+    select: {
+      monto: true,
+      tipoOperacion: true,
+      numeroComprobante: true,
+      id: true,
+      cuentaBancariaOrigenId: true,
+    },
+  });
+  const operacionesFormat = operaciones.map((operacion) => {
+    return {
+      monto: operacion.monto.toNumber(),
+      tipoOperacion: operacion.tipoOperacion.nombre,
+      numeroComprobante: operacion.numeroComprobante,
+      esDebito: operacion.tipoOperacion.esDebito,
+      cuentaBancaria: operacion.cuentaBancariaOrigenId,
+      id: operacion.id,
+    };
+  });
+  return operacionesFormat;
+}
