@@ -204,8 +204,8 @@ export default function Tabla({
                 }`}
               >
                 {operacion.tipoOperacion.esDebito
-                  ? `- ${Number(operacion.monto).toLocaleString()} Gs.`
-                  : `+ ${Number(operacion.monto).toLocaleString()} Gs.`}
+                  ? `- ${Number(operacion.monto).toLocaleString("es-PY")} Gs.`
+                  : `+ ${Number(operacion.monto).toLocaleString('es-PY')} Gs.`}
               </span>
             </td>
           </tr>
