@@ -106,11 +106,11 @@ export default function BarChart({ balances }: { balances: Balance[] }) {
   } as ChartOptions<"bar">;
 
   return (
-    <div className="w-full flex flex-col gap-2">
+    <div className="w-full mt-4 flex flex-col gap-2">
       <h3 className={`text-lg text-white font-semibold`}>
         Saldo de Cuentas Bancarias
       </h3>
-      <div className="rounded-md bg-gray-900 p-4 border border-gray-100 h-[224px]">
+      <div className="rounded-md bg-gray-900 p-4 border border-gray-100 ">
         <Bar data={data} options={options} height={chartHeight} />
       </div>
     </div>
