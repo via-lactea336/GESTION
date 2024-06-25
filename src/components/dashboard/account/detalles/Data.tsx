@@ -271,10 +271,10 @@ export default function Data({ userName }: DataProps) {
 
       <div className="flex justify-around gap-3 mb-1 bg-primary-800 p-4 rounded-md">
         <div>
-          <label>Tipo Operacion</label>
+          <label className="mr-1">Tipo Operacion</label>
           <select
             className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3 
-              [width:200px]"
+              [width:180px]"
             name="tipoOperacionId"
             onChange={handleChange}
           >
@@ -288,7 +288,7 @@ export default function Data({ userName }: DataProps) {
         </div>
 
         <div>
-          <label>Operacion</label>
+          <label className="mr-1">Movimiento</label>
           <select
             className="bg-gray-800 text-white py-1 px-2 rounded mr-3 w-28"
             name="esDebito"
@@ -300,24 +300,8 @@ export default function Data({ userName }: DataProps) {
           </select>
         </div>
 
-        <div>
-          <label>Banco</label>
-          <select
-            className="bg-gray-800 text-white py-1 px-2 rounded mr-3 [width:200px]"
-            name="banco"
-            onChange={handleChange}
-          >
-            <option value="">Todos</option>
-            {bancos?.data.map((option, i) => (
-              <option key={i} value={option.nombre}>
-                {option.nombre}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label>Fecha desde</label>
+        <div className="flex flex-row">
+          <label className="mr-2 mt-1">Fecha desde</label>
           <InputCalendar
             id="fechaMin"
             value={filtros.fechaMin}
@@ -326,8 +310,8 @@ export default function Data({ userName }: DataProps) {
           />
         </div>
 
-        <div>
-          <label>Fecha hasta</label>
+        <div className="flex flex-row">
+          <label className="mr-2 mt-1">Fecha hasta</label>
           <InputCalendar
             id="fechaMax"
             value={filtros.fechaMax}
