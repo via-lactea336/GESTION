@@ -106,7 +106,8 @@ model Cheque {
   monto                     Decimal          @db.Money        
   
   fechaEmision              DateTime
-  fechaPago                 DateTime?
+  fechaDeposito             DateTime?
+  fechaPago                 DateTime? 
 
   involucrado               String @db.VarChar(128)
 

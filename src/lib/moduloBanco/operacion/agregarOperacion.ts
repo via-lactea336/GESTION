@@ -18,6 +18,7 @@ export type CrearOperacionFields = {
     fechaEmision: string,
     esRecibido: boolean,
     bancoChequeId: string,
+    fechaPago?: string
   }[]
 }
 

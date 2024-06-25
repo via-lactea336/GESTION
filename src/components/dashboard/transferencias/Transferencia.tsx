@@ -68,7 +68,7 @@ export default function Transferencia({ operacion, handleOnChange, setMontoParci
           <label className=" mb-2">N° de Cuenta del {esDebito ? "Destinatario" : "Remitente"}*</label>
           <Input
             className={'block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none'}
-            onChange={(e) => setMontoParcial(Number(e.target.value))}
+            onChange={handleOnChange}
             id="cuentaInvolucrado"
             value={operacion.cuentaInvolucrado || ""}
             type="text"
