@@ -59,12 +59,12 @@ export function DonutChart({ data, title }: Props) {
 
   const replacements: { [key: string]: string } = {
     Retiro: "Retiro",
-    "DEBITO BANCARIO": "Débito",
-    "TRANSFERENCIA (EMITIDA)": "Transferencia",
-    "TRANSFERENCIA (RECIBIDA)": "Transferencia",
-    "Emitir Cheque": "Emisión de cheque",
-    "CONCILIACION DE CHEQUE": "Conciliación",
-    "ANULACION DE CHEQUE": "Anulación de cheque",
+    "Débito bancario": "Débito",
+    "Transferencia (Emitida)": "Transferencia",
+    "Transferencia (Recibida)": "Transferencia",
+    "Emisión de cheque": "Emisión de cheque",
+    "Conciliación de Cheque": "Conciliación",
+    "Anulación de Cheque": "Anulación de cheque",
   };
 
   const getReplacedName = (originalName: string): string => {
