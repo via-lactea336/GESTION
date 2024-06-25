@@ -102,7 +102,7 @@ export default function PageComponent() {
       <div className="w-1/2 py-4 border-b border-gray-300">
         <div className="flex justify-between w-full">
           <p className="w-1/3 text-base">Monto:</p>
-          <p className="w-2/3 text-base text-right">{monto}</p>
+          <p className="w-2/3 text-base text-right">{Number(monto).toLocaleString("es-PY")}</p>
         </div>
         <div className="flex justify-between w-full">
           <p className="w-1/3 text-base">Comprobante:</p>

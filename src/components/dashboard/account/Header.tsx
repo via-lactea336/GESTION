@@ -14,13 +14,13 @@ type MenuItem = {
 type HeaderProps = {
   onBancoSeleccionado: (bancoId: string) => void;
   onTipoCuentaSeleccionado: (tipoCuenta: string) => void;
-  onVerSaldo: (verSaldo: boolean) => void;
+ 
 };
 
 const Header = ({
   onBancoSeleccionado,
   onTipoCuentaSeleccionado,
-  onVerSaldo,
+
 }: HeaderProps) => {
   const estadoInicial = [{ id: "0", nombre: "No hay bancos", deleted: null }];
   const handleBancoSeleccionado = (
@@ -37,10 +37,6 @@ const Header = ({
     onTipoCuentaSeleccionado(tipoCuenta);
   };
 
-  const handleVerSaldo = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const verSaldo = event.target.checked;
-    onVerSaldo(verSaldo);
-  };
 
   const obtenerYMostrarBanco = async () => {
     try {
@@ -97,15 +93,7 @@ const Header = ({
             </select>
           </div>
         ))}
-        <div className="flex items-center gap-3">
-          <h3>Ver saldos</h3>
-          <input
-            onChange={handleVerSaldo}
-            defaultChecked={false}
-            type="checkbox"
-            className="h-4 w-4 accent-primary-500 cursor-pointer"
-          />
-        </div>
+       
       </nav>
     </header>
   );

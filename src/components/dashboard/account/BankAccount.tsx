@@ -22,13 +22,7 @@ const BankAccount: React.FC<Props> = ({
       <p className="text-sm"> N° de cuenta {numeroCuenta}</p>
       <p className="text-sm"> {tipoDeCuenta}</p>
       <div className="flex flex-row-reverse justify-between items-center pt-4 w-full">
-        <p className="text-xl">
-          {" "}
-          {verSaldo
-            ? Number(saldoFormateado).toLocaleString()
-            : `${"*".repeat(saldoFormateado.toLocaleString().length)}`}{" "}
-          GS
-        </p>
+        <p className="text-xl"> {Number(saldoFormateado).toLocaleString("es-PY")}GS</p>
         <a
           href={`/dashboard/account/${id}`}
           className="bg-primary-700 text-white py-2 px-2 text-sm rounded-md hover:bg-primary-600"

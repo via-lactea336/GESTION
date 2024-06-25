@@ -1,3 +1,4 @@
+import { movimientoDetallado } from "@/components/cajaVentanasEmergentes/ResumenDetalle";
 import {
   AperturaCaja,
   ArqueoDeCaja,
@@ -86,7 +87,7 @@ export type UserWithName = {
 
 export type DatosExtendidosRegistroCaja = RegistroCaja & {
   apertura: {
-    movimiento: Movimiento[];
+    movimiento: movimientoDetallado[];
     observaciones: string | null;
     arqueo: {
       observaciones: string | null;
@@ -99,7 +100,11 @@ export type RegistroDiarioFullData = RegistroCaja & {
     arqueo: ArqueoDeCaja;
     movimiento: (Movimiento & {
       factura: Factura | null;
-      comprobante: Comprobante & {user: {nombre: string, apellido: string, docIdentidad: string}} | null;
+      comprobante:
+        | (Comprobante & {
+            user: { nombre: string; apellido: string; docIdentidad: string };
+          })
+        | null;
       movimientoDetalles: MovimientoDetalle[];
     })[];
   };

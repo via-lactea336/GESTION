@@ -120,7 +120,7 @@
                 {cheques?.map((cheque) => (
                   <tr className='border-b-2 h-auto p-0 m-0 border-gray-500' key={cheque.numeroCheque}>
                     <td className=''>{cheque.numeroCheque}</td>
-                    <td>{cheque.monto}</td>
+                    <td>{Number(cheque.monto).toLocaleString("es-PY")}</td>
                     <td>{cheque.involucrado}</td>
                     <td>
                       <button

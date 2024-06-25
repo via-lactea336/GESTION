@@ -67,7 +67,6 @@ export default function Page() {
       <Header
         onBancoSeleccionado={setBancoSeleccionado}
         onTipoCuentaSeleccionado={setTipoCuentaSeleccionado}
-        onVerSaldo={setVerSaldo}
       />
       <div className="bg-gray-700 mt-2 rounded-md">
         <div className="grid flex-wrap p-6 gap-4 grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
@@ -83,7 +82,10 @@ export default function Page() {
               saldo={cuenta.saldo}
               saldoDisponible={cuenta.saldoDisponible}
               verSaldo={verSaldo}
-              deleted={cuenta.deleted} createdAt={new Date()} updatedAt={new Date()}            />
+              deleted={cuenta.deleted}
+              createdAt={new Date()}
+              updatedAt={new Date()}
+            />
           ))}
         </div>
       </div>

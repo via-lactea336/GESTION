@@ -94,7 +94,7 @@ type ResumenCajaProps = {
   montoIngreso: number;
   montoIngresoCheque: number;
   montoIngresoTarjeta: number;
-  movimientos: Array<movimientoDetallado>;
+  movimientos: movimientoDetallado[];
   observaciones: string;
 };
 

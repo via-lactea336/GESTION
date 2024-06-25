@@ -161,3 +161,85 @@ export async function obtenerAperturaPorUserId(userId: string) {
   });
   return apertura;
 }
+
+export async function obtenerGastosAgrupados() {
+  // Agrupar operaciones por tipo de gasto
+  const gastos = await prisma.operacion.findMany({
+    select: {
+      tipoOperacion: true,
+      monto: true,
+    },
+    where: {
+      tipoOperacion: {
+        esDebito: true,
+      },
+    },
+  });
+
+  // Agrupar y sumar los montos por tipo de operación
+  const gastosAgrupados = gastos.reduce((acc, gasto) => {
+    const tipo = gasto.tipoOperacion.nombre;
+    if (!acc[tipo]) {
+      acc[tipo] = {
+        tipoOperacion: gasto.tipoOperacion,
+        monto: gasto.monto.toNumber(),
+      };
+    } else {
+      acc[tipo].monto += gasto.monto.toNumber();
+    }
+    return acc;
+  }, {} as Record<string, { tipoOperacion: { nombre: string }; monto: number }>);
+
+  // Convertir el objeto resultante en un array
+  const format = Object.values(gastosAgrupados);
+  return format;
+}
+
+// obtener el saldo de todas las cuentas
+export async function obtenerSaldoCuentas() {
+  const cuentas = await prisma.cuentaBancaria.findMany({
+    select: {
+      saldo: true,
+      banco: true,
+    },
+    //ordenar por saldo descendente
+    orderBy: {
+      saldo: "asc",
+    },
+  });
+  const saldos = cuentas.map((cuenta) => {
+    return {
+      cuenta: cuenta.banco.nombre,
+      saldo: cuenta.saldo.toNumber(),
+    };
+  });
+  return saldos;
+}
+
+//obtener las ultimas 5 operaciones
+export async function obtenerUltimasOperaciones() {
+  const operaciones = await prisma.operacion.findMany({
+    take: 5,
+    orderBy: {
+      fechaOperacion: "desc",
+    },
+    select: {
+      monto: true,
+      tipoOperacion: true,
+      numeroComprobante: true,
+      id: true,
+      cuentaBancariaOrigenId: true,
+    },
+  });
+  const operacionesFormat = operaciones.map((operacion) => {
+    return {
+      monto: operacion.monto.toNumber(),
+      tipoOperacion: operacion.tipoOperacion.nombre,
+      numeroComprobante: operacion.numeroComprobante,
+      esDebito: operacion.tipoOperacion.esDebito,
+      cuentaBancaria: operacion.cuentaBancariaOrigenId,
+      id: operacion.id,
+    };
+  });
+  return operacionesFormat;
+}

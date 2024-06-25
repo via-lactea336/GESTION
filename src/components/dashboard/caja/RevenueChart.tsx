@@ -1,6 +1,5 @@
 import { generateYAxis } from "@/lib/utils";
 import { CalendarIcon } from "@heroicons/react/24/outline";
-import { Revenue } from "@/lib/definitions";
 import { fetchRevenue } from "@/lib/actions";
 
 export default async function RevenueChart() {
@@ -10,7 +9,7 @@ export default async function RevenueChart() {
 
   if (!Array.isArray(revenue)) {
     // Manejar el caso en el que revenue no es un array
-    return <p className="mt-4 text-gray-400">No revenue data available.</p>;
+    return <p className="mt-4 text-gray-400">No hay datos disponibles.</p>;
   }
 
   return (
