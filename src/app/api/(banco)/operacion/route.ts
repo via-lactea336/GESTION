@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
       })
 
       if(
-        operacionTx.tipoOperacion.nombre.startsWith("TRANSFERENCIA") &&
+        operacionTx.tipoOperacion.nombre.startsWith("Transferencia") &&
         (
           !operacionTx.bancoInvolucrado ||
           !operacionTx.cuentaInvolucrado ||
@@ -107,8 +107,9 @@ export async function POST(req: NextRequest) {
 
       if(cheques && cheques.length !== 0){
         for(const cheque of cheques){
-          const { numeroCheque, involucrado, monto, esRecibido, bancoChequeId } = cheque
+          const { numeroCheque, involucrado, monto, esRecibido, bancoChequeId, fechaPago } = cheque
           if(!numeroCheque || !involucrado || !monto || esRecibido===undefined || esRecibido===null || !bancoChequeId) throw new ApiError("Uno de los cheques no tiene informacion suficiente para ser procesada la operacion", 400)
+          if(fechaPago && new Date(fechaPago).toISOString().split("T")[0] > operacionTx.fechaOperacion.toISOString().split("T")[0]) throw new ApiError(`La fecha de pago del cheque ${cheque.numeroCheque} no puede ser posterior a la fecha de la operacion`, 400)
           await tx.cheque.create({
             data: {
               operacionId: operacionTx.id,
@@ -118,8 +119,9 @@ export async function POST(req: NextRequest) {
               fechaEmision: !cheque.esRecibido? operacionTx.fechaOperacion : cheque.fechaEmision,
               esRecibido: cheque.esRecibido,
               cuentaBancariaAfectadaId: operacionTx.cuentaBancariaOrigenId,
+              fechaDeposito: cheque.esRecibido? operacionTx.fechaOperacion : null,
               bancoChequeId: cheque.bancoChequeId,
-              fechaPago:cheque.esRecibido? new Date() : null,
+              fechaPago:cheque.esRecibido && fechaPago? new Date(fechaPago) : null,
               estado: cheque.esRecibido? estadoCheque.PAGADO : estadoCheque.EMITIDO,
             }
           })

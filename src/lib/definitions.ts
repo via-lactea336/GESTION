@@ -97,6 +97,11 @@ export type DatosExtendidosRegistroCaja = RegistroCaja & {
 
 export type RegistroDiarioFullData = RegistroCaja & {
   apertura: AperturaCaja & {
+    caja:{numero:number}
+    cajero: {
+      nombre: string;
+      apellido: string;
+    }
     arqueo: ArqueoDeCaja;
     movimiento: (Movimiento & {
       factura: Factura | null;

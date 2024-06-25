@@ -1,9 +1,9 @@
 import Input from '@/components/global/Input'
 import InputCalendar from '@/components/global/InputCalendar'
+import { CrearOperacionFields } from '@/lib/moduloBanco/operacion/agregarOperacion'
 import React from 'react'
 import AgregarCheque, { ChequeCreate } from './AgregarCheque'
 import { Banco } from '@prisma/client'
-import { CrearOperacionFields } from '@/lib/moduloBanco/operacion/agregarOperacion'
 
 type Props = {
   loading: boolean
@@ -17,14 +17,24 @@ type Props = {
   setCheques: React.Dispatch<React.SetStateAction<ChequeCreate[]>>
 }
 
-export default function Deposito({operacion, setOperacion, handleOnChange, loading, setMontoParcial, montoParcial, bancos, cheques, setCheques}: Props) {
+export default function PagoProveedores({
+  handleOnChange,
+  operacion,
+  loading,
+  setMontoParcial,
+  cheques,
+  setCheques,
+  setOperacion,
+  montoParcial,
+  bancos
+}: Props) {
   return (
     <>
       <div className="flex sm:flex-row flex-wrap flex-col box-border gap-3 mb-3 w-full">
 
         <div className="flex flex-col w-full">
           <label className=" mb-2">
-            Nombre del depositante
+            Nombre del Proveedor*
           </label>
           <Input
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
@@ -37,7 +47,7 @@ export default function Deposito({operacion, setOperacion, handleOnChange, loadi
           />
         </div>
         <div className="flex flex-col w-full">
-          <label className="mb-2">Ruc</label>
+          <label className="mb-2">Ruc del Proveedor*</label>
           <Input
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="rucInvolucrado"
@@ -48,7 +58,7 @@ export default function Deposito({operacion, setOperacion, handleOnChange, loadi
           />
         </div>
         <div className="flex flex-col w-full">
-          <label className=" mb-2">Monto (Efectivo)</label>
+          <label className=" mb-2">Monto (Transferencia)*</label>
           <Input
             className={'block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none'}
             id="montoParcial"
@@ -103,7 +113,7 @@ export default function Deposito({operacion, setOperacion, handleOnChange, loadi
 
         <AgregarCheque 
           cheques={cheques}
-          chequeRecibido={true}
+          chequeRecibido={false}
           setCheques={setCheques}
           handleOnChangeOperacion={handleOnChange}
           loading={loading}

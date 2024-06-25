@@ -15,6 +15,7 @@
     fechaEmision: string,
     esRecibido: boolean,
     bancoChequeId: string,
+    fechaPago?: string
   }
 
   type Props = {
@@ -26,6 +27,7 @@
     setCheques: React.Dispatch<React.SetStateAction<ChequeCreate[]>>
     bancos: Banco[]
     loading: boolean
+    chequeRecibido:boolean
   }
 
   export default function AgregarCheque({
@@ -35,16 +37,18 @@
     setOperacion,
     operacion,
     loading,
-    monto
+    monto,
+    chequeRecibido
   }: Props) {
 
     const [display, setDisplay] = useState(false)
 
-    const initValueCheque = {numeroCheque: '',
+    const initValueCheque = {
+      numeroCheque: '',
       involucrado: '',
       monto: 0,
       fechaEmision: '',
-      esRecibido: true,
+      esRecibido: chequeRecibido,
       bancoChequeId: '',
     }
     const [cheque, setCheque] = useState<ChequeCreate>(initValueCheque)
@@ -55,6 +59,8 @@
       monto:0
     }
     const [montos, setMontos] = useState(initMontosValues)
+
+    const [esDiferido, setEsDiferido] = useState(false)
 
     useEffect(() => {
       setMontos(initMontosValues)
@@ -146,13 +152,13 @@
                     onChange={onChange}
                     id='bancoChequeId'
                   >
-                    <option value="">Selecciona el banco del cheque</option>
+                    <option value="">Banco del cheque</option>
                     {
                       bancos.map(banco => <option key={banco.id} value={banco.id}>{banco.nombre}</option>)
                     }
                   </select>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
                   <label>Monto</label>
                   <Input
                     value={cheque.monto}
@@ -185,6 +191,27 @@
                     handleChange={onChange}
                     id='fechaEmision'
                     className='bg-gray-800 text-white py-1 px-2 rounded-md'
+                  />
+                </div>
+                <div className="flex gap-2 items-center">
+                  <input type="checkbox" 
+                    checked={esDiferido} 
+                    onChange={(e) =>{
+                        setEsDiferido(e.target.checked)
+                        if(!e.target.checked) setCheque({ ...cheque, fechaPago: undefined })
+                      }} 
+                    id="esDiferido" />
+                  <label htmlFor='esDiferido'>Fecha de Pago</label>
+                  <InputCalendar
+                    value={cheque.fechaPago || ""}
+                    disabled={!esDiferido}
+                    limit={
+                      operacion.fechaOperacion.trim() === "" ? undefined :
+                      new Date(operacion.fechaOperacion)
+                    }
+                    handleChange={onChange}
+                    id='fechaPago'
+                    className='disabled:opacity-50 bg-gray-800 text-white py-1 px-2 rounded-md'
                   />
                 </div>
                 <div className="flex gap-2">

@@ -17,6 +17,7 @@ import Retiro from "./Retiro";
 import DebitoBancario from "./DebitoBancario";
 import Transferencia from "./Transferencia";
 import EmitirCheque from "./EmitirCheque";
+import PagoProveedores from "./PagoProveedores";
 
 type Operacion = {
   tipoOperacionId: string;
@@ -153,7 +154,7 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
   useEffect(() => {
     setCheques([])
     switch (nombreOperacion) {
-      case "DEBITO BANCARIO":
+      case "Débito bancario":
         if(!cuentasBancaria) {
           alert("No se encontro la cuenta bancaria")
           break
@@ -278,7 +279,7 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
             monto={montoParcial}
           />
         :
-        nombreOperacion === "DEBITO BANCARIO"?
+        nombreOperacion === "Débito bancario"?
           <DebitoBancario
             handleOnChange={handleOnChange}
             loading={loading}
@@ -287,7 +288,7 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
             setMontoParcial={setMontoParcial}
           />
         :
-        nombreOperacion.startsWith("TRANSFERENCIA")?
+        nombreOperacion.startsWith("Transferencia")?
         <Transferencia 
           handleOnChange={handleOnChange}
           loading={loading}
@@ -304,6 +305,19 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
             setCheques={setCheques}
             cheques={cheques}
             handleOnChange={handleOnChange}
+          />
+        :
+        nombreOperacion === "Pago a proveedores"?
+          <PagoProveedores
+            handleOnChange={handleOnChange}
+            operacion={operacion}
+            loading={loading}
+            setMontoParcial={setMontoParcial}
+            cheques={cheques}
+            setCheques={setCheques}
+            setOperacion={setOperacion}
+            montoParcial={montoParcial}
+            bancos={bancos}
           />
         :
         null

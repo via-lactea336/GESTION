@@ -13,6 +13,7 @@ type InputCalendarProps = {
   handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   limit?: Date;
   min?: string;
+  disabled?:boolean,
 };
 
 export default function InputCalendar({
@@ -26,6 +27,7 @@ export default function InputCalendar({
   withTime,
   limit,
   min,
+  disabled
 }: InputCalendarProps) {
   const { maxDate, maxDateTime } = useCalendar();
   const [error, setError] = useState<string>("");
@@ -66,6 +68,7 @@ export default function InputCalendar({
         id={id}
         name={id}
         type="date"
+        disabled={disabled}
         required={required || false}
         max={maxDate}
         min={min}

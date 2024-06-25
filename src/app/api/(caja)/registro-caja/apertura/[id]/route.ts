@@ -13,6 +13,17 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     include: {
       apertura:{
         include:{
+          caja: {
+            select:{
+              numero: true
+            }
+          },
+          cajero: {
+            select:{
+              nombre: true,
+              apellido: true
+            }
+          },
           arqueo: true,
           movimiento: {
             include:{
