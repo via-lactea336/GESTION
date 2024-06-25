@@ -7,6 +7,7 @@ import {
 } from "@/lib/apiResponse";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import reflejarOperacion from "@/lib/moduloBanco/operacion/reflejarOperacion";
+import ApiError from "@/lib/api/ApiError";
 
 export async function POST(
   req: NextRequest,
@@ -16,23 +17,30 @@ export async function POST(
   const id = params.id;
   
     try{
-      //Conciliar el cheque
-      const cheque = await prisma.cheque.update({
-        where: {
-          id,
-          estado: estadoCheque.EMITIDO,
-        },
-        data: {
-          fechaPago: new Date(),
-          estado: estadoCheque.PAGADO,
-        },
+
+      const cheque = await prisma.$transaction(async (tx) => {
+
+        const chequeTx = await tx.cheque.update({
+          where: {
+            id,
+          },
+          data: {
+            fechaDeposito: new Date(),
+            estado: estadoCheque.PAGADO,
+          },
+        })
+
+        if(chequeTx.fechaPago && chequeTx.fechaPago.toISOString().split('T')[0] > new Date().toISOString().split('T')[0]) throw new ApiError("El cheque no puede ser conciliado antes de la fecha de pago.", 400)
+
+        return chequeTx
+
       })
 
       if (!cheque) return generateApiErrorResponse("Cheque no encontrado", 404)
 
       const tipoOperacion = await prisma.tipoOperacion.findUnique({
         where: {
-          nombre: "CONCILIACION DE CHEQUE",
+          nombre: "Conciliación de cheque",
         },select:{
           id: true,
           esDebito: true,
@@ -46,7 +54,7 @@ export async function POST(
       const operacion = await prisma.operacion.create({
         data: {
           nombreInvolucrado: cheque.involucrado,
-          concepto: "CONCILIACION DE CHEQUE",
+          concepto: "Conciliación de cheque n° " + cheque.numeroCheque,
           fechaOperacion: new Date(),
           cuentaBancariaOrigenId: cheque.cuentaBancariaAfectadaId,
           monto: cheque.monto,

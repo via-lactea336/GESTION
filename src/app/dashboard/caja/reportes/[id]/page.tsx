@@ -8,20 +8,17 @@ import ResumenCajaPDF from "@/components/PDF/ResumenDiario";
 import DetalleMovimiento, {
   movimientoDetallado,
 } from "@/components/cajaVentanasEmergentes/ResumenDetalle";
-import { CajaData, Cajero, RegistroDiarioFullData } from "@/lib/definitions";
-import Link from "next/link";
+import { RegistroDiarioFullData } from "@/lib/definitions";
 import LoadingCirleIcon from "@/components/global/LoadingCirleIcon";
 import obtenerRegistroDeCajaPorAperturaId from "@/lib/moduloCaja/resumenDiario/obtenerRegistroDeCajaPorAperturaId";
 import { useParams } from "next/navigation";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
 import { Modal } from "@/components/global/Modal";
-import useCookies from "@/lib/hooks/useCookies";
 
 export default function Page() {
   const { id } = useParams();
 
   const [showModal, setShowModal] = useState(false);
-  const { caja, cajero } = useCookies();
   const [registros, setRegistros] = useState<RegistroDiarioFullData>();
   const [detalle, setDetalle] = useState<movimientoDetallado>();
 
@@ -81,8 +78,8 @@ export default function Page() {
     <div>
       <div className={showModal ? "blur-sm brightness-50" : ""}>
         <Header title="Resumen diario" className="-mt-8">
-          <h3 className="ml-8">{cajero.nombre}</h3>
-          <h3>Caja N° {caja.numero}</h3>
+          <h3 className="ml-8">{registros.apertura.cajero.nombre + " " + registros.apertura.cajero.apellido}</h3>
+          <h3>Caja N° {registros.apertura.caja.numero}</h3>
         </Header>
 
         <div className="bg-gray-800 py-4 px-4 rounded-md mt-5">
@@ -97,8 +94,8 @@ export default function Page() {
             document={
               <ResumenCajaPDF
                 createdAt={registros.createdAt}
-                caja={Number(caja.numero)}
-                cajero={cajero.nombre}
+                caja={Number(registros.apertura.caja.numero)}
+                cajero={registros.apertura.cajero.nombre + " " + registros.apertura.cajero.apellido}
                 apertura={{
                   saldoInicial: Number(registros.montoInicial),
                   createdAt: registros.createdAt,

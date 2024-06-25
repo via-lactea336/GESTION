@@ -53,7 +53,7 @@ export default function Input({
   const val = type === "formattedNumber" ? formatted : value;
 
   return (
-    <div>
+    <div className="">
       <input
         className={`[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${className} ${
           error ? "border border-red-500" : ""

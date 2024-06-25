@@ -10,33 +10,44 @@ export async function GET(req:NextRequest, { params }: { params: { id: string } 
         id
       },
       include: {
-        apertura:{
-          include:{
-            arqueo: true,
-            movimiento: {
-              include:{
-                factura: true,
-                comprobante:{
-                  include:{
-                    user:{
-                      select:{
-                        nombre: true,
-                        apellido: true,
-                        docIdentidad: true
+          apertura:{
+            include:{
+              caja: {
+                select:{
+                  numero: true
+                }
+              },
+              cajero: {
+                select:{
+                  nombre: true,
+                  apellido: true
+                }
+              },
+              arqueo: true,
+              movimiento: {
+                include:{
+                  factura: true,
+                  comprobante:{
+                    include:{
+                      user:{
+                        select:{
+                          nombre: true,
+                          apellido: true,
+                          docIdentidad: true
+                        }
                       }
                     }
-                  }
-                },
-                movimientoDetalles: {
-                  include:{
-                    tarjeta: true,
-                    chequeCaja: true
+                  },
+                  movimientoDetalles: {
+                    include:{
+                      tarjeta: true,
+                      chequeCaja: true
+                    }
                   }
                 }
               }
             }
           }
-        }
       }
     });
     if(!registroCaja) return generateApiErrorResponse("No se ha podido encontrar el registro de caja", 500)

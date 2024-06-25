@@ -43,6 +43,17 @@ export async function GET(request: NextRequest) {
     include: documentacion === "true" ? {
       apertura:{
         include:{
+          caja: {
+            select:{
+              numero: true
+            }
+          },
+          cajero: {
+            select:{
+              nombre: true,
+              apellido: true
+            }
+          },
           arqueo: true,
           movimiento: {
             include:{
