@@ -15,13 +15,13 @@ import obtenerRegistroDeCajaPorAperturaId from "@/lib/moduloCaja/resumenDiario/o
 import { useParams } from "next/navigation";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
 import { Modal } from "@/components/global/Modal";
+import useCookies from "@/lib/hooks/useCookies";
 
 export default function Page() {
   const { id } = useParams();
 
   const [showModal, setShowModal] = useState(false);
-  const caja = obtenerCookie("caja") as CajaData;
-  const cajero = obtenerCookie("cajero") as Cajero;
+  const { caja, cajero } = useCookies();
   const [registros, setRegistros] = useState<RegistroDiarioFullData>();
   const [detalle, setDetalle] = useState<movimientoDetallado>();
 
@@ -52,10 +52,6 @@ export default function Page() {
     };
     fetchRegistro();
   }, [id]);
-
-  useEffect(() => {
-    console.log(items);
-  }, [items]);
 
   const formatDate = (dateString: Date) => {
     const date = new Date(dateString);

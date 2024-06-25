@@ -133,6 +133,13 @@ export async function fetchLatestInvoices(): Promise<LatestInvoice[]> {
       totalSaldoPagado: true,
       numeroFactura: true,
       movimientos: true,
+      esContado: true,
+    },
+    where: {
+      totalSaldoPagado: { gt: 0 },
+      movimientos: {
+        some: {},
+      },
     },
   });
   const latestInvoices = latestInvoicesData.map((invoice) => ({
@@ -142,6 +149,7 @@ export async function fetchLatestInvoices(): Promise<LatestInvoice[]> {
     amount: invoice.total.toNumber(),
     invoiceNumber: invoice.numeroFactura,
     movId: invoice.movimientos?.at(-1)?.id,
+    type: invoice.esContado ? "Contado" : "Crédito",
     paymentStatus:
       +invoice.totalSaldoPagado === +invoice.total ? "pagado" : "pendiente",
   }));

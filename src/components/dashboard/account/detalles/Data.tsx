@@ -16,7 +16,6 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@heroicons/react/24/outline";
-import { PDFDownloadLink } from "@react-pdf/renderer";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -24,6 +23,15 @@ import { useState, useEffect } from "react";
 import { Toaster } from "sonner";
 import Tabla from "./Tabla";
 import Cookies from "js-cookie";
+import dynamic from "next/dynamic";
+
+const PDFDownloadLink = dynamic(
+  () => import("@react-pdf/renderer").then((mod) => mod.PDFDownloadLink),
+  {
+    ssr: false,
+    loading: () => <></>,
+  }
+);
 
 type DataProps = {
   userName: string;
@@ -43,15 +51,7 @@ export default function Data({ userName }: DataProps) {
   const [operaciones, setOperaciones] = useState<OperacionAndTipoOperacion[]>(
     []
   );
-  const [bancos, setBancos] = useState<
-    ApiResponseData<
-      {
-        id: string;
-        nombre: string;
-        deleted: Date | null;
-      }[]
-    >
-  >();
+
   const [operacionesFiltradas, setOperacionesFiltradas] = useState<
     OperacionAndTipoOperacion[]
   >([]);
@@ -126,7 +126,6 @@ export default function Data({ userName }: DataProps) {
         if (typeof tipoOperacionesReq === "string" || !tipoOperacionesReq) {
           throw new Error(tipoOperacionesReq);
         }
-        setBancos(tipoOperacionesReq);
       } catch (error) {
         console.error(error);
       }
@@ -196,7 +195,7 @@ export default function Data({ userName }: DataProps) {
             href={`/dashboard/account/${id}/transacciones`}
             className="bg-gray-800 hover:bg-gray-900 text-white mr-4 py-2 px-4 rounded"
           >
-            Transaccion
+            Transacción
           </Link>
 
           <Link
@@ -250,7 +249,7 @@ export default function Data({ userName }: DataProps) {
           <div className="mb-4 flex items-center">
             <label className="block font-semibold mr-2">Saldo Total:</label>
             {accountData ? (
-              <p>${Number(accountData.saldo).toLocaleString()}</p>
+              <p>{Number(accountData.saldo).toLocaleString()} Gs.</p>
             ) : (
               <div className="bg-gray-300 h-4 w-20 rounded animate-pulse"></div>
             )}
@@ -260,7 +259,7 @@ export default function Data({ userName }: DataProps) {
               Saldo Disponible:
             </label>
             {accountData ? (
-              <p>${Number(accountData.saldoDisponible).toLocaleString()}</p>
+              <p>{Number(accountData.saldoDisponible).toLocaleString()} Gs.</p>
             ) : (
               <div className="bg-gray-300 h-4 w-20 rounded animate-pulse"></div>
             )}
@@ -269,9 +268,9 @@ export default function Data({ userName }: DataProps) {
       </div>
       <h1 className="text-xl font-bold my-4">Movimientos</h1>
 
-      <div className="flex justify-around gap-3 mb-1 bg-primary-800 p-4 rounded-md">
-        <div>
-          <label className="mr-1">Tipo Operacion</label>
+      <div className="flex justify-around items-center gap-3 mb-1 bg-primary-800 p-4 rounded-md">
+        <div className="flex flex-col gap-2">
+          <label className="mr-1">Operacion</label>
           <select
             className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3 
               [width:180px]"
@@ -287,7 +286,7 @@ export default function Data({ userName }: DataProps) {
           </select>
         </div>
 
-        <div>
+        <div className="flex flex-col gap-2">
           <label className="mr-1">Movimiento</label>
           <select
             className="bg-gray-800 text-white py-1 px-2 rounded mr-3 w-28"
@@ -300,22 +299,24 @@ export default function Data({ userName }: DataProps) {
           </select>
         </div>
 
-        <div className="flex flex-row">
+        <div className="flex flex-col gap-2">
           <label className="mr-2 mt-1">Fecha desde</label>
           <InputCalendar
             id="fechaMin"
             value={filtros.fechaMin}
+            limit={filtros.fechaMax ? new Date(filtros.fechaMax) : new Date()}
             handleChange={handleChange}
             className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
           />
         </div>
 
-        <div className="flex flex-row">
+        <div className="flex flex-col gap-2">
           <label className="mr-2 mt-1">Fecha hasta</label>
           <InputCalendar
             id="fechaMax"
             value={filtros.fechaMax}
             handleChange={handleChange}
+            min={filtros.fechaMin}
             className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
           />
         </div>

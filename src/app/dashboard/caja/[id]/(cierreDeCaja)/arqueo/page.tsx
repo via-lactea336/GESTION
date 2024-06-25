@@ -138,7 +138,7 @@ export default function Page() {
                   <Input
                     type="number"
                     id="moneda500"
-                    placeholder="10"
+                    placeholder=""
                     value={
                       denominaciones.moneda500 === 0
                         ? ""
@@ -163,7 +163,7 @@ export default function Page() {
                   <Input
                     type="number"
                     id="moneda1000"
-                    placeholder="15"
+                    placeholder=""
                     value={
                       denominaciones.moneda1000 === 0
                         ? ""
@@ -188,7 +188,7 @@ export default function Page() {
                   <Input
                     type="number"
                     id="billete2000"
-                    placeholder="30"
+                    placeholder=""
                     value={
                       denominaciones.billete2000 === 0
                         ? ""
@@ -215,7 +215,7 @@ export default function Page() {
                   <Input
                     type="number"
                     id="billete5000"
-                    placeholder="50"
+                    placeholder=""
                     value={
                       denominaciones.billete5000 === 0
                         ? ""
@@ -242,7 +242,7 @@ export default function Page() {
                   <Input
                     type="number"
                     id="billete10000"
-                    placeholder="50"
+                    placeholder=""
                     value={
                       denominaciones.billete10000 === 0
                         ? ""
@@ -269,7 +269,7 @@ export default function Page() {
                   <Input
                     type="number"
                     id="billete20000"
-                    placeholder="40"
+                    placeholder=""
                     value={
                       denominaciones.billete20000 === 0
                         ? ""
@@ -296,7 +296,7 @@ export default function Page() {
                   <Input
                     type="number"
                     id="billete50000"
-                    placeholder="25"
+                    placeholder=""
                     value={
                       denominaciones.billete50000 === 0
                         ? ""
@@ -323,7 +323,7 @@ export default function Page() {
                   <Input
                     type="number"
                     id="billete100000"
-                    placeholder="20"
+                    placeholder=""
                     value={
                       denominaciones.billete100000 === 0
                         ? ""
