@@ -10,9 +10,10 @@ type Props = {
     };
     monto: number;
   }[];
+  title: string;
 };
 
-export function DonutChart({ data }: Props) {
+export function DonutChart({ data, title }: Props) {
   const borderColor = [
     "rgba(84, 46, 155, 0.1)",
     "rgba(255, 99, 132, 0.1)",
@@ -58,11 +59,12 @@ export function DonutChart({ data }: Props) {
 
   const replacements: { [key: string]: string } = {
     Retiro: "Retiro",
-    "DEBITO BANCARIO": "Débito",
-    "TRANSFERENCIA (EMITIDA)": "Transferencia",
-    "Emitir Cheque": "Emisión de cheque",
-    "CONCILIACION DE CHEQUE": "Conciliación",
-    "ANULACION DE CHEQUE": "Anulación de cheque",
+    "Débito bancario": "Débito",
+    "Transferencia (Emitida)": "Transferencia",
+    "Transferencia (Recibida)": "Transferencia",
+    "Emisión de cheque": "Emisión de cheque",
+    "Conciliación de Cheque": "Conciliación",
+    "Anulación de Cheque": "Anulación de cheque",
   };
 
   const getReplacedName = (originalName: string): string => {
@@ -71,9 +73,7 @@ export function DonutChart({ data }: Props) {
 
   return (
     <section className="flex flex-col gap-2 w-full">
-      <h3 className="text-lg font-semibold">
-        Importe de Gastos por Tipo de Operación
-      </h3>
+      <h3 className="text-lg font-semibold">{title}</h3>
       <div className="bg-gray-900 border border-primary-100 p-4 rounded-md flex items-center">
         <div className="w-[290px] h-[190px]">
           <Doughnut

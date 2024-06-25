@@ -127,5 +127,6 @@ export type LatestInvoice = {
   amount: number;
   paymentStatus: string;
   invoiceNumber: string;
+  type: string;
   movId?: string;
 };

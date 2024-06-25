@@ -20,9 +20,9 @@ export default async function LatestMovs() {
   }
 
   return (
-    <div className="flex w-1/2 mt-4 flex-col gap-2">
+    <div className="flex w-full mt-4 flex-col gap-2">
       <h2 className={`text-lg font-semibold`}>Últimas Operaciones</h2>
-      <div className="flex grow flex-col justify-between bg-gray-900 border border-primary-100 p-4 rounded-md">
+      <div className="flex grow flex-col justify-between bg-gray-900 border border-primary-100 p-2 rounded-md">
         <div className="px-4">
           {latestMovs?.map((mov: LatestMov, i) => {
             return (

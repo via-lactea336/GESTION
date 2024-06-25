@@ -131,7 +131,7 @@ export default function Tabla({
       <tbody>
         <tr>
           <td>
-            <span className="text-md text-primary-400">Operacion</span>
+            <span className="text-md text-primary-400">Movimiento</span>
           </td>
           <td>
             <span className="text-md mr-2 text-primary-400">Fecha</span>
@@ -140,10 +140,7 @@ export default function Tabla({
             <span className="text-md mr-2 text-primary-400">Hora</span>
           </td>
           <td>
-            <span className="text-md mr-2 text-primary-400">Banco</span>
-          </td>
-          <td>
-            <span className="text-md mr-2 text-primary-400">Titular</span>
+            <span className="text-md mr-2 text-primary-400">Tipo Operacion</span>
           </td>
           <td>
             <span className="text-md mr-2 text-primary-400">Concepto</span>
@@ -182,12 +179,7 @@ export default function Tabla({
             </td>
             <td>
               <h1 className="text-sm font-normal mt-1">
-                {operacion.bancoInvolucrado}
-              </h1>
-            </td>
-            <td>
-              <h1 className="text-sm font-normal mt-1 ">
-                {operacion.nombreInvolucrado}
+                {operacion.tipoOperacion.nombre}
               </h1>
             </td>
             <td>

@@ -6,6 +6,9 @@ import TransferReceipt from "../../../../../components/PDF/TransferenciaDetails"
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { obtenerCookie } from "@/lib/obtenerCookie";
 import { UserWithName } from "@/lib/definitions";
+import useCookies from "@/lib/hooks/useCookies";
+import LoadingCirleIcon from "@/components/global/LoadingCirleIcon";
+import { useSession } from "next-auth/react";
 
 export default function PageComponent() {
   const [dateTime, setDateTime] = useState("undefined");
@@ -21,14 +24,16 @@ export default function PageComponent() {
   const [numCuentaOrigen, setNumCuentaOrigen] = useState("undefined");
   const [bancoOrigen, setBancoOrigen] = useState("undefined");
   const [tipoOperacion, setTipoOperacion] = useState("undefined");
+  const [loading, setLoading] = useState(true);
+
+  const { data: session, status } = useSession();
+  const user = session?.user;
 
   const { idMov } = useParams();
   const router = useRouter();
 
   const getTransferencia = async () => {
     const data = await obtenerOperacionPorId(idMov as string);
-    console.log(data);
-
     if (
       data == undefined ||
       typeof data === "string" ||
@@ -59,6 +64,7 @@ export default function PageComponent() {
     setNumCuentaOrigen(data.data.cuentaBancariaOrigen.numeroCuenta);
     setBancoOrigen(data.data.cuentaBancariaOrigen.banco.nombre);
     setTipoOperacion(data.data.tipoOperacion.esDebito ? "Debito" : "Credito");
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -68,7 +74,12 @@ export default function PageComponent() {
   const handleCloseButtonClick = () => {
     router.back();
   };
-  const user: UserWithName = obtenerCookie("user");
+  if (!user || loading)
+    return (
+      <div className="grid place-items-center h-full">
+        <LoadingCirleIcon className="animate-spin" />
+      </div>
+    );
 
   return (
     <div className="flex flex-col items-center justify-center h-full">
@@ -102,7 +113,9 @@ export default function PageComponent() {
       <div className="w-1/2 py-4 border-b border-gray-300">
         <div className="flex justify-between w-full">
           <p className="w-1/3 text-base">Monto:</p>
-          <p className="w-2/3 text-base text-right">{Number(monto).toLocaleString("es-PY")}</p>
+          <p className="w-2/3 text-base text-right">
+            {Number(monto).toLocaleString("es-PY")}
+          </p>
         </div>
         <div className="flex justify-between w-full">
           <p className="w-1/3 text-base">Comprobante:</p>
@@ -213,7 +226,11 @@ export default function PageComponent() {
           >
             Cerrar
           </button>
-          <button className="mr-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+          <button
+            className={
+              "mr-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            }
+          >
             <PDFDownloadLink
               document={
                 <TransferReceipt
@@ -228,17 +245,13 @@ export default function PageComponent() {
                   monto={monto}
                   dateTime={dateTime}
                   bancoOrigen={bancoOrigen}
-                  userName={user.name}
+                  userName={`${user?.nombre}`}
                 />
               }
               fileName="transferencia.pdf"
             >
               {({ loading, url, error, blob }) =>
-                loading ? (
-                  <p> Cargando documento... </p>
-                ) : (
-                  <p>Descargar</p>
-                )
+                loading ? <p> Cargando documento... </p> : <p>Descargar</p>
               }
             </PDFDownloadLink>
           </button>

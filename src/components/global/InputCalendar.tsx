@@ -46,7 +46,10 @@ export default function InputCalendar({
         onChange={(e) => {
           if (e.target.value.length < 0 || e.target.value.split("-").length < 3)
             return;
-          if (new Date(e.currentTarget.value).toISOString() > new Date().toISOString()) {
+          if (
+            new Date(e.currentTarget.value).toISOString() >
+            new Date().toISOString()
+          ) {
             setError(`Por favor, seleccione una fecha válida.`);
           } else {
             setError("");
@@ -70,7 +73,7 @@ export default function InputCalendar({
         type="date"
         disabled={disabled}
         required={required || false}
-        max={maxDate}
+        max={limit ? limit.toISOString().split("T")[0] : maxDate}
         min={min}
         value={value}
         placeholder={placeholder}

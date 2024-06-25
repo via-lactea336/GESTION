@@ -133,6 +133,13 @@ export async function fetchLatestInvoices(): Promise<LatestInvoice[]> {
       totalSaldoPagado: true,
       numeroFactura: true,
       movimientos: true,
+      esContado: true,
+    },
+    where: {
+      totalSaldoPagado: { gt: 0 },
+      movimientos: {
+        some: {},
+      },
     },
   });
   const latestInvoices = latestInvoicesData.map((invoice) => ({
@@ -142,6 +149,7 @@ export async function fetchLatestInvoices(): Promise<LatestInvoice[]> {
     amount: invoice.total.toNumber(),
     invoiceNumber: invoice.numeroFactura,
     movId: invoice.movimientos?.at(-1)?.id,
+    type: invoice.esContado ? "Contado" : "Crédito",
     paymentStatus:
       +invoice.totalSaldoPagado === +invoice.total ? "pagado" : "pendiente",
   }));
@@ -169,11 +177,6 @@ export async function obtenerGastosAgrupados() {
       tipoOperacion: true,
       monto: true,
     },
-    where: {
-      tipoOperacion: {
-        esDebito: true,
-      },
-    },
   });
 
   // Agrupar y sumar los montos por tipo de operación
@@ -183,16 +186,18 @@ export async function obtenerGastosAgrupados() {
       acc[tipo] = {
         tipoOperacion: gasto.tipoOperacion,
         monto: gasto.monto.toNumber(),
+        esDebito: gasto.tipoOperacion.esDebito,
       };
     } else {
       acc[tipo].monto += gasto.monto.toNumber();
     }
     return acc;
-  }, {} as Record<string, { tipoOperacion: { nombre: string }; monto: number }>);
+  }, {} as Record<string, { tipoOperacion: { nombre: string }; monto: number; esDebito: boolean }>);
 
   // Convertir el objeto resultante en un array
-  const format = Object.values(gastosAgrupados);
-  return format;
+  const egresos = Object.values(gastosAgrupados).filter((o) => o.esDebito);
+  const ingresos = Object.values(gastosAgrupados).filter((o) => !o.esDebito);
+  return { egresos, ingresos };
 }
 
 // obtener el saldo de todas las cuentas
@@ -219,7 +224,7 @@ export async function obtenerSaldoCuentas() {
 //obtener las ultimas 5 operaciones
 export async function obtenerUltimasOperaciones() {
   const operaciones = await prisma.operacion.findMany({
-    take: 5,
+    take: 4,
     orderBy: {
       fechaOperacion: "desc",
     },

@@ -6,7 +6,7 @@ import { obtenerGastosAgrupados, obtenerSaldoCuentas } from "@/lib/actions";
 import Link from "next/link";
 
 export default async function Page() {
-  const gastos = await obtenerGastosAgrupados();
+  const { ingresos, egresos } = await obtenerGastosAgrupados();
   const balances = await obtenerSaldoCuentas();
 
   return (
@@ -16,14 +16,23 @@ export default async function Page() {
           href="/dashboard/account"
           className="bg-gray-800 py-1 px-2 rounded-md"
         >
-          Cuenta
+          Cuentas
         </Link>
       </Header>
       <div className="flex gap-8">
-        <DonutChart data={gastos} />
+        <DonutChart
+          data={ingresos}
+          title="Importe de Ingresos por Tipo de Operación"
+        />
+        <DonutChart
+          data={egresos}
+          title="Importe de Egresos por Tipo de Operación"
+        />
+      </div>
+      <div className="flex gap-8">
+        <LatestMovs />
         <BarChart balances={balances} />
       </div>
-      <LatestMovs />
     </div>
   );
 }
