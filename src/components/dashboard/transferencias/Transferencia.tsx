@@ -12,9 +12,10 @@ type Props = {
   bancos: Banco[]
   loading: boolean
   esDebito: boolean
+  pagoProveedores: boolean
 }
 
-export default function Transferencia({ operacion, handleOnChange, setMontoParcial, monto, bancos, esDebito }: Props) {
+export default function Transferencia({ operacion, handleOnChange, setMontoParcial, monto, bancos, esDebito, pagoProveedores }: Props) {
   return (
     <>
       <div className="flex sm:flex-row flex-wrap flex-col box-border gap-3 mb-3 w-full">
@@ -118,9 +119,10 @@ export default function Transferencia({ operacion, handleOnChange, setMontoParci
         <div className="w-full md:w-2/3 mb-6 md:mb-0">
           <label className="mb-2">Concepto*</label>
           <Input
-            className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
+            className="block w-full bg-gray-800 rounded py-3 disabled:opacity-50 px-6 my-2 leading-tight focus:outline-none"
             id="concepto"
             type="text"
+            disabled={pagoProveedores}
             onChange={handleOnChange}
             value={operacion.concepto}
             required
