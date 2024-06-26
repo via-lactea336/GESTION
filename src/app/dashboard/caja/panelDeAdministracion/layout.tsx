@@ -9,7 +9,6 @@ type Props = {
 
 export default async function layout({ children }: Props) {
   const session = await getServerSession(authOptions);
-
   if (!session) return redirect("/login");
 
   if (session.user.rol !== "ADMIN") {

@@ -65,15 +65,15 @@ export default function Page({ params, searchParams }: Props) {
             {link.text}
           </Link>
         ))}
-        {!cajero ? (
+        {!cajero && loading ? (
           <div className="animate-pulse bg-gray-300 py-2 px-10 rounded-md mx-2" />
         ) : (
-          <h3 className="ml-8">{cajero.nombre}</h3>
+          <h3 className="ml-8">{cajero && cajero.nombre}</h3>
         )}
-        {!caja ? (
+        {!caja && loading ? (
           <div className="animate-pulse bg-gray-300 py-2 px-10 rounded-md mx-2" />
         ) : (
-          <h3>Caja N° {caja.numero}</h3>
+          <h3>{caja && `Caja N° ${caja.numero}`}</h3>
         )}
       </Header>
       <div

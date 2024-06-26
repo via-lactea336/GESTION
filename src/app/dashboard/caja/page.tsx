@@ -8,12 +8,13 @@ import { redirect } from "next/navigation";
 
 export default async function Page() {
   const session = await getServerSession(authOptions);
-  const links = [
+  const header = [
     { href: `/dashboard/caja/panelDeAdministracion`, text: "Panel" },
     { href: `/dashboard/caja/historial`, text: "Historial" },
     { href: `/dashboard/caja/reportes`, text: "Reportes" },
   ];
   if (!session) return redirect("/login");
+  const links = session.user.rol === "ADMIN" ? header : [];
 
   const { cajaId } = (await obtenerAperturaPorUserId(session.user.id)) ?? {
     cajaId: "",
