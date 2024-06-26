@@ -19,6 +19,7 @@ import { type Cheque, estadoCheque, Banco } from "@prisma/client";
 import Link from "next/link";
 import React, { useEffect } from "react";
 import { Toaster, toast } from "sonner";
+import Input from "@/components/global/Input";
 
 export default function Cheque({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -173,17 +174,26 @@ export default function Cheque({ params }: { params: { id: string } }) {
 
   return (
     <div className="flex flex-col h-full -mt-8">
-      <header className="flex gap-3 justify-between items-center flex-wrap px-8 py-4 w-full rounded-md bg-primary-800 text-white">
-        <h1 className="text-2xl font-bold">Cheques</h1>
+      <header className="flex flex-col gap-4 justify-between items-center flex-wrap px-8 py-4 w-full rounded-md bg-primary-800 text-white">
+        <div className="flex justify-between items-center w-full">
+          <h1 className="text-2xl font-bold">Cheques</h1>
+          <Link
+            className="bg-gray-800 hover:bg-gray-900 text-white  py-2 px-4 rounded"
+            href={`/dashboard/account/${id}`}
+          >
+            Atras
+          </Link>
+        </div>
 
-        <nav className="flex flex-wrap items-center gap-6">
+        <nav className="flex flex-wrap md:items-center md:flex-row flex-col gap-4 w-full">
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <h3 className="mr-2">Bancos</h3>
               <select
                 className="bg-gray-800 text-white py-1 px-2 rounded-md "
                 name="bancoChequeId"
                 onChange={handleOnChange}
+                value={filtro.bancoChequeId || ""}
               >
                 <option value={""}>Todos</option>
                 {bancos.map((banco, index) => (
@@ -193,12 +203,13 @@ export default function Cheque({ params }: { params: { id: string } }) {
                 ))}
               </select>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <h3 className="mr-2">Estado</h3>
               <select
                 className="bg-gray-800 text-white py-1 px-2 rounded-md w-full"
                 name="estado"
                 onChange={handleOnChange}
+                value={filtro.estado !== undefined? filtro.estado.toString() : ""}
               >
                 <option value={""}>Todos</option>
                 {Object.values(estadoCheque).map((estadoCheque, index) => (
@@ -210,12 +221,13 @@ export default function Cheque({ params }: { params: { id: string } }) {
             </div>
           </div>
           <div className="flex flex-col items-center gap-3">
-            <div className="flex flex-col items-center justify-between gap-3">
-              <h3 className="mr-2">Emitido/Recibido</h3>
+            <div className="flex flex-col items-center justify-between gap-2">
+              <h3 className="mr-2">Operacion</h3>
               <select
                 className="bg-gray-800 text-white py-1 px-2 rounded"
                 name="esRecibido"
                 onChange={handleOnChange}
+                value={filtro.esRecibido !== undefined? filtro.esRecibido.toString() : ""}
               >
                 <option value={""}>Todos</option>
                 <option value={"true"}>Recibido</option>
@@ -224,7 +236,7 @@ export default function Cheque({ params }: { params: { id: string } }) {
             </div>
           </div>
           <div className="flex flex-col items-center gap-3">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <h3 className="">Desde</h3>
               <InputCalendar
                 handleChange={handleOnChange}
@@ -233,7 +245,7 @@ export default function Cheque({ params }: { params: { id: string } }) {
                 id="fechaDesde"
               />
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <h3 className="">Hasta</h3>
               <InputCalendar
                 handleChange={handleOnChange}
@@ -244,25 +256,25 @@ export default function Cheque({ params }: { params: { id: string } }) {
             </div>
           </div>
           <div className="flex flex-col items-center gap-3">
-            <input
-              onChange={handleOnChange}
-              onKeyDown={onKeyDownHandleForNumberInputs}
+            <Input
+              onChange={(e) => {
+                setFiltro({ ...filtro, montoDesde: Number(e.target.value) });
+              }}
               className="bg-gray-800 text-white py-1 px-2 rounded"
+              value={filtro.montoDesde || ""}
               placeholder="Monto Desde"
-              type="number"
-              min={1}
-              name="montoDesde"
+              type="formattedNumber"
               id="montoDesde"
             />
-            <input
-              onChange={handleOnChange}
-              onKeyDown={onKeyDownHandleForNumberInputs}
+            <Input
+              onChange={(e) => {
+                setFiltro({ ...filtro, montoHasta: Number(e.target.value) });
+              }}
               className="bg-gray-800 text-white py-1 px-2 rounded"
+              value={filtro.montoHasta || ""}
               placeholder="Monto Hasta"
-              type="number"
-              name="montoHasta"
+              type="formattedNumber"
               id="montoHasta"
-              min={1}
             />
           </div>
 
@@ -276,7 +288,7 @@ export default function Cheque({ params }: { params: { id: string } }) {
               <MagnifyingGlassIcon className="w-6 h-6" />
             </button>
             <button
-              onClick={() => {
+              onClick={async () => {
                 setFiltro(filtroInit);
               }}
               className="bg-primary-500 hover:bg-primary-600 text-white p-1 rounded"
@@ -285,12 +297,6 @@ export default function Cheque({ params }: { params: { id: string } }) {
             </button>
           </div>
         </nav>
-        <Link
-          className="bg-gray-800 hover:bg-gray-900 text-white  py-2 px-4 rounded"
-          href={`/dashboard/account/${id}`}
-        >
-          Atras
-        </Link>
       </header>
 
       <h2 className="text-xl font-bold my-4">Lista de Cheques</h2>
@@ -319,7 +325,12 @@ export default function Cheque({ params }: { params: { id: string } }) {
                   </th>
                   <th className="text-left">
                     <span className="text-md mt-1 text-primary-400 font-normal">
-                      Fecha
+                      Tipo
+                    </span>
+                  </th>
+                  <th className="text-left">
+                    <span className="text-md mt-1 text-primary-400 font-normal">
+                      Fecha Emision
                     </span>
                   </th>
                   <th className="text-left">
@@ -360,6 +371,7 @@ export default function Cheque({ params }: { params: { id: string } }) {
                       </div>
                     </td>
                     <td>{cheque.numeroCheque}</td>
+                    <td>{cheque.fechaPago? "Diferido" : "Común"}</td>
                     <td>{cheque.fechaEmision.toString().split("T")[0]}</td>
                     <td>{cheque.bancoCheque.nombre}</td>
                     <td className="flex justify-center">

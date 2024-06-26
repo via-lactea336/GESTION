@@ -55,7 +55,6 @@ export default function Deposito({operacion, setOperacion, handleOnChange, loadi
             onChange={(e) => setMontoParcial(Number(e.target.value))} 
             value={montoParcial}
             type="formattedNumber"
-            required
             placeholder="Ingrese el monto"
           />
         </div>

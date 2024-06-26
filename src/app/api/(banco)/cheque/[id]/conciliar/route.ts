@@ -40,7 +40,7 @@ export async function POST(
 
       const tipoOperacion = await prisma.tipoOperacion.findUnique({
         where: {
-          nombre: "Conciliación de cheque",
+          nombre: "Conciliación de Cheque",
         },select:{
           id: true,
           esDebito: true,

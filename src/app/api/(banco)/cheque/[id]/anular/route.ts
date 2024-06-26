@@ -16,7 +16,19 @@ export async function POST(
   const {bancoAfectadoId} : {bancoAfectadoId: string} = await req.json();
 
   try {
-    const cheque = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
+      
+      const tipoOperacionIdTx = await tx.tipoOperacion.findUnique({
+        where: {
+          nombre: "Anulación de Cheque"
+        },
+        select:{
+          id: true
+        }
+      })
+      
+      if(!tipoOperacionIdTx) throw new ApiError("Tipo de operacion para anulacion de cheque no encontrada", 404)
+
       const chequeTx = await tx.cheque.update({
         where: {
           id:id,
@@ -38,29 +50,19 @@ export async function POST(
         }
       })
 
+      if(!chequeTx) throw new ApiError("Cheque no encontrado", 404)
+
       if(chequeTx.fechaPago && chequeTx.fechaPago.toISOString().split('T')[0] > new Date().toISOString().split('T')[0]) throw new ApiError("El cheque no puede ser anulado antes de la fecha de pago.", 400)
 
-      return chequeTx
+      return {chequeTx, tipoOperacionIdTx}
     })
 
-    if (!cheque)
-      return generateApiErrorResponse("Cheque no encontrado", 404);
-  
-    const tipoOperacionId = await prisma.tipoOperacion.findUnique({
-      where: {
-        nombre: "Anulación de cheque"
-      },
-      select:{
-        id: true
-      }
-    })
-  
-    if(!tipoOperacionId) return generateApiErrorResponse("Tipo de operacion para anulacion de cheque no encontrada", 404)
+    const {chequeTx: cheque, tipoOperacionIdTx: tipoOperacionId} = result
     
     const operacion = await prisma.operacion.create({
       data: {
         nombreInvolucrado: cheque.involucrado,
-        concepto: "Anulación de cheque n° " + cheque.numeroCheque,
+        concepto: "Anulación de Cheque n° " + cheque.numeroCheque,
         fechaOperacion: new Date(),
         cuentaBancariaOrigenId: cheque.cuentaBancariaAfectadaId,
         monto: cheque.monto,
