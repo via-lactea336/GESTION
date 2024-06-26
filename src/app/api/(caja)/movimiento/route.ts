@@ -213,7 +213,7 @@ export async function POST(req: NextRequest) {
         },
         {
           concepto: `Cobro de la factura numero ${result.factura.numeroFactura}`,
-          codigo: "101.01.01",
+          codigo: "103.01.01",
           monto: sum,
           esDebe: true,
           esAsentable: true,

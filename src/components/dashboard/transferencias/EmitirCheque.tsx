@@ -10,13 +10,15 @@ type Props = {
   cheques: ChequeCreate[]
   setCheques: React.Dispatch<React.SetStateAction<ChequeCreate[]>>
   operacion: CrearOperacionFields
+  pagoProveedores: boolean
 }
 
 export default function EmitirCheque({
   handleOnChange,
   setCheques,
   operacion,
-  cheques
+  cheques,
+  pagoProveedores
 }: Props) {
 
   console.log(cheques)
@@ -119,9 +121,10 @@ export default function EmitirCheque({
         <div className="w-full md:w-2/3 mb-6 md:mb-0">
           <label className="mb-2">Concepto*</label>
           <Input
-            className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
+            className="block w-full bg-gray-800 rounded disabled:opacity-50 py-3 px-6 my-2 leading-tight focus:outline-none"
             id="concepto"
             type="text"
+            disabled={pagoProveedores}
             onChange={handleOnChange}
             value={operacion.concepto}
             required

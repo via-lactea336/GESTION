@@ -6,6 +6,7 @@ import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiRes
 import reflejarOperacion from "@/lib/moduloBanco/operacion/reflejarOperacion";
 import { ChequeAndOperacion } from "@/lib/definitions";
 import ApiError from "@/lib/api/ApiError";
+import generarAsiento from "@/lib/asientos/services/asiento/generarAsiento";
 
 export async function POST(req: NextRequest) {
   
@@ -134,6 +135,28 @@ export async function POST(req: NextRequest) {
 
     //Refleja el incremento o decremento en el saldo de la cuenta bancaria siguiendo las propiedades del tipo de Operacion
     await reflejarOperacion(cuentaBancariaOrigenId, monto, operacion.tipoOperacion.esDebito, operacion.tipoOperacion.afectaSaldo, operacion.tipoOperacion.afectaSaldoDisponible)
+
+    if(operacion.concepto === "Pago a Proveedores"){
+      const numOrdenCompra = Math.floor(Math.random() * (3000 - 100 + 1) + 100)
+      await generarAsiento([
+        {
+          fecha: operacion.fechaOperacion,
+          concepto: operacion.concepto + " con orden de compra #" + numOrdenCompra,
+          monto: +operacion.monto,
+          codigo:"101.01.01",
+          esDebe: false,
+          esAsentable: true
+        },
+        {
+          fecha: operacion.fechaOperacion,
+          concepto: "Bancos con relacion a la orden de compra #" + numOrdenCompra,
+          monto: +operacion.monto,
+          codigo:"101.01.02",
+          esDebe: true,
+          esAsentable: true
+        }
+      ])
+    }
 
     return generateApiSuccessResponse(200, "La operacion se genero correctamente")
   

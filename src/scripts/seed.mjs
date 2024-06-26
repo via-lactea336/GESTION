@@ -94,13 +94,13 @@ async function main() {
         afectaSaldoDisponible: true,
       },
       {
-        nombre: "ANULACION DE CHEQUE",
+        nombre: "Anulación de Cheque",
         esDebito: true,
         afectaSaldo: true,
         afectaSaldoDisponible: true,
       },
       {
-        nombre: "CONCILIACION DE CHEQUE",
+        nombre: "Conciliación de Cheque",
         esDebito: true,
         afectaSaldo: false,
         afectaSaldoDisponible: true,
@@ -231,17 +231,22 @@ async function main() {
     data: [
       {
         codigo:"101.01.01",
-        nombre:"CAJA",
+        nombre:"PAGO A PROVEEDORES",
+        asentable: true
+      },
+      {
+        codigo:"101.01.02",
+        nombre:"BANCOS",
         asentable: true
       },
       {
         codigo:"103.01.01",
-        nombre:"CLIENTES NACIONALES",
+        nombre:"CLIENTES",
         asentable: true
       },
       {
         codigo:"401.01.01",
-        nombre:"VENTA DE MERCADERIAS",
+        nombre:"RECAUDACION A DEPOSITAR",
         asentable: true
       }
     ]

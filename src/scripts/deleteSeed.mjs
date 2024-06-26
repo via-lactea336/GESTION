@@ -41,6 +41,11 @@ async function main() {
  
   await prisma.cliente.deleteMany({});
 
+  //asientos
+  await prisma.detalleAsiento.deleteMany({});
+  await prisma.cuenta.deleteMany({});
+  await prisma.asiento.deleteMany({});
+
   console.log("All records have been deleted.");
 }
 

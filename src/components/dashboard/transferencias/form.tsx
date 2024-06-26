@@ -98,6 +98,7 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
   //Naturaleza de la operacion
   const [nombreOperacion, setNombreOperacion] = useState("");
   const [esDebito, setEsDebito] = useState<boolean>(false);
+  const [pagoProveedores, setPagoProveedores] = useState<boolean>(false);
 
   //Estados para manejar opciones 
   const [bancos, setBancos] = useState<Banco[]>([]);
@@ -118,6 +119,12 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
     const { name, value, id, type } = event.target;
     if (type === "datetime-local") setOperacion({ ...operacion, [name || id]: value });
     setOperacion({ ...operacion, [name || id]: value });
+  };
+
+  const handlePagoProveedoresChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if(event.target.checked) setOperacion({ ...operacion, concepto:"Pago a Proveedores" });
+    else setOperacion({ ...operacion, concepto:"" });
+    setPagoProveedores(event.target.checked);
   };
 
   //Fetch data for the form
@@ -153,6 +160,7 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
 
   useEffect(() => {
     setCheques([])
+    setPagoProveedores(false)
     switch (nombreOperacion) {
       case "Débito bancario":
         if(!cuentasBancaria) {
@@ -297,6 +305,7 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
           setMontoParcial={setMontoParcial}
           esDebito={esDebito}
           bancos={bancos}
+          pagoProveedores={pagoProveedores}
         />
         :
         nombreOperacion === "Emitir Cheque"?
@@ -304,6 +313,7 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
             operacion={operacion}
             setCheques={setCheques}
             cheques={cheques}
+            pagoProveedores={pagoProveedores}
             handleOnChange={handleOnChange}
           />
         :
@@ -325,11 +335,28 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
 
       {
       operacion.tipoOperacionId.trim() !== "" && 
-      <div className="px-3 flex items-center justify-end mb-6 md:mb-0">
+      <div className="px-3 flex items-center mt-4 justify-between mb-6 md:mb-0">
+
+        {
+          (nombreOperacion === "Transferencia (Emitida)" 
+          || nombreOperacion === "Emitir Cheque")
+          &&
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="pagoProveedor"
+              onChange={handlePagoProveedoresChange}
+              checked={pagoProveedores}
+            >
+            </input> 
+            <label htmlFor="pagoProveedor">Pagar Proveedor</label>
+          </div>
+        }
+
         <button
           type="submit"
           className={
-            "bg-primary-800 mt-4 rounded-md px-3 py-3  hover:bg-primary-700 " +
+            "bg-primary-800 rounded-md px-3 py-3 ml-auto hover:bg-primary-700 " +
             (loading || loadingSend ? " cursor-progress" : "cursor-pointer")
           }
         >

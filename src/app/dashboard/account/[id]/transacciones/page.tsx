@@ -21,7 +21,7 @@ export default async function Page({ params }: { params: { id: string } }) {
           Atrás
         </Link>
       </Header>
-      <div className="flex justify-center items-center mt-6 p-12 bg-gray-700 rounded-md">
+      <div className="flex justify-center items-center xs:w-3/4 w-full mx-auto mt-6 p-12 bg-gray-700 rounded-md">
         <FormTransferencias cuentaBancariaId={id} />
       </div>
     </div>
