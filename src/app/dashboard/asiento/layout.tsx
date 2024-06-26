@@ -1,10 +1,16 @@
-import authOptions from "@/lib/auth/options";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import authOptions from "@/lib/auth/options";
+import React from "react";
 
-export default async function Page() {
+type Props = {
+  children: React.ReactNode;
+};
+
+export default async function layout({ children }: Props) {
   const session = await getServerSession(authOptions);
   if (!session) return redirect("/login");
+
   if (session.user.rol !== "ADMIN") {
     return (
       <div className="grid place-items-center h-[70vh]">
@@ -18,10 +24,6 @@ export default async function Page() {
       </div>
     );
   }
-  return (
-    <div className="flex flex-col items-center justify-center h-full">
-      <h1 className="text-4xl font-bold">Dashboard</h1>
-      <p className="text-lg">Bienvenido al dashboard!</p>
-    </div>
-  );
+
+  return children;
 }
