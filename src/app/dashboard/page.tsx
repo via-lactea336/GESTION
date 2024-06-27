@@ -1,6 +1,16 @@
 import authOptions from "@/lib/auth/options";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import {
+  BanknotesIcon,
+  ChartBarIcon,
+  DocumentChartBarIcon,
+  
+} from "@heroicons/react/24/outline";
+
+import Link from "next/link";
+
+
 
 export default async function Page() {
   const session = await getServerSession(authOptions);
@@ -19,9 +29,42 @@ export default async function Page() {
     );
   }
   return (
-    <div className="flex flex-col items-center justify-center h-full">
-      <h1 className="text-4xl font-bold">Dashboard</h1>
-      <p className="text-lg">Bienvenido al dashboard!</p>
+    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+      <main className="grid flex-1 items-center justify-center gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
+          <div className="text-center bg-gray-800 rounded-md p-3 w-72 h-72 flex flex-col justify-between hover:bg-gray-700 transition-colors duration-200">
+            <div className="flex flex-col justify-center flex-1">
+              <DocumentChartBarIcon className="h-12 w-12 mx-auto text-primary mb-2" />
+              <h3 className="text-2xl font-bold">Banco</h3>
+              <p className="text-muted-foreground">Accede a tu información bancaria</p>
+            </div>
+            <div className="mb-4">
+              <Link
+                href="/dashboard/account/panel"
+                className="px-4 py-2 bg-primary-800 text-white rounded-md w-3/4 hover:bg-primary-700"
+              >
+                Ir al panel
+              </Link>
+            </div>
+          </div>
+          <div className="text-center bg-gray-800 rounded-md p-3 w-72 h-72 flex flex-col justify-between hover:bg-gray-700 transition-colors duration-200">
+            <div className="flex flex-col justify-center flex-1">
+              <BanknotesIcon className="h-12 w-12 mx-auto text-primary mb-2" />
+              <h3 className="text-2xl font-bold">Caja</h3>
+              <p className="text-muted-foreground">Gestiona tus movimientos de caja</p>
+            </div>
+            <div className="mb-4">
+              <Link
+                href="/dashboard/caja/panelDeAdministracion"
+                className="px-4 py-2 bg-primary-800 text-white rounded-md w-3/4 hover:bg-primary-700"
+                prefetch={false}
+              >
+                Ir al panel
+              </Link>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
