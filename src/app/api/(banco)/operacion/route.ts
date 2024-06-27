@@ -107,8 +107,8 @@ export async function POST(req: NextRequest) {
       throw new ApiError("Saldo insuficiente para realizar la operacion", 400);
 
       if(
-        operacionTx.concepto === "Pago a Proveedores"
-        && (
+        operacionTx.concepto === "Pago a Proveedores" && 
+        (
           operacionTx.tipoOperacion.nombre === "Transferencia (Emitida)"
           || operacionTx.tipoOperacion.nombre === "Emitir Cheque"
         )
@@ -116,17 +116,17 @@ export async function POST(req: NextRequest) {
         const numOrdenCompra = Math.floor(Math.random() * (3000 - 100 + 1) + 100)
         await generarAsiento([
           {
-            fecha: operacion.fechaOperacion,
-            concepto: operacion.concepto + " con orden de compra #" + numOrdenCompra,
-            monto: +operacion.monto,
+            fecha: operacionTx.fechaOperacion,
+            concepto: operacionTx.concepto + " con orden de compra #" + numOrdenCompra,
+            monto: +operacionTx.monto,
             codigo:"101.01.01",
             esDebe: false,
             esAsentable: true
           },
           {
-            fecha: operacion.fechaOperacion,
+            fecha: operacionTx.fechaOperacion,
             concepto: "Bancos con relacion a la orden de compra #" + numOrdenCompra,
-            monto: +operacion.monto,
+            monto: +operacionTx.monto,
             codigo:"101.01.02",
             esDebe: true,
             esAsentable: true
@@ -157,6 +157,9 @@ export async function POST(req: NextRequest) {
         }
       }
       return operacionTx
+    }, {
+      maxWait: 10000,
+      timeout: 10000
     })
 
     if(!operacion) return generateApiErrorResponse("Error generating operation", 400)  
@@ -168,7 +171,7 @@ export async function POST(req: NextRequest) {
   
   }catch(err){
     if(err instanceof PrismaClientKnownRequestError) {
-      if(err.code === "P2002") return generateApiErrorResponse("La operacion ya existe", 400)
+      if(err.code === "P2002") return generateApiErrorResponse("Ya existe una operación con el mismo n° de comprobante", 400)
     }
     if(err instanceof ApiError) return generateApiErrorResponse(err.message, err.status)
     if(err instanceof Error) return generateApiErrorResponse(err.message, 400)
