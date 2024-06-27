@@ -6,7 +6,7 @@ async function main() {
   // Crear usuario Admin
 
   // Crear bancos
-  const bancoFamiliar = await prisma.banco.create({
+ /* const bancoFamiliar = await prisma.banco.create({
     data: {
       nombre: "Banco Familiar",
     },
@@ -23,211 +23,51 @@ async function main() {
       nombre: "Banco Atlas",
     },
   });
+  */
 
   // Crear entidad de ejemplo
-  const entidad = await prisma.entidad.create({
+ /* const entidad = await prisma.entidad.create({
     data: {
       nombre: "ACME S.A.",
       ruc: "80017052-0",
     },
   });
-
+*/
   // Crear cuentas bancarias en cada banco
-  const cuentaBancariaBancoFamiliar = await prisma.cuentaBancaria.create({
+  /*const cuentaBancariaBancoFamiliar = await prisma.cuentaBancaria.create({
     data: {
       numeroCuenta: "22-2851549",
-      bancoId: bancoFamiliar.id,
-      entidadId: entidad.id,
+      bancoId: "3ae57eff-6661-44fd-a062-87d2f5d6e425",
+      entidadId: "666255a1-d7bd-43f9-aaa4-a6d8198ec071",
       esCuentaAhorro: false,
-      saldo: 1000000,
-      saldoDisponible: 1000000,
+      saldo: 0,
+      saldoDisponible: 0,
     },
   });
 
   const cuentaBancariaBancoItau = await prisma.cuentaBancaria.create({
     data: {
       numeroCuenta: "11-223344",
-      bancoId: itau.id,
-      entidadId: entidad.id,
+      bancoId: "6c1bf193-23f8-48fb-be51-3c0046228801",
+      entidadId: "666255a1-d7bd-43f9-aaa4-a6d8198ec071",
       esCuentaAhorro: false,
-      saldo: 2000000,
-      saldoDisponible: 2000000,
+      saldo: 0,
+      saldoDisponible: 0,
     },
   });
 
   const cuentaBancariaBancoAtlas = await prisma.cuentaBancaria.create({
     data: {
       numeroCuenta: "33-445566",
-      bancoId: atlas.id,
-      entidadId: entidad.id,
-      esCuentaAhorro: false,
-      saldo: 500000,
-      saldoDisponible: 500000,
+      bancoId: "0af7791c-ac7f-4476-88f0-78c94189c379",
+      entidadId: "666255a1-d7bd-43f9-aaa4-a6d8198ec071",
+      esCuentaAhorro: true,
+      saldo: 0,
+      saldoDisponible: 0,
     },
   });
-
-  // Crear tipos de operaciones
-  const tiposOperacion = await prisma.tipoOperacion.createMany({
-    data: [
-      // {
-      //   nombre: "Movimiento Debito",
-      //   esDebito: true,
-      //   afectaSaldo: true,
-      //   afectaSaldoDisponible: true,
-      // },
-      // {
-      //   nombre: "Movimiento Credito",
-      //   esDebito: false,
-      //   afectaSaldo: true,
-      //   afectaSaldoDisponible: true,
-      // },
-      {
-        nombre: "Retiro",
-        esDebito: true,
-        afectaSaldo: true,
-        afectaSaldoDisponible: true,
-      },
-      {
-        nombre: "Depósito",
-        esDebito: false,
-        afectaSaldo: true,
-        afectaSaldoDisponible: true,
-      },
-      {
-        nombre: "Anulación de Cheque",
-        esDebito: true,
-        afectaSaldo: true,
-        afectaSaldoDisponible: true,
-      },
-      {
-        nombre: "Conciliación de Cheque",
-        esDebito: true,
-        afectaSaldo: false,
-        afectaSaldoDisponible: true,
-      },
-      {
-        nombre: "Emitir Cheque",
-        esDebito: true,
-        afectaSaldo: true,
-        afectaSaldoDisponible: false,
-      },
-    ],
-    skipDuplicates: true,
-  });
-
-  // Obtener los tipos de operaciones creados
-  const tiposOperacionData = await prisma.tipoOperacion.findMany();
-
-  // Crear operaciones para cada cuenta bancaria
-  const operacionesCuentaBancoFamiliar = await prisma.operacion.createMany({
-    data: [
-      {
-        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Movimiento Debito").id,
-        fechaOperacion: new Date(),
-        monto: 100000,
-        cuentaBancariaOrigenId: cuentaBancariaBancoFamiliar.id,
-        bancoInvolucrado: "Banco Familiar",
-        nombreInvolucrado: "Juan Perez",
-        cuentaInvolucrado: "22-2851549",
-        rucInvolucrado: "80017052-0",
-        concepto: "Pago de Servicios",
-        numeroComprobante: "000001",
-      },
-      {
-        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Movimiento Debito").id,
-        fechaOperacion: new Date(),
-        monto: 150000,
-        cuentaBancariaOrigenId: cuentaBancariaBancoFamiliar.id,
-        bancoInvolucrado: "Banco Itaú",
-        nombreInvolucrado: "Maria Gonzalez",
-        cuentaInvolucrado: "11-223344",
-        rucInvolucrado: "1234567890",
-        concepto: "Pago de Salario",
-        numeroComprobante: "000002",
-      },
-      {
-        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Transferencia").id,
-        fechaOperacion: new Date(),
-        monto: 50000,
-        cuentaBancariaOrigenId: cuentaBancariaBancoFamiliar.id,
-        bancoInvolucrado: "Banco Atlas",
-        nombreInvolucrado: "Pedro Rodriguez",
-        cuentaInvolucrado: "33-445566",
-        rucInvolucrado: "0987654321",
-        concepto: "Transferencia de fondos",
-        numeroComprobante: "000003",
-      },
-      {
-        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Movimiento Credito").id,
-        fechaOperacion: new Date(),
-        monto: 200000,
-        cuentaBancariaOrigenId: cuentaBancariaBancoFamiliar.id,
-        bancoInvolucrado: "Banco Familiar",
-        nombreInvolucrado: "María López",
-        cuentaInvolucrado: "22-2851549",
-        rucInvolucrado: "7654321-0",
-        concepto: "Pago de Compra de Electrodomésticos",
-        numeroComprobante: "000004",
-      },
-    ],
-    skipDuplicates: true,
-  });
-
-  const operacionesCuentaBancoItau = await prisma.operacion.createMany({
-    data: [
-      {
-        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Movimiento Credito").id,
-        fechaOperacion: new Date(),
-        monto: 100000,
-        cuentaBancariaOrigenId: cuentaBancariaBancoItau.id,
-        bancoInvolucrado: "Banco Familiar",
-        nombreInvolucrado: "Bryan Ojeda",
-        cuentaInvolucrado: "22-3331549",
-        rucInvolucrado: "5131477-0",
-        concepto: "Pago de Servicios",
-        numeroComprobante: "000005",
-      },
-      {
-        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Movimiento Credito").id,
-        fechaOperacion: new Date(),
-        monto: 150000,
-        cuentaBancariaOrigenId: cuentaBancariaBancoItau.id,
-        bancoInvolucrado: "Banco Itaú",
-        nombreInvolucrado: "Mirian Gonzalez",
-        cuentaInvolucrado: "17-203344",
-        rucInvolucrado: "222333-0",
-        concepto: "Pago de Salario",
-        numeroComprobante: "000006",
-      },
-      {
-        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Transferencia").id,
-        fechaOperacion: new Date(),
-        monto: 50000,
-        cuentaBancariaOrigenId: cuentaBancariaBancoItau.id,
-        bancoInvolucrado: "Banco Atlas",
-        nombreInvolucrado: "Julio Rodriguez",
-        cuentaInvolucrado: "38-440066",
-        rucInvolucrado: "511110-0",
-        concepto: "Transferencia de fondos",
-        numeroComprobante: "000007",
-      },
-      {
-        tipoOperacionId: tiposOperacionData.find((tipo) => tipo.nombre === "Movimiento Debito").id,
-        fechaOperacion: new Date(),
-        monto: 200000,
-        cuentaBancariaOrigenId: cuentaBancariaBancoItau.id,
-        bancoInvolucrado: "Banco Familiar",
-        nombreInvolucrado: "Gustavo López",
-        cuentaInvolucrado: "17-203344",
-        rucInvolucrado: "4454321-0",
-        concepto: "Pago de Compra de Muebles",
-        numeroComprobante: "000008",
-      },
-    ],
-    skipDuplicates: true,
-  });
-  
-  const cuentas = await prisma.cuenta.createMany({
+  */
+ /* const cuentas = await prisma.cuenta.createMany({
     data: [
       {
         codigo:"101.01.01",
@@ -250,42 +90,37 @@ async function main() {
         asentable: true
       }
     ]
-  })
-
+  })*/
+  await prisma.caja.deleteMany({});
   const cajas = await prisma.caja.createMany({
     data: [
       {
-        "id": "db639420-1db5-4cee-8f1e-c27435baba47",
         "numero": 1,
         "estaCerrado": true,
       },
       {
-        "id": "2f353283-8c52-44e8-ac6b-bb807b11b5dd",
         "numero": 2,
         "estaCerrado": true,
       },
       {
-        "id": "fc103569-4d29-47b6-a43d-786d600c8008",
         "numero": 3,
         "estaCerrado": true,
       },
       {
-        "id": "fc103569-4d29-47b6-a43d-786d600c8007",
         "numero": 4,
         "estaCerrado": true,
       },
       {
-        "id": "fc103569-4d29-47b6-a43d-786d600c8001",
         "numero": 5,
         "estaCerrado": true,
       },
       {
-        "id": "fc103569-4d29-47b6-a43d-786d600c8006",
         "numero": 316,
         "estaCerrado": true,
       }
     ]
   })
+
 
 
   // const cheques = await prisma.cheque.createMany({

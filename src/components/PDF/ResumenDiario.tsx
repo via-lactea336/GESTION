@@ -27,10 +27,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 20,
     textAlign: "center",
-    backgroundColor: "#333", 
-    color: "#FFF", 
-    padding: 10, 
-    borderRadius: 5, 
+    backgroundColor: "#333",
+    color: "#FFF",
+    padding: 10,
+    borderRadius: 5,
   },
   text: {
     fontSize: 14,
@@ -150,11 +150,11 @@ const ResumenCajaPDF: React.FC<ResumenCajaProps> = ({
             {formatTime(createdAt)}
           </Text>
           <Text style={styles.text}>
-            <Text style={styles.bold}>Caja N°: </Text>
+            <Text style={styles.bold}>N° de Caja: </Text>
             {caja}
           </Text>
           <Text style={styles.text}>
-            <Text style={styles.bold}>Cajero N°: </Text>
+            <Text style={styles.bold}>Cajero: </Text>
             {cajero}
           </Text>
           <View style={styles.table}>
@@ -196,7 +196,9 @@ const ResumenCajaPDF: React.FC<ResumenCajaProps> = ({
               <Text style={[styles.tableCol, styles.tableHeader]}>Ingreso</Text>
             </View>
             <View style={styles.tableRow}>
-              <Text style={[styles.tableCol, styles.tableHeader]}>Efectivo</Text>
+              <Text style={[styles.tableCol, styles.tableHeader]}>
+                Efectivo
+              </Text>
               <Text style={[styles.tableCol, styles.tableHeader]}>
                 {Number(montoIngreso).toLocaleString()} Gs.
               </Text>
@@ -208,7 +210,9 @@ const ResumenCajaPDF: React.FC<ResumenCajaProps> = ({
               </Text>
             </View>
             <View style={styles.tableRow}>
-              <Text style={[styles.tableCol, styles.tableHeader]}>Tarjetas</Text>
+              <Text style={[styles.tableCol, styles.tableHeader]}>
+                Tarjetas
+              </Text>
               <Text style={[styles.tableCol, styles.tableHeader]}>
                 {Number(montoIngresoTarjeta).toLocaleString()} Gs.
               </Text>
@@ -259,7 +263,8 @@ const ResumenCajaPDF: React.FC<ResumenCajaProps> = ({
                         </Text>
                         <Text style={styles.innerTableCell}>
                           Monto total a pagar:{" "}
-                          {Number(mov.factura?.total).toLocaleString("es-PY")} Gs.
+                          {Number(mov.factura?.total).toLocaleString("es-PY")}{" "}
+                          Gs.
                         </Text>
                       </View>
                     </View>
@@ -283,8 +288,8 @@ const ResumenCajaPDF: React.FC<ResumenCajaProps> = ({
                           Método de pago: {detalle.metodoPago}
                         </Text>
                         <Text style={styles.tableCol}>
-                          Monto Parcial: {Number(detalle.monto).toLocaleString()}{" "}
-                          Gs.
+                          Monto Parcial:{" "}
+                          {Number(detalle.monto).toLocaleString()} Gs.
                         </Text>
                       </View>
                     ))}

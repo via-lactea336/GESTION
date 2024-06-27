@@ -314,7 +314,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
                 <option value={medioDePago.EFECTIVO}>Efectivo</option>
                 <option value={medioDePago.TARJETA}>Tarjeta</option>
                 <option value={medioDePago.CHEQUE}>Cheque</option>
-                <option value={"Otro"}>Otro</option>
+                <option value={medioDePago.OTRO}>Otro</option>
               </select>
             </div>
             <div className="mb-4 w-1/2 relative">
@@ -351,6 +351,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
                 type="text"
                 value={detalle}
                 disabled={disabled}
+                required={metodo === medioDePago.OTRO ? true : false}
                 placeholder="Especifique detalles del pago (por ejemplo,Cheque #12345)"
                 onChange={(e) => setDetalle(e.target.value)}
                 className="mt-1 block h-3/4 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-primary-600 sm:text-sm"
