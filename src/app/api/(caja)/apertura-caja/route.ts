@@ -19,6 +19,29 @@ export async function POST(req: NextRequest) {
       400
     );
 
+  const aperturaVerif = await prisma.aperturaCaja.findFirst({
+    where: {
+      cajaId,
+      cajeroId,
+      cierreCaja: null,
+    },
+    select:{
+      cajero:{
+        select:{
+          nombre:true,
+          apellido:true
+        }
+      },
+      caja:{
+        select:{
+          numero:true
+        }
+      }
+    }
+  })
+
+  if(aperturaVerif) return generateApiErrorResponse(`Ya existe una apertura activa en la caja n° ${aperturaVerif.caja.numero} por el cajero ${aperturaVerif.cajero.apellido} ${aperturaVerif.cajero.nombre}`, 400)
+
   try {
 
     const aperturaCaja = await prisma.$transaction(async (tx) => {

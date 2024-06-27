@@ -108,10 +108,7 @@ export async function POST(req: NextRequest) {
 
       if(
         operacionTx.concepto === "Pago a Proveedores" && 
-        (
-          operacionTx.tipoOperacion.nombre === "Transferencia (Emitida)"
-          || operacionTx.tipoOperacion.nombre === "Emitir Cheque"
-        )
+        operacionTx.tipoOperacion.nombre === "Transferencia (Emitida)" 
       ){
         const numOrdenCompra = Math.floor(Math.random() * (3000 - 100 + 1) + 100)
         await generarAsiento([
