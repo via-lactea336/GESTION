@@ -237,6 +237,7 @@ enum medioDePago {
   EFECTIVO
   CHEQUE
   TARJETA
+  OTRO
 }
 
 model Movimiento{

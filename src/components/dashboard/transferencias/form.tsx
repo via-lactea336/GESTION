@@ -159,6 +159,8 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
   }, []);
 
   useEffect(() => {
+    console.log(operacion);
+    setMontoParcial(0)
     setCheques([])
     setPagoProveedores(false)
     switch (nombreOperacion) {
@@ -167,10 +169,11 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
           alert("No se encontro la cuenta bancaria")
           break
         }
-        setOperacion({
-          ...initialValues,
+        setOperacion(
+          prev =>{ return {...initialValues, 
           nombreInvolucrado: cuentasBancaria.banco.nombre,
-        })
+          tipoOperacionId:prev.tipoOperacionId}}
+        )
         break
       
       case "Emitir Cheque":
@@ -178,7 +181,7 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
           alert("No se encontro la cuenta bancaria")
           break
         }
-        setOperacion(initialValues)
+        setOperacion(prev =>{ return {...initialValues, tipoOperacionId:prev.tipoOperacionId}})
         setCheques(prev => [...prev, {
           numeroCheque: "",
           involucrado: "",
@@ -189,7 +192,7 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
         }])
       
       default:
-        setOperacion(initialValues)
+        setOperacion(prev =>{ return {...initialValues, tipoOperacionId:prev.tipoOperacionId}})
         break
     }    
   }, [operacion.tipoOperacionId])

@@ -81,7 +81,7 @@ export default function EmitirCheque({
               setCheques(prev => [{ ...prev[0], monto: Number(e.target.value) }])
             }}
             id="monto"
-            value={operacion.monto}
+            value={cheques[0]?.monto || ""}
             type="formattedNumber"
             required
             placeholder="Ingrese el monto"
