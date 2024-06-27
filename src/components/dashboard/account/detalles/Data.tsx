@@ -24,6 +24,8 @@ import { Toaster } from "sonner";
 import Tabla from "./Tabla";
 import Cookies from "js-cookie";
 import dynamic from "next/dynamic";
+import Input from "@/components/global/Input";
+import { useDebouncedCallback } from "use-debounce";
 
 const PDFDownloadLink = dynamic(
   () => import("@react-pdf/renderer").then((mod) => mod.PDFDownloadLink),
@@ -52,9 +54,6 @@ export default function Data({ userName }: DataProps) {
     []
   );
 
-  const [operacionesFiltradas, setOperacionesFiltradas] = useState<
-    OperacionAndTipoOperacion[]
-  >([]);
   const [tipoOperaciones, setTipoOperaciones] = useState<
     ApiResponseData<
       {
@@ -72,10 +71,10 @@ export default function Data({ userName }: DataProps) {
     fechaMin: "",
     fechaMax: "",
     banco: "",
-    numeroComprobante:"",
     esDebito: undefined,
     pagina: 0,
   });
+  const [numeroComprobante, setNumeroComprobante] = useState("")
 
   const { id } = useParams();
   const router = useRouter();
@@ -147,6 +146,10 @@ export default function Data({ userName }: DataProps) {
       [name]: value,
     });
   };
+
+  const handelNumeroComprobanteChange = useDebouncedCallback((value:string)=>{
+    setNumeroComprobante(value)
+  }, 300)
 
   const changeIndicePagina = async (indice: number) => {
     setIndiceActual(indice);
@@ -321,11 +324,23 @@ export default function Data({ userName }: DataProps) {
             className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
           />
         </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="mr-2 mt-1">N° Comprobante</label>
+          <Input
+            id="numeroComprobante"
+            onChange={(e) => {handelNumeroComprobanteChange(e.target.value)}}
+            type="text"
+            placeholder="Ingrese el n° de comprobante"
+            className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"
+          />
+        </div>
       </div>
       <Toaster richColors />
       <div className="flex-grow bg-gray-800 rounded-md p-5 flex flex-row">
         <Tabla
           filtros={filtros}
+          numeroComprobante={numeroComprobante}
           handleNavigation={handleNavigation}
           setOperaciones={setOperaciones}
           setindicesPagina={setindicesPagina}

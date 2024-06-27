@@ -11,6 +11,7 @@ import { toast } from "sonner";
 
 type TablaProps = {
   handleNavigation: (path: string) => () => void;
+  numeroComprobante:string;
   setindicesPagina: (pagina: number) => void;
   setOperaciones: (operaciones: OperacionAndTipoOperacion[]) => void;
   filtros: {
@@ -18,7 +19,6 @@ type TablaProps = {
     fechaMin: string;
     fechaMax: string;
     banco: string;
-    numeroComprobante:string;
     esDebito: boolean | undefined;
     pagina: number;
   };
@@ -29,6 +29,7 @@ export default function Tabla({
   setindicesPagina,
   setOperaciones,
   filtros,
+  numeroComprobante
 }: TablaProps) {
   const quantityPerPage = parseInt(process.env.QUANTITY_PER_PAGE || "8");
 
@@ -83,6 +84,7 @@ export default function Tabla({
         esDebito: filtros.esDebito,
         banco: filtros.banco,
         tipoOperacionId: filtros.tipoOperacionId,
+        numeroComprobante:numeroComprobante
       });
 
       if (typeof operacionesReq === "string") {
@@ -105,7 +107,7 @@ export default function Tabla({
     } finally {
       setLoading(false);
     }
-  }, [id, filtros, quantityPerPage, setOperaciones, setindicesPagina]);
+  }, [id, filtros, quantityPerPage, numeroComprobante, setOperaciones, setindicesPagina]);
 
   useEffect(() => {
     fetchOperaciones();
