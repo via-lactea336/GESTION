@@ -172,7 +172,6 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
           cuentaInvolucrado: undefined,
           rucInvolucrado: undefined,
           nombreInvolucrado: cuentasBancaria.banco.nombre,
-          bancoInvolucrado: cuentasBancaria.banco.nombre,
         })
         break
 
@@ -181,7 +180,6 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
           ...operacion,
           cuentaInvolucrado: undefined,
           rucInvolucrado: undefined,
-          bancoInvolucrado: cuentasBancaria?.banco.nombre,
         })
         break
       
