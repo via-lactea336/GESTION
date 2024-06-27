@@ -34,7 +34,7 @@ export default async function obtenerOperacionesFiltros(
   if(cuentaId) searchParams.append("cuentaId", cuentaId)
   if(banco) searchParams.append("banco", banco)
   if(tipoOperacionId) searchParams.append("tipoOperacion", tipoOperacionId)
-  if(numeroComprobante) searchParams.append("numeroComprobante", numeroComprobante)
+  if(numeroComprobante && numeroComprobante.trim() !== "") searchParams.append("numeroComprobante", numeroComprobante)
   if(esDebito !== null) searchParams.append("esDebito", `${esDebito}`)
 
   const queryString = searchParams.toString();

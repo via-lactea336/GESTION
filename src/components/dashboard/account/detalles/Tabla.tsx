@@ -18,6 +18,7 @@ type TablaProps = {
     fechaMin: string;
     fechaMax: string;
     banco: string;
+    numeroComprobante:string;
     esDebito: boolean | undefined;
     pagina: number;
   };

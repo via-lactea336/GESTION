@@ -72,6 +72,7 @@ export default function Data({ userName }: DataProps) {
     fechaMin: "",
     fechaMax: "",
     banco: "",
+    numeroComprobante:"",
     esDebito: undefined,
     pagina: 0,
   });
