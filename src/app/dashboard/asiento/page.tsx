@@ -1,5 +1,4 @@
 import prisma from '@/lib/prisma'
-import { formatDate } from '@/lib/utils'
 import React from 'react'
 
 type Props = {}
@@ -13,7 +12,10 @@ export default async function Asiento({}: Props) {
           cuenta: true
         }
       }
-    }
+    },
+    orderBy: { 
+      createdAt: 'desc' 
+    },
   })
 
   return (
