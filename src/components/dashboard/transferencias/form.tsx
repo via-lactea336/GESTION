@@ -168,18 +168,8 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
           break
         }
         setOperacion({
-          ...operacion,
-          cuentaInvolucrado: undefined,
-          rucInvolucrado: undefined,
+          ...initialValues,
           nombreInvolucrado: cuentasBancaria.banco.nombre,
-        })
-        break
-
-      case "Retiro":
-        setOperacion({
-          ...operacion,
-          cuentaInvolucrado: undefined,
-          rucInvolucrado: undefined,
         })
         break
       
@@ -188,6 +178,7 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
           alert("No se encontro la cuenta bancaria")
           break
         }
+        setOperacion(initialValues)
         setCheques(prev => [...prev, {
           numeroCheque: "",
           involucrado: "",
@@ -198,13 +189,7 @@ export default function FormTransferencias({cuentaBancariaId}:Props) {
         }])
       
       default:
-        setOperacion({
-          ...operacion,
-          nombreInvolucrado: initialValues.nombreInvolucrado,
-          bancoInvolucrado: initialValues.bancoInvolucrado,
-          rucInvolucrado: initialValues.rucInvolucrado,
-          cuentaInvolucrado: initialValues.cuentaInvolucrado,
-        })
+        setOperacion(initialValues)
         break
     }    
   }, [operacion.tipoOperacionId])
