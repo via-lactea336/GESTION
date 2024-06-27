@@ -13,25 +13,38 @@ import { saveAs } from "file-saver";
 const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
-    backgroundColor: "#E4E4E4",
+    backgroundColor: "#ffffff",
     padding: 30,
   },
   section: {
     margin: 10,
     padding: 10,
-    flexGrow: 1,
+    border: "1px solid #e4e4e4",
+    borderRadius: 5,
+    backgroundColor: "#f9f9f9",
   },
   header: {
-    fontSize: 20,
+    fontSize: 24,
     marginBottom: 20,
     textAlign: "center",
+    color: "#333333",
+    borderBottom: "2px solid #e4e4e4",
+    paddingBottom: 10,
   },
   text: {
-    fontSize: 12,
+    fontSize: 14,
     marginBottom: 10,
+    color: "#333333",
   },
   bold: {
     fontWeight: "bold",
+    color: "#555555",
+  },
+  footer: {
+    fontSize: 12,
+    marginTop: 20,
+    textAlign: "center",
+    color: "#888888",
   },
 });
 
@@ -60,7 +73,7 @@ const ComprobantePDF: React.FC<ComprobanteProps> = ({
         <View style={styles.section}>
           <Text style={styles.header}>Comprobante de Extracción</Text>
           <Text style={styles.text}>
-            <Text style={styles.bold}>Caja: </Text>
+            <Text style={styles.bold}>Caja N°: </Text>
             {caja}
           </Text>
           <Text style={styles.text}>
@@ -73,13 +86,16 @@ const ComprobantePDF: React.FC<ComprobanteProps> = ({
           </Text>
           <Text style={styles.text}>
             <Text style={styles.bold}>Monto: </Text>
-            {montoFormateado} Gs. {/* Usar el monto formateado aquí */}
+            {montoFormateado} Gs. 
           </Text>
-          <Text style={styles.text}>
-            <Text style={styles.bold}>Observaciones: </Text>
-            {observaciones} 
-          </Text>
+          {observaciones && (
+            <Text style={styles.text}>
+              <Text style={styles.bold}>Observaciones: </Text>
+              {observaciones} 
+            </Text>
+          )}
         </View>
+        <Text style={styles.footer}> No válido como comprobante legal</Text>
       </Page>
     </Document>
   );
@@ -87,7 +103,7 @@ const ComprobantePDF: React.FC<ComprobanteProps> = ({
 
 export const generatePDF = async (props: ComprobanteProps) => {
   const blob = await pdf(<ComprobantePDF {...props} />).toBlob();
-  saveAs(blob, "Comprobante.pdf");
+  saveAs(blob, "ComprobanteEgreso.pdf");
 };
 
 export default ComprobantePDF;
