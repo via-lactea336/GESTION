@@ -1,27 +1,32 @@
-import Input from '@/components/global/Input'
-import InputCalendar from '@/components/global/InputCalendar'
-import { CrearOperacionFields } from '@/lib/moduloBanco/operacion/agregarOperacion'
-import { Banco } from '@prisma/client'
-import React from 'react'
+import Input from "@/components/global/Input";
+import InputCalendar from "@/components/global/InputCalendar";
+import { CrearOperacionFields } from "@/lib/moduloBanco/operacion/agregarOperacion";
+import { Banco } from "@prisma/client";
+import React from "react";
 
 type Props = {
-  monto:number
-  operacion: CrearOperacionFields
-  setMontoParcial: (value: number) => void
-  handleOnChange: (event: React.ChangeEvent<HTMLInputElement|HTMLSelectElement>) => void
-  bancos: Banco[]
-  loading: boolean
-}
+  monto: number;
+  operacion: CrearOperacionFields;
+  setMontoParcial: (value: number) => void;
+  handleOnChange: (
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void;
+  bancos: Banco[];
+  loading: boolean;
+};
 
-export default function Retiro({ operacion, handleOnChange, setMontoParcial, monto, bancos }: Props) {
+export default function Retiro({
+  operacion,
+  handleOnChange,
+  setMontoParcial,
+  monto,
+  bancos,
+}: Props) {
   return (
     <>
       <div className="flex sm:flex-row flex-wrap flex-col box-border gap-3 mb-3 w-full">
-
         <div className="flex flex-col w-full">
-          <label className=" mb-2">
-            Nombre del Titular*
-          </label>
+          <label className=" mb-2">Solicitante del Retiro*</label>
           <Input
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="nombreInvolucrado"
@@ -33,21 +38,24 @@ export default function Retiro({ operacion, handleOnChange, setMontoParcial, mon
           />
         </div>
         <div className="flex flex-col w-full">
-          <label className="mb-2">Ruc</label>
+          <label className="mb-2">Ruc*</label>
           <Input
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="rucInvolucrado"
             onChange={handleOnChange}
             value={operacion.rucInvolucrado || ""}
             type="text"
+            required
             placeholder="Ingrese el RUC"
           />
         </div>
         <div className="flex flex-col w-full">
           <label className=" mb-2">Monto (Efectivo)</label>
           <Input
-            className={'block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none'}
-            onChange={(e) => setMontoParcial(Number(e.target.value))} 
+            className={
+              "block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
+            }
+            onChange={(e) => setMontoParcial(Number(e.target.value))}
             id="montoParcial"
             value={monto}
             type="formattedNumber"
@@ -67,7 +75,6 @@ export default function Retiro({ operacion, handleOnChange, setMontoParcial, mon
             placeholder="Ingrese el numero de comprobante"
           />
         </div>
-
       </div>
 
       <div className="flex w-full gap-3">
@@ -94,8 +101,7 @@ export default function Retiro({ operacion, handleOnChange, setMontoParcial, mon
             placeholder="Ingrese el concepto"
           />
         </div>
-
       </div>
     </>
-  )
+  );
 }
