@@ -159,7 +159,7 @@ const Extraccion: React.FC = () => {
           />
         </div>
         <div className="">
-          <label className="block text-primary-200 mb-2">Observacioes:</label>
+          <label className="block text-primary-200 mb-2">Observaciones:</label>
           <Input
             type="text"
             id="observaciones"

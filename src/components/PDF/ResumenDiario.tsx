@@ -8,8 +8,8 @@ import {
   pdf,
 } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
-import { Movimiento } from "@prisma/client";
 import { movimientoDetallado } from "../cajaVentanasEmergentes/ResumenDetalle";
+import { DatosExtendidosRegistroCaja } from "@/lib/definitions";
 
 // Definir los estilos
 const styles = StyleSheet.create({
@@ -27,9 +27,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 20,
     textAlign: "center",
+    backgroundColor: "#333", 
+    color: "#FFF", 
+    padding: 10, 
+    borderRadius: 5, 
   },
   text: {
-    fontSize: 12,
+    fontSize: 14,
     marginBottom: 10,
   },
   bold: {
@@ -45,14 +49,7 @@ const styles = StyleSheet.create({
   },
   tableCol: {
     width: "50%",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "#000",
-  },
-  tableCell: {
-    margin: 5,
     padding: 5,
-    fontSize: 12,
   },
   tableHeader: {
     backgroundColor: "#D3D3D3",
@@ -82,6 +79,27 @@ const styles = StyleSheet.create({
   textContainer: {
     overflow: "hidden",
     textOverflow: "ellipsis",
+  },
+  innerTable: {
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderColor: "#000",
+    width: "100%",
+  },
+  innerTableHeader: {
+    backgroundColor: "#D3D3D3",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  innerTableRow: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: "#000",
+  },
+  innerTableCell: {
+    padding: 5,
+    width: "50%",
+    textAlign: "center",
   },
 });
 
@@ -114,130 +132,190 @@ const ResumenCajaPDF: React.FC<ResumenCajaProps> = ({
   montoIngresoTarjeta,
   movimientos,
   observaciones,
-}) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.section}>
-        <Text style={styles.header}>Resumen de Caja</Text>
-        <Text style={styles.text}>
-          <Text style={styles.bold}>Fecha: </Text>
-          {formatDate(createdAt)}
-        </Text>
-        <Text style={styles.text}>
-          <Text style={styles.bold}>Hora: </Text>
-          {formatTime(createdAt)}
-        </Text>
-        <Text style={styles.text}>
-          <Text style={styles.bold}>Caja: </Text>
-          {caja}
-        </Text>
-        <Text style={styles.text}>
-          <Text style={styles.bold}>Cajero: </Text>
-          {cajero}
-        </Text>
-        <View style={styles.table}>
-          <View style={[styles.tableRow]}>
-            <Text style={[styles.tableCol, styles.tableCell]}>
-              Caja Inicial
-            </Text>
-            <Text style={[styles.tableCol, styles.tableCell]}>
-              {Number(apertura?.saldoInicial).toLocaleString()} Gs.
-            </Text>
+}) => {
+  const movimientosIngreso = movimientos.filter((mov) => mov.esIngreso);
+  const movimientosEgreso = movimientos.filter((mov) => !mov.esIngreso);
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.section}>
+          <Text style={styles.header}>Resumen de Caja</Text>
+          <Text style={styles.text}>
+            <Text style={styles.bold}>Fecha: </Text>
+            {formatDate(createdAt)}
+          </Text>
+          <Text style={styles.text}>
+            <Text style={styles.bold}>Hora: </Text>
+            {formatTime(createdAt)}
+          </Text>
+          <Text style={styles.text}>
+            <Text style={styles.bold}>Caja N°: </Text>
+            {caja}
+          </Text>
+          <Text style={styles.text}>
+            <Text style={styles.bold}>Cajero N°: </Text>
+            {cajero}
+          </Text>
+          <View style={styles.table}>
+            <View style={[styles.tableRow]}>
+              <Text style={[styles.tableCol, styles.tableHeader]}>
+                Caja Inicial
+              </Text>
+              <Text style={[styles.tableCol, styles.tableHeader]}>
+                {Number(apertura?.saldoInicial).toLocaleString()} Gs.
+              </Text>
+            </View>
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCol, styles.tableHeader]}>
+                Dinero Registrado
+              </Text>
+              <Text style={[styles.tableCol, styles.tableHeader]}>
+                {Number(montoRegistrado).toLocaleString()} Gs.
+              </Text>
+            </View>
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCol, styles.tableHeader]}>
+                Observaciones
+              </Text>
+              <Text style={[styles.tableCol, styles.tableHeader]}>
+                {observaciones}
+              </Text>
+            </View>
           </View>
-          <View style={styles.tableRow}>
-            <Text style={[styles.tableCol, styles.tableCell]}>
-              Dinero en Caja
-            </Text>
-            <Text style={[styles.tableCol, styles.tableCell]}>
-              {Number(montoRegistrado).toLocaleString()} Gs.
-            </Text>
-          </View>
-          <View style={styles.tableRow}>
-            <Text style={[styles.tableCol, styles.tableCell]}>
-              Observaciones
-            </Text>
-            <Text style={[styles.tableCol, styles.tableCell]}>
-              {observaciones}
-            </Text>
+
+          <Text style={styles.header}>
+            Resumen de ingresos por forma de pago
+          </Text>
+
+          <View style={styles.table}>
+            <View style={[styles.tableRow, styles.tableHeader]}>
+              <Text style={[styles.tableCol, styles.tableHeader]}>
+                Forma de Pago
+              </Text>
+              <Text style={[styles.tableCol, styles.tableHeader]}>Ingreso</Text>
+            </View>
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCol, styles.tableHeader]}>Efectivo</Text>
+              <Text style={[styles.tableCol, styles.tableHeader]}>
+                {Number(montoIngreso).toLocaleString()} Gs.
+              </Text>
+            </View>
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCol, styles.tableHeader]}>Cheque</Text>
+              <Text style={[styles.tableCol, styles.tableHeader]}>
+                {Number(montoIngresoCheque).toLocaleString()} Gs.
+              </Text>
+            </View>
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCol, styles.tableHeader]}>Tarjetas</Text>
+              <Text style={[styles.tableCol, styles.tableHeader]}>
+                {Number(montoIngresoTarjeta).toLocaleString()} Gs.
+              </Text>
+            </View>
           </View>
         </View>
+      </Page>
 
-        <Text style={styles.header}>
-          Resumen de ingresos y egresos por forma de pago
-        </Text>
-
-        <View style={styles.table}>
-          <View style={[styles.tableRow, styles.tableHeader]}>
-            <Text style={[styles.tableCol, styles.tableCell]}>
-              Forma de Pago
-            </Text>
-            <Text style={[styles.tableCol, styles.tableCell]}>Ingreso</Text>
-          </View>
-          <View style={styles.tableRow}>
-            <Text style={[styles.tableCol, styles.tableCell]}>Efectivo</Text>
-            <Text style={[styles.tableCol, styles.tableCell]}>
-              {Number(montoIngreso).toLocaleString()} Gs.
-            </Text>
-          </View>
-          <View style={styles.tableRow}>
-            <Text style={[styles.tableCol, styles.tableCell]}>Cheque</Text>
-            <Text style={[styles.tableCol, styles.tableCell]}>
-              {Number(montoIngresoCheque).toLocaleString()} Gs.
-            </Text>
-          </View>
-          <View style={styles.tableRow}>
-            <Text style={[styles.tableCol, styles.tableCell]}>Tarjetas</Text>
-            <Text style={[styles.tableCol, styles.tableCell]}>
-              {Number(montoIngresoTarjeta).toLocaleString()} Gs.
-            </Text>
-          </View>
-        </View>
-        <Text style={styles.header}>Movimientos</Text>
-
-        {movimientos?.map((mov) => (
-          <View style={styles.movimientoSection} key={mov.id}>
-            <Text style={styles.movimientoHeader}>
-              {mov.esIngreso ? "Operacion de Ingreso" : "Operacion de Egreso"}
-            </Text>
-            <View style={styles.movimientoDetails}>
-              <View>
-                <Text style={[styles.detalle, styles.textContainer]}>
-                  Monto total de la operacion:{" "}
-                  {Number(mov.monto).toLocaleString("es-PY")} Gs.
-                </Text>
-                <Text style={[styles.detalle, styles.textContainer]}>
-                  Fecha: {formatDate(mov.createdAt)}
-                </Text>
-                <Text style={[styles.detalle, styles.textContainer]}>
-                  Hora: {formatTime(mov.createdAt)}
-                </Text>
+      {movimientosIngreso.length > 0 && (
+        <Page size="A4" style={styles.page}>
+          <View style={styles.section}>
+            <Text style={styles.header}>Movimientos de Ingreso</Text>
+            {movimientosIngreso.map((mov) => (
+              <View style={styles.movimientoSection} key={mov.id}>
+                <View style={styles.movimientoDetails}>
+                  <View>
+                    <Text style={[styles.detalle, styles.textContainer]}>
+                      Monto total de la operación:{" "}
+                      {Number(mov.monto).toLocaleString("es-PY")} Gs.
+                    </Text>
+                    <Text style={[styles.detalle, styles.textContainer]}>
+                      Fecha: {formatDate(mov.createdAt)}
+                    </Text>
+                    <Text style={[styles.detalle, styles.textContainer]}>
+                      Hora: {formatTime(mov.createdAt)}
+                    </Text>
+                  </View>
+                  <View>
+                    <View style={styles.innerTable}>
+                      <Text style={styles.innerTableHeader}>
+                        Detalles de Factura
+                      </Text>
+                      <View style={styles.innerTableRow}>
+                        <Text style={styles.innerTableCell}>
+                          Tipo de factura:{" "}
+                          {mov.factura?.esContado ? "Contado" : "Crédito"}
+                        </Text>
+                        <Text style={styles.innerTableCell}>
+                          Número de Factura: {mov.factura?.numeroFactura}
+                        </Text>
+                      </View>
+                      <View style={styles.innerTableRow}>
+                        <Text style={styles.innerTableCell}>
+                          Fecha de emisión de la factura:{" "}
+                          {mov.factura?.createdAt
+                            ? formatDate(mov.factura.createdAt)
+                            : ""}
+                        </Text>
+                        <Text style={styles.innerTableCell}>
+                          Monto total a pagar:{" "}
+                          {Number(mov.factura?.total).toLocaleString("es-PY")} Gs.
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+                {mov.esIngreso && mov.movimientoDetalles?.length > 0 && (
+                  <View>
+                    <Text style={[styles.detalle, styles.textContainer]}>
+                      Detalles Operación
+                    </Text>
+                    {mov.movimientoDetalles.map((detalle, index) => (
+                      <View
+                        key={index}
+                        style={[
+                          styles.tableRow,
+                          { borderBottom: "1px solid #000" },
+                        ]}
+                      >
+                        <Text style={styles.tableCol}>N°{index + 1}</Text>
+                        <Text style={styles.tableCol}>
+                          Método de pago: {detalle.metodoPago}
+                        </Text>
+                        <Text style={styles.tableCol}>
+                          Monto Parcial: {Number(detalle.monto).toLocaleString()}{" "}
+                          Gs.
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
               </View>
-              <View>
-                {mov.esIngreso ? (
-                  <>
+            ))}
+          </View>
+        </Page>
+      )}
+
+      {movimientosEgreso.length > 0 && (
+        <Page size="A4" style={styles.page}>
+          <View style={styles.section}>
+            <Text style={styles.header}>Movimientos de Egreso</Text>
+            {movimientosEgreso.map((mov) => (
+              <View style={styles.movimientoSection} key={mov.id}>
+                <View style={styles.movimientoDetails}>
+                  <View>
                     <Text style={[styles.detalle, styles.textContainer]}>
-                      Detalles de Factura
+                      Monto total de la operación:{" "}
+                      {Number(mov.monto).toLocaleString("es-PY")} Gs.
                     </Text>
                     <Text style={[styles.detalle, styles.textContainer]}>
-                      Tipo de factura:{" "}
-                      {mov.factura?.esContado ? "Contado" : "Credito"}
+                      Fecha: {formatDate(mov.createdAt)}
                     </Text>
                     <Text style={[styles.detalle, styles.textContainer]}>
-                      Numero de Factura: {mov.factura?.numeroFactura}
+                      Hora: {formatTime(mov.createdAt)}
                     </Text>
-                    <Text style={[styles.detalle, styles.textContainer]}>
-                      Fecha de emision de la factura:{" "}
-                      {mov.factura?.createdAt
-                        ? formatDate(mov.factura.createdAt)
-                        : ""}
-                    </Text>
-                    <Text style={[styles.detalle, styles.textContainer]}>
-                      Monto total a pagar:{" "}
-                      {Number(mov.factura?.total).toLocaleString("es-PY")} Gs.
-                    </Text>
-                  </>
-                ) : (
-                  <>
+                  </View>
+                  <View>
                     <Text style={[styles.detalle, styles.textContainer]}>
                       Encargado: {mov.comprobante?.user?.nombre}{" "}
                       {mov.comprobante?.user?.apellido}
@@ -248,41 +326,16 @@ const ResumenCajaPDF: React.FC<ResumenCajaProps> = ({
                     <Text style={[styles.detalle, styles.textContainer]}>
                       Observaciones: {mov.comprobante?.concepto}
                     </Text>
-                  </>
-                )}
-              </View>
-            </View>
-            {mov.esIngreso && mov.movimientoDetalles?.length > 0 && (
-              <View>
-                <Text style={[styles.detalle, styles.textContainer]}>
-                  Detalles Operacion
-                </Text>
-                {mov.movimientoDetalles.map((detalle, index) => (
-                  <View
-                    key={index}
-                    style={[
-                      styles.tableRow,
-                      { borderBottom: "1px solid #000" },
-                    ]}
-                  >
-                    <Text style={styles.tableCell}>N°{index + 1}</Text>
-                    <Text style={styles.tableCell}>
-                      Metodo de pago: {detalle.metodoPago}
-                    </Text>
-                    <Text style={styles.tableCell}>
-                      Monto Parcial: {Number(detalle.monto).toLocaleString()}{" "}
-                      Gs.
-                    </Text>
                   </View>
-                ))}
+                </View>
               </View>
-            )}
+            ))}
           </View>
-        ))}
-      </View>
-    </Page>
-  </Document>
-);
+        </Page>
+      )}
+    </Document>
+  );
+};
 
 export const generatePDF = async (props: ResumenCajaProps) => {
   const blob = await pdf(<ResumenCajaPDF {...props} />).toBlob();
