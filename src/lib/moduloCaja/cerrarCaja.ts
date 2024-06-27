@@ -44,6 +44,9 @@ export default async function cerrarCaja(aperturaId: string, observaciones?: str
       },
     });
     if (!aperturaCaja || !caja || !arqueo) throw new ApiError("Error cerrando la caja", 500)
+  }, {
+    maxWait: 10000,
+    timeout: 10000
   })
   await calcularDatosRegistroCaja(aperturaId)
 }
