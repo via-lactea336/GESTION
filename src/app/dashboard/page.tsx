@@ -5,12 +5,9 @@ import {
   BanknotesIcon,
   ChartBarIcon,
   DocumentChartBarIcon,
-  
 } from "@heroicons/react/24/outline";
 
 import Link from "next/link";
-
-
 
 export default async function Page() {
   const session = await getServerSession(authOptions);
@@ -29,14 +26,17 @@ export default async function Page() {
     );
   }
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40">
-      <main className="grid flex-1 items-center justify-center gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
-          <div className="text-center bg-gray-800 rounded-md p-3 w-72 h-72 flex flex-col justify-between hover:bg-gray-700 transition-colors duration-200">
+    <div className="flex w-full flex-col bg-muted/40">
+      <main className="grid flex-1 w-full items-center justify-center gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+        <h1 className="text-center text-3xl">Bienvenido al Panel General</h1>
+        <div className="flex items-center gap-4">
+          <div className="text-center bg-gray-800 rounded-md py-3 px-6 border border-gray-100 w-72 h-72 flex flex-col justify-between hover:bg-gray-700 transition-colors duration-200">
             <div className="flex flex-col justify-center flex-1">
               <DocumentChartBarIcon className="h-12 w-12 mx-auto text-primary mb-2" />
               <h3 className="text-2xl font-bold">Banco</h3>
-              <p className="text-muted-foreground">Accede a tu información bancaria</p>
+              <p className="text-muted-foreground">
+                Accede a tu información bancaria
+              </p>
             </div>
             <div className="mb-4">
               <Link
@@ -47,11 +47,13 @@ export default async function Page() {
               </Link>
             </div>
           </div>
-          <div className="text-center bg-gray-800 rounded-md p-3 w-72 h-72 flex flex-col justify-between hover:bg-gray-700 transition-colors duration-200">
+          <div className="text-center bg-gray-800 rounded-md py-3 px-6 border border-gray-100 w-72 h-72 flex flex-col justify-between hover:bg-gray-700 transition-colors duration-200">
             <div className="flex flex-col justify-center flex-1">
               <BanknotesIcon className="h-12 w-12 mx-auto text-primary mb-2" />
               <h3 className="text-2xl font-bold">Caja</h3>
-              <p className="text-muted-foreground">Gestiona tus movimientos de caja</p>
+              <p className="text-muted-foreground">
+                Gestiona tus movimientos de caja
+              </p>
             </div>
             <div className="mb-4">
               <Link
