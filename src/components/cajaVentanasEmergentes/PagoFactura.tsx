@@ -351,7 +351,7 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
                 type="text"
                 value={detalle}
                 disabled={disabled}
-                required={metodo === medioDePago.OTRO ? true : false}
+                required={metodo === medioDePago.OTRO}
                 placeholder="Especifique detalles del pago (por ejemplo,Cheque #12345)"
                 onChange={(e) => setDetalle(e.target.value)}
                 className="mt-1 block h-3/4 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-primary-600 sm:text-sm"
@@ -360,11 +360,13 @@ export default function PagoFacturas({ idFactura }: { idFactura: string }) {
           </div>
           <div className="w-full flex justify-end items-center gap-4">
             <button
-              disabled={disabled || loading}
+              disabled={
+                disabled || loading || (metodo === medioDePago.OTRO && !detalle)
+              }
               onClick={agregarMetodoPago}
               className={
                 " text-white py-2 px-4 rounded-md shadow-sm " +
-                (error || loading
+                (error || loading || (metodo === medioDePago.OTRO && !detalle)
                   ? " cursor-not-allowed bg-primary-900"
                   : "bg-primary-800 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-900")
               }
