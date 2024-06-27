@@ -1,8 +1,9 @@
+
 import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
 import { CuentaBancaria } from "@prisma/client";
 import { OperacionAndTipoOperacion } from "@/lib/definitions";
 import { getCurrentDate } from "@/lib/getCurrentDate";
-// Definición de los tipos de los props
+
 type TransferReceiptProps = {
   operaciones: OperacionAndTipoOperacion[];
   cuenta: CuentaBancaria;
@@ -20,12 +21,21 @@ const formatDate = (dateString: Date) => {
   return formattedDate;
 };
 
+const formatTime = (dateString: Date) => {
+  const date = new Date(dateString);
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const formattedTime = `${hours < 10 ? "0" + hours : hours}:${
+    minutes < 10 ? "0" + minutes : minutes
+  }`;
+  return formattedTime;
+};
+
 function DetalleCuentaReceipt({
   operaciones,
   cuenta,
   userName,
 }: TransferReceiptProps) {
-  // Create styles
   const styles = StyleSheet.create({
     page: {
       flexDirection: "column",
@@ -33,7 +43,7 @@ function DetalleCuentaReceipt({
       padding: 20,
     },
     section: {
-      width: "90%",
+      width: "100%",
       flexDirection: "column",
       marginBottom: 10,
     },
@@ -55,7 +65,7 @@ function DetalleCuentaReceipt({
       fontSize: 12,
     },
     container: {
-      width: "70%",
+      width: "100%",
       margin: "0 auto",
     },
     categoria: {
@@ -66,7 +76,7 @@ function DetalleCuentaReceipt({
     },
     table: {
       display: "flex",
-      width: "auto",
+      width: "100%",
       borderStyle: "solid",
       borderWidth: 1,
       borderRightWidth: 0,
@@ -76,7 +86,7 @@ function DetalleCuentaReceipt({
       flexDirection: "row",
     },
     tableCol: {
-      width: "20%",
+      width: "16.66%",
       borderStyle: "solid",
       borderWidth: 1,
       borderLeftWidth: 0,
@@ -128,7 +138,7 @@ function DetalleCuentaReceipt({
                 <Text style={styles.text}>{Number(cuenta.saldo).toLocaleString('es-ES')}</Text>
               </View>
               <View style={styles.section}>
-                <Text style={styles.subtitle}>Saldo Retenido:</Text>
+                <Text style={styles.subtitle}>Saldo Total:</Text>
                 <Text style={styles.text}>
                   {Number(cuenta.saldoDisponible).toLocaleString('es-ES')}
                 </Text>
@@ -147,7 +157,7 @@ function DetalleCuentaReceipt({
             <View style={styles.tableRow}>
               <View style={styles.tableCol}>
                 <Text style={[styles.tableCell, styles.tableHeader]}>
-                  Operación
+                  Movimiento
                 </Text>
               </View>
               <View style={styles.tableCol}>
@@ -157,12 +167,12 @@ function DetalleCuentaReceipt({
               </View>
               <View style={styles.tableCol}>
                 <Text style={[styles.tableCell, styles.tableHeader]}>
-                  Banco Origen
+                  Hora
                 </Text>
               </View>
               <View style={styles.tableCol}>
                 <Text style={[styles.tableCell, styles.tableHeader]}>
-                  Involucrado
+                  Tipo Operación
                 </Text>
               </View>
               <View style={styles.tableCol}>
@@ -180,7 +190,7 @@ function DetalleCuentaReceipt({
               <View style={styles.tableRow} key={index}>
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
-                    {operacion.tipoOperacion.esDebito ? "Debito" : "Credito"}
+                    {operacion.tipoOperacion.esDebito ? "Débito" : "Crédito"}
                   </Text>
                 </View>
                 <View style={styles.tableCol}>
@@ -190,12 +200,12 @@ function DetalleCuentaReceipt({
                 </View>
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
-                    {operacion.bancoInvolucrado}
+                    {formatTime(operacion.fechaOperacion)}
                   </Text>
                 </View>
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
-                    {operacion.nombreInvolucrado}
+                    {operacion.tipoOperacion.nombre}
                   </Text>
                 </View>
                 <View style={styles.tableCol}>
