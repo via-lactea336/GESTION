@@ -1,6 +1,5 @@
 "use client";
 import cerrarCajaAdmin from "@/lib/moduloCaja/aperturaCaja/cerrarCajaAdmin";
-import { login } from "@/lib/auth/login";
 import { useRouter } from "next/navigation";
 import PasswordField from "../auth/PasswordField";
 import { AperturaCaja, Caja } from "@prisma/client";
@@ -8,6 +7,7 @@ import { obtenerCookie } from "@/lib/obtenerCookie";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { Toaster, toast } from "sonner";
+import Cookies from "js-cookie";
 
 export default function FormArqueo() {
   const router = useRouter();
@@ -24,21 +24,25 @@ export default function FormArqueo() {
     const username = target.username.value;
     const password = target.password.value;
     const observaciones = e.currentTarget.observaciones.value;
-    const error = await login({ username, password });
-    if (!error) {
-      const res = await cerrarCajaAdmin(caja.id, apertura.id, observaciones, username, password);
-      setLoading(false);
-      if (res.error) {
-        toast.error(res.error);
-      } else {
-        toast.success(res.message);
-        setTimeout(() => {
-          router.push(`/dashboard/caja/reportes/${apertura.id}`);
-        }, 2000);
-      }
+
+    const res = await cerrarCajaAdmin(
+      caja.id,
+      apertura.id,
+      observaciones,
+      username,
+      password
+    );
+    setLoading(false);
+    if (res.error) {
+      toast.error(res.error);
     } else {
-      toast.error(error);
-      setLoading(false);
+      toast.success(res.message);
+      Cookies.remove("cajero");
+      Cookies.remove("caja");
+      Cookies.remove("apertura");
+      setTimeout(() => {
+        router.push(`/dashboard/caja/reportes/${apertura.id}`);
+      }, 2000);
     }
   };
 

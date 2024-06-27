@@ -54,7 +54,7 @@ export default function FormApertura({ caja, cajeroId, cajeroNombre }: Params) {
       router.push(`/dashboard/caja/${caja.id}/ingreso`);
     } else {
       setLoading(false);
-      toast.message(mensaje);
+      toast.error(mensaje);
     }
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
