@@ -4,6 +4,7 @@ import {
   generateApiErrorResponse,
   generateApiSuccessResponse,
 } from "@/lib/apiResponse";
+import { equal } from "assert";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -17,6 +18,7 @@ export async function GET(request: NextRequest) {
   const esDebito = searchParams.get("esDebito");
   const tipoOperacion = searchParams.get("tipoOperacion");
   const banco = searchParams.get("banco");
+  const numeroComprobante = searchParams.get("numeroComprobante")
 
   const skip = searchParams.get("skip");
   const upTo  = searchParams.get("upTo");
@@ -44,6 +46,9 @@ export async function GET(request: NextRequest) {
     monto:{
       gte:amounts[0],
       lte:amounts[1]
+    },
+    numeroComprobante: {
+      equals:numeroComprobante
     },
     tipoOperacion:esDebito || tipoOperacion? {
       id: tipoOperacion? tipoOperacion : undefined,
