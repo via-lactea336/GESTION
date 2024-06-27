@@ -11,7 +11,7 @@ async function main() {
   await prisma.operacion.deleteMany({});
 
   // Delete tipoOperacion
-  await prisma.tipoOperacion.deleteMany({});
+  //await prisma.tipoOperacion.deleteMany({});
 
   // Delete cuentaBancaria
   await prisma.cuentaBancaria.deleteMany({});
@@ -39,7 +39,7 @@ async function main() {
 
   await prisma.factura.deleteMany({});
  
-  await prisma.cliente.deleteMany({});
+  //await prisma.cliente.deleteMany({});
 
   //asientos
   await prisma.detalleAsiento.deleteMany({});

@@ -263,7 +263,7 @@ const ContenidoIngresos = () => {
                       {factura.cliente.nombre}
                     </td>
                     <td className="py-2 px-1 border border-white">
-                      {new Date(factura.createdAt).toLocaleDateString()}
+                      {new Date(factura.fechaEmision).toLocaleDateString()}
                     </td>
                     <td className="py-2 px-1 border border-white text-center">
                       {factura.pagado ? (
