@@ -8,6 +8,7 @@ import {
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import reflejarOperacion from "@/lib/moduloBanco/operacion/reflejarOperacion";
 import ApiError from "@/lib/api/ApiError";
+import generarAsiento from "@/lib/asientos/services/asiento/generarAsiento";
 
 export async function POST(
   req: NextRequest,
@@ -45,7 +46,8 @@ export async function POST(
           id: true,
           esDebito: true,
           afectaSaldo: true,
-          afectaSaldoDisponible: true
+          afectaSaldoDisponible: true,
+          nombre: true
         }
       });	
 
@@ -62,6 +64,29 @@ export async function POST(
           numeroComprobante: cheque.numeroCheque,
         },
       });
+
+      if(tipoOperacion.nombre === "Pago a Proveedores" && tipoOperacion.esDebito)
+      {
+        const numOrdenCompra = Math.floor(Math.random() * (3000 - 100 + 1) + 100)
+        await generarAsiento([
+          {
+            fecha: operacion.fechaOperacion,
+            concepto: operacion.concepto + " con orden de compra #" + numOrdenCompra,
+            monto: +operacion.monto,
+            codigo:"101.01.01",
+            esDebe: false,
+            esAsentable: true
+          },
+          {
+            fecha: operacion.fechaOperacion,
+            concepto: "Bancos con relacion a la orden de compra #" + numOrdenCompra,
+            monto: +operacion.monto,
+            codigo:"101.01.02",
+            esDebe: true,
+            esAsentable: true
+          }
+        ])
+      }
 
       if (!operacion) return generateApiErrorResponse("Operacion no creada", 500)
 
