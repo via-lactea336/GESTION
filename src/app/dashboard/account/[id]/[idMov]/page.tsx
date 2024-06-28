@@ -11,6 +11,10 @@ import Deposito from "@/components/dashboard/account/TransferenciaDetalles/Depos
 import DebitoBancario from "@/components/dashboard/account/TransferenciaDetalles/DebitoBancario";
 import Transferencia from "@/components/dashboard/account/TransferenciaDetalles/Transferencia";
 import EmitirCheque from "@/components/dashboard/account/TransferenciaDetalles/EmitirCheque";
+import DebitoBancarioPDF from "@/components/dashboard/account/TransferenciaDetalles/pdf/DebitoBancarioPDF";
+import DepositoPDF from "@/components/dashboard/account/TransferenciaDetalles/pdf/DepositoPDF";
+import EmitirChequePDF from "@/components/dashboard/account/TransferenciaDetalles/pdf/EmitirChequePDF";
+import RetiroPDF from "@/components/dashboard/account/TransferenciaDetalles/pdf/RetiroPDF";
 
 export default function PageComponent() {
   const [dateTime, setDateTime] = useState("undefined");
@@ -212,6 +216,73 @@ export default function PageComponent() {
           >
             <PDFDownloadLink
               document={
+                tipoOperacionNombre === "Débito bancario" ?
+                <DebitoBancarioPDF
+                  numComprobante={numComprobante}
+                  concepto={concepto}
+                  nombreDestino={nombreDestino}
+                  numCuentaDestino={numCuentaDestino || ""}
+                  bancoDestino={bancoDestino || ""}
+                  nombreOrigen={nombreOrigen}
+                  numCuentaOrigen={numCuentaOrigen}
+                  tipoOperacion={tipoOperacionNombre}
+                  monto={monto}
+                  dateTime={dateTime}
+                  bancoOrigen={bancoOrigen}
+                  userName={`${user?.nombre}`}
+                />
+                :
+                tipoOperacionNombre === "Depósito" ?
+                <DepositoPDF
+                  numComprobante={numComprobante}
+                  concepto={concepto}
+                  nombreDestino={nombreDestino}
+                  numCuentaDestino={numCuentaDestino || ""}
+                  bancoDestino={bancoDestino || ""}
+                  nombreOrigen={nombreOrigen}
+                  numCuentaOrigen={numCuentaOrigen}
+                  tipoOperacion={tipoOperacionNombre}
+                  monto={monto}
+                  dateTime={dateTime}
+                  bancoOrigen={bancoOrigen}
+                  userName={`${user?.nombre}`}
+                  ruc={ruc}
+                />
+                :
+                tipoOperacionNombre === "Emitir Cheque" ?
+                <EmitirChequePDF 
+                  numComprobante={numComprobante}
+                  concepto={concepto}
+                  nombreDestino={nombreDestino}
+                  numCuentaDestino={numCuentaDestino || ""}
+                  bancoDestino={bancoDestino || ""}
+                  nombreOrigen={nombreOrigen}
+                  numCuentaOrigen={numCuentaOrigen}
+                  tipoOperacion={tipoOperacionNombre}
+                  monto={monto}
+                  dateTime={dateTime}
+                  bancoOrigen={bancoOrigen}
+                  userName={`${user?.nombre}`}
+                />
+                :
+                tipoOperacionNombre === "Retiro" ?
+                <RetiroPDF
+                  numComprobante={numComprobante}
+                  concepto={concepto}
+                  nombreDestino={nombreDestino}
+                  numCuentaDestino={numCuentaDestino || ""}
+                  bancoDestino={bancoDestino || ""}
+                  nombreOrigen={nombreOrigen}
+                  numCuentaOrigen={numCuentaOrigen}
+                  tipoOperacion={tipoOperacionNombre}
+                  monto={monto}
+                  dateTime={dateTime}
+                  bancoOrigen={bancoOrigen}
+                  userName={`${user?.nombre}`}
+                  ruc={ruc}
+                />
+                :
+                tipoOperacionNombre.startsWith("Transferencia") ?
                 <TransferReceipt
                   numComprobante={numComprobante}
                   concepto={concepto}
@@ -226,8 +297,10 @@ export default function PageComponent() {
                   bancoOrigen={bancoOrigen}
                   userName={`${user?.nombre}`}
                 />
+                :
+                <></>
               }
-              fileName="transferencia.pdf"
+              fileName={`transferencia_${numComprobante}.pdf`}
             >
               {({ loading, url, error, blob }) =>
                 loading ? <p> Cargando documento... </p> : <p>Descargar</p>

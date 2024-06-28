@@ -1,7 +1,6 @@
 import React from "react";
 import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
 import { getCurrentDate } from "@/lib/getCurrentDate";
-import { obtenerCookie } from "@/lib/obtenerCookie";
 
 // Definición de los tipos de los props
 type TransferReceiptProps = {
@@ -19,7 +18,7 @@ type TransferReceiptProps = {
   userName: string;
 };
 
-function TransferReceipt({
+function DebitoBancarioPDF({
   tipoOperacion,
   dateTime,
   monto,
@@ -80,7 +79,7 @@ function TransferReceipt({
       <Page size="A4" style={styles.page}>
         <View style={[styles.container, styles.section]}>
           <Text style={styles.title}>
-            Comprobante de Transferencia - {tipoOperacion}
+            Comprobante {tipoOperacion}
           </Text>
           <View style={styles.view}>
             <View style={styles.section}>
@@ -99,6 +98,14 @@ function TransferReceipt({
         </View>
         <View style={[styles.container, styles.section]}>
           <View style={styles.view}>
+            <Text style={styles.subtitle}>Banco a Debitar:</Text>
+            <Text style={styles.text}>{nombreDestino}</Text>
+          </View>
+          <View style={styles.view}>
+            <Text style={styles.subtitle}>N° de Cuenta:</Text>
+            <Text style={styles.text}>{numCuentaOrigen}</Text>
+          </View>
+          <View style={styles.view}>
             <Text style={styles.subtitle}>Monto:</Text>
             <Text style={styles.text}>{Number(monto).toLocaleString('es-ES')} Gs.</Text>
           </View>
@@ -112,40 +119,6 @@ function TransferReceipt({
           </View>
         </View>
         <View style={[styles.container, styles.section]}>
-          <Text style={[styles.subtitle, styles.categoria]}>
-            {tipoOperacion === "Debito" ? "Destino" : "Origen"}
-          </Text>
-          <View style={styles.view}>
-            <Text style={styles.subtitle}>Nombre:</Text>
-            <Text style={styles.text}>{nombreDestino}</Text>
-          </View>
-          <View style={styles.view}>
-            <Text style={styles.subtitle}>Cuenta:</Text>
-            <Text style={styles.text}>{numCuentaDestino}</Text>
-          </View>
-          <View style={styles.view}>
-            <Text style={styles.subtitle}>Banco:</Text>
-            <Text style={styles.text}>{bancoDestino}</Text>
-          </View>
-        </View>
-        <View style={[styles.container, styles.section]}>
-          <Text style={[styles.subtitle, styles.categoria]}>
-            {tipoOperacion === "Debito" ? "Origen" : "Destino"}
-          </Text>
-          <View style={styles.view}>
-            <Text style={styles.subtitle}>Nombre:</Text>
-            <Text style={styles.text}>{nombreOrigen}</Text>
-          </View>
-          <View style={styles.view}>
-            <Text style={styles.subtitle}>Cuenta:</Text>
-            <Text style={styles.text}>{numCuentaOrigen}</Text>
-          </View>
-          <View style={styles.view}>
-            <Text style={styles.subtitle}>Banco:</Text>
-            <Text style={styles.text}>{bancoOrigen}</Text>
-          </View>
-        </View>
-        <View style={[styles.container, styles.section]}>
           <Text style={styles.subtitle}>Aviso:</Text>
           <Text style={styles.text}>No válido como comprobante legal</Text>
         </View>
@@ -154,4 +127,4 @@ function TransferReceipt({
   );
 }
 
-export default TransferReceipt;
+export default DebitoBancarioPDF;
