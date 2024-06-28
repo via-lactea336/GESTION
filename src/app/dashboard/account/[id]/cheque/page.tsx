@@ -172,6 +172,8 @@ export default function Cheque({ params }: { params: { id: string } }) {
 
   if (error) return <h1 className="text-red-500">{error}</h1>;
 
+  console.log("cheques", cheques);
+
   return (
     <div className="flex flex-col h-full -mt-8">
       <header className="flex flex-col gap-4 justify-between items-center flex-wrap px-8 py-4 w-full rounded-md bg-primary-800 text-white">
@@ -398,6 +400,11 @@ export default function Cheque({ params }: { params: { id: string } }) {
                           Cargando
                           <LoadingCirleIcon className="w-6 h-6 mx-auto animate-spin" />
                         </span>
+                        :
+                        cheque.fechaPago && cheque.fechaPago.toString().split("T")[0] > new Date().toString().split("T")[0] ?
+                          <span className="flex items-center gap-2 p-1 rounded my-2">
+                            -
+                          </span>
                         :
                         (
                           <div className="flex gap-2">

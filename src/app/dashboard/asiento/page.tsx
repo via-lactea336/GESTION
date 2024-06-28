@@ -16,6 +16,7 @@ export default async function Asiento({}: Props) {
     orderBy: { 
       createdAt: 'desc' 
     },
+    take:5
   })
 
   return (

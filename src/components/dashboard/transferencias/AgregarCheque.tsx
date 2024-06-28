@@ -205,10 +205,11 @@
                   <InputCalendar
                     value={cheque.fechaPago || ""}
                     disabled={!esDiferido}
-                    limit={
+                    min={
                       operacion.fechaOperacion.trim() === "" ? undefined :
-                      new Date(operacion.fechaOperacion)
+                      new Date(operacion.fechaOperacion).toISOString().split('T')[0]
                     }
+                    limit={operacion.fechaOperacion ? new Date(new Date(operacion.fechaOperacion).setDate(new Date().getDate() + 180)) : undefined}
                     handleChange={onChange}
                     id='fechaPago'
                     className='disabled:opacity-50 bg-gray-800 text-white py-1 px-2 rounded-md'

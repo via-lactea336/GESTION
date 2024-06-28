@@ -112,10 +112,11 @@ export default function EmitirCheque({
           <InputCalendar
             value={cheques[0]?.fechaPago || ""}
             disabled={!esDiferido}
-            limit={
+            min={
               operacion.fechaOperacion.trim() === "" ? undefined :
-              new Date(operacion.fechaOperacion)
+              new Date(operacion.fechaOperacion).toISOString().split('T')[0]
             }
+            limit={operacion.fechaOperacion ? new Date(new Date(operacion.fechaOperacion).setDate(new Date().getDate() + 180)) : undefined}
             handleChange={(e) => {
               setCheques(prev => [{ ...prev[0], fechaPago: e.target.value }])
             }}
