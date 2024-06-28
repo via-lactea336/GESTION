@@ -53,6 +53,8 @@ export async function POST(req: NextRequest) {
       if(new Decimal(monto).lessThan(sum)) return generateApiErrorResponse("La suma de los montos de los cheques no puede ser mayor al monto de la operacion", 400)
   }
   
+  console.log(cheques)
+
   try{
     const operacion = await prisma.$transaction(async (tx) => {
 
@@ -135,7 +137,7 @@ export async function POST(req: NextRequest) {
         for(const cheque of cheques){
           const { numeroCheque, involucrado, monto, esRecibido, bancoChequeId, fechaPago } = cheque
           if(!numeroCheque || !involucrado || !monto || esRecibido===undefined || esRecibido===null || !bancoChequeId) throw new ApiError("Uno de los cheques no tiene informacion suficiente para ser procesada la operacion", 400)
-          if(fechaPago && new Date(fechaPago).toISOString().split("T")[0] > operacionTx.fechaOperacion.toISOString().split("T")[0]) throw new ApiError(`La fecha de pago del cheque ${cheque.numeroCheque} no puede ser posterior a la fecha de la operacion`, 400)
+          if(fechaPago && (new Date(fechaPago).toISOString().split("T")[0] < operacionTx.fechaOperacion.toISOString().split("T")[0])) throw new ApiError(`La fecha de pago del cheque ${cheque.numeroCheque} no puede ser posterior a la fecha de la operacion`, 400)
           await tx.cheque.create({
             data: {
               operacionId: operacionTx.id,
@@ -147,7 +149,7 @@ export async function POST(req: NextRequest) {
               cuentaBancariaAfectadaId: operacionTx.cuentaBancariaOrigenId,
               fechaDeposito: cheque.esRecibido? operacionTx.fechaOperacion : null,
               bancoChequeId: cheque.bancoChequeId,
-              fechaPago:cheque.esRecibido && fechaPago? new Date(fechaPago) : null,
+              fechaPago:fechaPago? new Date(fechaPago) : null,
               estado: cheque.esRecibido? estadoCheque.PAGADO : estadoCheque.EMITIDO,
             }
           })

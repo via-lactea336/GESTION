@@ -89,7 +89,7 @@ export default function InputCalendar({
             );
             return;
           }
-          if (e.currentTarget.value > maxDate) {
+          if (!limit && e.currentTarget.value > maxDate) {
             setError(`Por favor, seleccione una fecha válida.`);
           } else {
             setError("");
