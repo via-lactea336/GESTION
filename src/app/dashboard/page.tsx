@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import {
   BanknotesIcon,
   ChartBarIcon,
+  CircleStackIcon,
   DocumentChartBarIcon,
 } from "@heroicons/react/24/outline";
 
@@ -29,11 +30,11 @@ export default async function Page() {
     <div className="flex w-full flex-col bg-muted/40">
       <main className="grid flex-1 w-full items-center justify-center gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
         <h1 className="text-center text-3xl">Bienvenido al Panel General</h1>
-        <div className="flex items-center gap-4">
-          <div className="text-center bg-gray-800 rounded-md py-3 px-6 border border-gray-100 w-72 h-72 flex flex-col justify-between hover:bg-gray-700 transition-colors duration-200">
+        <div className="flex w-full items-center gap-8">
+          <div className="text-center bg-gray-800 rounded-md py-3 px-6 border border-gray-100 w-72 h-72 flex flex-col justify-between">
             <div className="flex flex-col justify-center flex-1">
               <DocumentChartBarIcon className="h-12 w-12 mx-auto text-primary mb-2" />
-              <h3 className="text-2xl font-bold">Banco</h3>
+              <h3 className="text-xl font-semibold">Banco</h3>
               <p className="text-muted-foreground">
                 Accede a tu información bancaria
               </p>
@@ -47,10 +48,10 @@ export default async function Page() {
               </Link>
             </div>
           </div>
-          <div className="text-center bg-gray-800 rounded-md py-3 px-6 border border-gray-100 w-72 h-72 flex flex-col justify-between hover:bg-gray-700 transition-colors duration-200">
+          <div className="text-center bg-gray-800 rounded-md py-3 px-6 border border-gray-100 w-72 h-72 flex flex-col justify-between ">
             <div className="flex flex-col justify-center flex-1">
-              <BanknotesIcon className="h-12 w-12 mx-auto text-primary mb-2" />
-              <h3 className="text-2xl font-bold">Caja</h3>
+              <CircleStackIcon className="h-12 w-12 mx-auto text-primary mb-2" />
+              <h3 className="text-xl font-semibold ">Caja</h3>
               <p className="text-muted-foreground">
                 Gestiona tus movimientos de caja
               </p>

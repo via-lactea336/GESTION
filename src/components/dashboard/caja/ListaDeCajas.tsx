@@ -48,15 +48,17 @@ export default function ListaDeCajas({
               "flex-1 px-4 py-3 rounded-md bg-gray-700 hover:bg-gray-800 " +
               (cajaId === caja.id
                 ? "cursor-pointer"
-                : caja.estaCerrado
+                : caja.estaCerrado && !cajaId
                 ? "cursor-pointer"
                 : "bg-gray-800 cursor-not-allowed")
             }
           >
             {cajaId === caja.id
               ? "Continuar Trabajando"
-              : caja.estaCerrado
+              : caja.estaCerrado && !cajaId
               ? "Abrir Caja"
+              : caja.estaCerrado && cajaId
+              ? "No puedes abrir esta caja"
               : "Cajero Trabajando"}
           </button>
         </div>
