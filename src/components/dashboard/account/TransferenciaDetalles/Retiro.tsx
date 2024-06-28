@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
 interface Props {
   tipoOperacion: string;
@@ -15,6 +15,7 @@ interface Props {
   nombreOrigen?: string;
   numCuentaOrigen?: string;
   bancoOrigen?: string;
+  ruc?: string | null;
 }
 
 const RetiroDinero: React.FC<Props> = ({
@@ -30,13 +31,12 @@ const RetiroDinero: React.FC<Props> = ({
   nombreOrigen,
   numCuentaOrigen,
   bancoOrigen,
+  ruc,
 }) => {
   return (
     <>
       <div className="w-1/2 py-4 border-b border-gray-300">
-        <h1 className="text-2xl font-bold pb-4">
-          Detalles - Retiro de Dinero
-        </h1>
+        <h1 className="text-2xl font-bold pb-4">Detalles - Retiro de Dinero</h1>
         <div className="flex items-center ">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -65,14 +65,11 @@ const RetiroDinero: React.FC<Props> = ({
           <p className="w-1/3 text-base">Nombre del Titular:</p>
           <p className="w-2/3 text-base text-right">{nombreOrigen}</p>
         </div>
-        <div className="flex justify-between w-full">
-          <p className="w-1/3 text-base">RUC:</p>
-          <p className="w-2/3 text-base text-right">{numCuentaOrigen}</p>
-        </div>
+
         <div className="flex justify-between w-full">
           <p className="w-1/3 text-base">Monto retirado:</p>
           <p className="w-2/3 text-base text-right">
-            {Number(monto).toLocaleString('es-PY')}
+            {Number(monto).toLocaleString("es-PY")}
           </p>
         </div>
         <div className="flex justify-between w-full">
@@ -85,7 +82,9 @@ const RetiroDinero: React.FC<Props> = ({
         </div>
       </div>
 
-      {(nombreDestino == null && numCuentaDestino == null && bancoDestino == null) ? null : (
+      {nombreDestino == null &&
+      numCuentaDestino == null &&
+      bancoDestino == null ? null : (
         <div className="w-1/2 pb-4 border-b border-gray-300">
           <div className="flex items-center border mb-2 px-2">
             <svg
@@ -106,9 +105,7 @@ const RetiroDinero: React.FC<Props> = ({
               <circle cx="16" cy="9" r="2.9" />
               <circle cx="6" cy="5" r="3" />
             </svg>
-            <p className="text-lg px-2">
-              {tipoOperacion == "Debito" ? "Destino" : "Origen"}
-            </p>
+            <p className="text-lg px-2">Persona que retiró el dinero</p>
           </div>
           {nombreDestino && (
             <div className="flex justify-between w-full">
@@ -116,6 +113,10 @@ const RetiroDinero: React.FC<Props> = ({
               <p className="w-2/3 text-base text-right">{nombreDestino}</p>
             </div>
           )}
+          <div className="flex justify-between w-full">
+            <p className="w-1/3 text-base">RUC:</p>
+            <p className="w-2/3 text-base text-right">{ruc}</p>
+          </div>
           {numCuentaDestino && (
             <div className="flex justify-between w-full">
               <p className="w-1/3 text-base">Cuenta:</p>
@@ -131,7 +132,9 @@ const RetiroDinero: React.FC<Props> = ({
         </div>
       )}
 
-      {(nombreOrigen == null && numCuentaOrigen == null && bancoOrigen == null) ? null : (
+      {nombreOrigen == null &&
+      numCuentaOrigen == null &&
+      bancoOrigen == null ? null : (
         <div className="w-1/2 pb-4 border-b border-gray-300">
           <div className="flex items-center border mb-2 px-2">
             <svg
@@ -150,17 +153,9 @@ const RetiroDinero: React.FC<Props> = ({
               <circle cx="12" cy="12" r="2" />
               <path d="M6 12h.01M18 12h.01" />
             </svg>
-            <p className="text-lg px-2">
-              {tipoOperacion == "Debito" ? "Origen" : "Destino"}
-            </p>
+            <p className="text-lg px-2">Detalles de la cuenta</p>
           </div>
 
-          {nombreOrigen && (
-            <div className="flex justify-between w-full">
-              <p className="w-1/3 text-base">Nombre:</p>
-              <p className="w-2/3 text-base text-right">{nombreOrigen}</p>
-            </div>
-          )}
           {numCuentaOrigen && (
             <div className="flex justify-between w-full">
               <p className="w-1/3 text-base">Cuenta:</p>
