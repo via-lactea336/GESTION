@@ -12,6 +12,7 @@ import Header from "@/components/global/Header";
 import { Toaster, toast } from "sonner";
 import useCookies from "@/lib/hooks/useCookies";
 import LoadingCirleIcon from "@/components/global/LoadingCirleIcon";
+import Cookies from "js-cookie";
 
 export default function Page() {
   const router = useRouter();
@@ -61,6 +62,9 @@ export default function Page() {
       }
       setLoading(false);
       toast.success("Caja cerrada con éxito");
+      Cookies.remove("cajero");
+      Cookies.remove("caja");
+      Cookies.remove("apertura");
       router.push(`/dashboard/caja/reportes/${apertura.id}`);
     } catch (error) {
       setLoading(false);

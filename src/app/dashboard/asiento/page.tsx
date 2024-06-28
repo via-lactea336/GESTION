@@ -1,5 +1,4 @@
 import prisma from '@/lib/prisma'
-import { formatDate } from '@/lib/utils'
 import React from 'react'
 
 type Props = {}
@@ -13,7 +12,10 @@ export default async function Asiento({}: Props) {
           cuenta: true
         }
       }
-    }
+    },
+    orderBy: { 
+      createdAt: 'desc' 
+    },
   })
 
   return (
@@ -37,8 +39,8 @@ export default async function Asiento({}: Props) {
                 <td className="border px-4 py-2">{asiento.fecha.toISOString().split('T')[0]}</td>
                 <td className="border px-4 py-2">{asiento.descripcion}</td>
                 <td className="border px-4 py-2">{detalle.cuenta.nombre}</td>
-                <td className="border px-4 py-2">{detalle.esDebe ? +detalle.monto : ''}</td>
-                <td className="border px-4 py-2">{!detalle.esDebe ? +detalle.monto : ''}</td>
+                <td className="border px-4 py-2">{detalle.esDebe ? ((+detalle.monto).toLocaleString("es-PY")) + " Gs." : ''}</td>
+                <td className="border px-4 py-2">{!detalle.esDebe ? ((+detalle.monto).toLocaleString("es-PY")) + " Gs.": ''}</td>
               </tr>
             ))
           )}

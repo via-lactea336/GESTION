@@ -37,7 +37,7 @@ export default function ContenedorCajas({
       if (caja.id === cajaId)
         return router.push(`/dashboard/caja/${cajaId}/ingreso`);
     }
-    if (caja?.estaCerrado) {
+    if (caja?.estaCerrado && !cajaId) {
       setShowModal(true);
     }
   };

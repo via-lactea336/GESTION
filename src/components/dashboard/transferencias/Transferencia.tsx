@@ -1,25 +1,34 @@
-import Input from '@/components/global/Input'
-import InputCalendar from '@/components/global/InputCalendar'
-import { CrearOperacionFields } from '@/lib/moduloBanco/operacion/agregarOperacion'
-import { Banco } from '@prisma/client'
-import React from 'react'
+import Input from "@/components/global/Input";
+import InputCalendar from "@/components/global/InputCalendar";
+import { CrearOperacionFields } from "@/lib/moduloBanco/operacion/agregarOperacion";
+import { Banco } from "@prisma/client";
+import React from "react";
 
 type Props = {
-  monto:number
-  operacion: CrearOperacionFields
-  setMontoParcial: (value: number) => void
-  handleOnChange: (event: React.ChangeEvent<HTMLInputElement|HTMLSelectElement>) => void
-  bancos: Banco[]
-  loading: boolean
-  esDebito: boolean
-  pagoProveedores: boolean
-}
+  monto: number;
+  operacion: CrearOperacionFields;
+  setMontoParcial: (value: number) => void;
+  handleOnChange: (
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void;
+  bancos: Banco[];
+  loading: boolean;
+  esDebito: boolean;
+  pagoProveedores: boolean;
+};
 
-export default function Transferencia({ operacion, handleOnChange, setMontoParcial, monto, bancos, esDebito, pagoProveedores }: Props) {
+export default function Transferencia({
+  operacion,
+  handleOnChange,
+  setMontoParcial,
+  monto,
+  bancos,
+  esDebito,
+  pagoProveedores,
+}: Props) {
   return (
     <>
       <div className="flex sm:flex-row flex-wrap flex-col box-border gap-3 mb-3 w-full">
-
         <div className="flex flex-col w-full">
           <label className=" mb-2">
             Nombre del {esDebito ? "Destinatario" : "Remitente"}*
@@ -54,7 +63,9 @@ export default function Transferencia({ operacion, handleOnChange, setMontoParci
           </select>
         </div>
         <div className="flex flex-col w-full">
-          <label className="mb-2">Ruc del {esDebito ? "Destinatario" : "Remitente"}*</label>
+          <label className="mb-2">
+            N° de documento del {esDebito ? "Destinatario" : "Remitente"}*
+          </label>
           <Input
             className="block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
             id="rucInvolucrado"
@@ -66,9 +77,13 @@ export default function Transferencia({ operacion, handleOnChange, setMontoParci
           />
         </div>
         <div className="flex flex-col w-full">
-          <label className=" mb-2">N° de Cuenta del {esDebito ? "Destinatario" : "Remitente"}*</label>
+          <label className=" mb-2">
+            N° de Cuenta del {esDebito ? "Destinatario" : "Remitente"}*
+          </label>
           <Input
-            className={'block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none'}
+            className={
+              "block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
+            }
             onChange={handleOnChange}
             id="cuentaInvolucrado"
             value={operacion.cuentaInvolucrado || ""}
@@ -80,7 +95,9 @@ export default function Transferencia({ operacion, handleOnChange, setMontoParci
         <div className="flex flex-col w-full">
           <label className=" mb-2">Monto*</label>
           <Input
-            className={'block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none'}
+            className={
+              "block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none"
+            }
             onChange={(e) => setMontoParcial(Number(e.target.value))}
             id="montoParcial"
             value={monto}
@@ -101,7 +118,6 @@ export default function Transferencia({ operacion, handleOnChange, setMontoParci
             placeholder="Ingrese el numero de comprobante"
           />
         </div>
-
       </div>
 
       <div className="flex w-full gap-3">
@@ -129,8 +145,7 @@ export default function Transferencia({ operacion, handleOnChange, setMontoParci
             placeholder="Ingrese el concepto"
           />
         </div>
-
       </div>
     </>
-  )
+  );
 }

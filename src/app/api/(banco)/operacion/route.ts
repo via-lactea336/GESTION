@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { estadoCheque } from "@prisma/client";
-import {Decimal} from "@prisma/client/runtime/library";
+import {Decimal, PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
 import {generateApiErrorResponse, generateApiSuccessResponse} from "@/lib/apiResponse";
 import reflejarOperacion from "@/lib/moduloBanco/operacion/reflejarOperacion";
 import { ChequeAndOperacion } from "@/lib/definitions";
@@ -106,6 +106,31 @@ export async function POST(req: NextRequest) {
       )
       throw new ApiError("Saldo insuficiente para realizar la operacion", 400);
 
+      if(
+        operacionTx.concepto === "Pago a Proveedores" && 
+        operacionTx.tipoOperacion.nombre === "Transferencia (Emitida)" 
+      ){
+        const numOrdenCompra = Math.floor(Math.random() * (3000 - 100 + 1) + 100)
+        await generarAsiento([
+          {
+            fecha: operacionTx.fechaOperacion,
+            concepto: operacionTx.concepto + " con orden de compra #" + numOrdenCompra,
+            monto: +operacionTx.monto,
+            codigo:"101.01.01",
+            esDebe: false,
+            esAsentable: true
+          },
+          {
+            fecha: operacionTx.fechaOperacion,
+            concepto: "Bancos con relacion a la orden de compra #" + numOrdenCompra,
+            monto: +operacionTx.monto,
+            codigo:"101.01.02",
+            esDebe: true,
+            esAsentable: true
+          }
+        ])
+      }
+
       if(cheques && cheques.length !== 0){
         for(const cheque of cheques){
           const { numeroCheque, involucrado, monto, esRecibido, bancoChequeId, fechaPago } = cheque
@@ -129,6 +154,9 @@ export async function POST(req: NextRequest) {
         }
       }
       return operacionTx
+    }, {
+      maxWait: 10000,
+      timeout: 10000
     })
 
     if(!operacion) return generateApiErrorResponse("Error generating operation", 400)  
@@ -136,31 +164,12 @@ export async function POST(req: NextRequest) {
     //Refleja el incremento o decremento en el saldo de la cuenta bancaria siguiendo las propiedades del tipo de Operacion
     await reflejarOperacion(cuentaBancariaOrigenId, monto, operacion.tipoOperacion.esDebito, operacion.tipoOperacion.afectaSaldo, operacion.tipoOperacion.afectaSaldoDisponible)
 
-    if(operacion.concepto === "Pago a Proveedores"){
-      const numOrdenCompra = Math.floor(Math.random() * (3000 - 100 + 1) + 100)
-      await generarAsiento([
-        {
-          fecha: operacion.fechaOperacion,
-          concepto: operacion.concepto + " con orden de compra #" + numOrdenCompra,
-          monto: +operacion.monto,
-          codigo:"101.01.01",
-          esDebe: false,
-          esAsentable: true
-        },
-        {
-          fecha: operacion.fechaOperacion,
-          concepto: "Bancos con relacion a la orden de compra #" + numOrdenCompra,
-          monto: +operacion.monto,
-          codigo:"101.01.02",
-          esDebe: true,
-          esAsentable: true
-        }
-      ])
-    }
-
     return generateApiSuccessResponse(200, "La operacion se genero correctamente")
   
   }catch(err){
+    if(err instanceof PrismaClientKnownRequestError) {
+      if(err.code === "P2002") return generateApiErrorResponse("Ya existe una operación con el mismo n° de comprobante", 400)
+    }
     if(err instanceof ApiError) return generateApiErrorResponse(err.message, err.status)
     if(err instanceof Error) return generateApiErrorResponse(err.message, 400)
     else return generateApiErrorResponse("Something went wrong", 500)

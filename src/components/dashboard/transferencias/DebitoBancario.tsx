@@ -66,7 +66,7 @@ export default function DebitoBancario({ operacion, handleOnChange, setMontoParc
             onChange={handleOnChange}
             value={operacion.concepto}
             required
-            placeholder="Ej: Pago a proveedores"
+            placeholder="Ej: Costo de admision de cheque"
           />
         </div>
 

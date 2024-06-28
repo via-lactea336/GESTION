@@ -19,8 +19,33 @@ export async function POST(req: NextRequest) {
       400
     );
 
-  try {
+  const aperturaVerif = await prisma.aperturaCaja.findFirst({
+    where: {
+      cajeroId,
+      cierreCaja: null,
+    },
+    select: {
+      cajero: {
+        select: {
+          nombre: true,
+          apellido: true,
+        },
+      },
+      caja: {
+        select: {
+          numero: true,
+        },
+      },
+    },
+  });
 
+  if (aperturaVerif)
+    return generateApiErrorResponse(
+      `Ya existe una apertura activa en la caja n° ${aperturaVerif.caja.numero} por el cajero ${aperturaVerif.cajero.apellido} ${aperturaVerif.cajero.nombre}`,
+      400
+    );
+
+  try {
     const aperturaCaja = await prisma.$transaction(async (tx) => {
       const aperturaTx = await tx.aperturaCaja.create({
         data: {
@@ -28,19 +53,20 @@ export async function POST(req: NextRequest) {
           cajeroId,
           apertura,
           saldoInicial,
-          observaciones
+          observaciones,
         },
-        include:{
-          caja:{
-            select:{
-              id:true,
-              estaCerrado:true
-            }
-          }
-        }
-      })
+        include: {
+          caja: {
+            select: {
+              id: true,
+              estaCerrado: true,
+            },
+          },
+        },
+      });
 
-      if(!aperturaTx.caja.estaCerrado) throw new ApiError("La caja ya fue abierta", 400)
+      if (!aperturaTx.caja.estaCerrado)
+        throw new ApiError("La caja ya fue abierta", 400);
 
       const caja = await tx.caja.update({
         where: {
@@ -48,15 +74,19 @@ export async function POST(req: NextRequest) {
         },
         data: {
           saldoEfectivo: aperturaTx.saldoInicial,
-          saldoCheque:0,
-          saldoTarjeta:0,
+          saldoCheque: 0,
+          saldoTarjeta: 0,
           estaCerrado: false,
         },
       });
 
-      if(!caja) throw new ApiError("Error actualizando la caja posterior a la apertura", 500)
-      
-      return aperturaTx
+      if (!caja)
+        throw new ApiError(
+          "Error actualizando la caja posterior a la apertura",
+          500
+        );
+
+      return aperturaTx;
     });
 
     return generateApiSuccessResponse(
@@ -65,9 +95,11 @@ export async function POST(req: NextRequest) {
       [aperturaCaja]
     );
   } catch (err) {
-    if (err instanceof PrismaClientKnownRequestError && err.code === "P2002")return generateApiErrorResponse("La apertura de caja ya existe", 400);
-    if(err instanceof ApiError) return generateApiErrorResponse(err.message, err.status);
-    if(err instanceof Error) return generateApiErrorResponse(err.message, 500)
+    if (err instanceof PrismaClientKnownRequestError && err.code === "P2002")
+      return generateApiErrorResponse("La apertura de caja ya existe", 400);
+    if (err instanceof ApiError)
+      return generateApiErrorResponse(err.message, err.status);
+    if (err instanceof Error) return generateApiErrorResponse(err.message, 500);
     else
       return generateApiErrorResponse(
         "Hubo un error en la creacion de la apertura de caja",

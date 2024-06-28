@@ -1,8 +1,7 @@
 import Input from '@/components/global/Input'
 import InputCalendar from '@/components/global/InputCalendar'
-import React, { useEffect, useState } from 'react'
+import React, {useState} from 'react'
 import { ChequeCreate } from './AgregarCheque'
-import { CuentaBancariaAndBanco } from '@/lib/definitions'
 import { CrearOperacionFields } from '@/lib/moduloBanco/operacion/agregarOperacion'
 
 type Props = {
@@ -21,7 +20,7 @@ export default function EmitirCheque({
   pagoProveedores
 }: Props) {
 
-  console.log(cheques)
+  const [esDiferido, setEsDiferido] = useState(false)
 
   return (
     <>
@@ -58,7 +57,7 @@ export default function EmitirCheque({
             placeholder="Ingrese el RUC"
           />
         </div>
-        
+
         <div className="flex flex-col w-full">
           <label className=" mb-2">N° de Cheque</label>
           <Input
@@ -71,7 +70,7 @@ export default function EmitirCheque({
             placeholder="Ingrese el numero de cheque"
           />
         </div>
-        
+
         <div className="flex flex-col w-full">
           <label className=" mb-2">Monto*</label>
           <Input
@@ -81,7 +80,7 @@ export default function EmitirCheque({
               setCheques(prev => [{ ...prev[0], monto: Number(e.target.value) }])
             }}
             id="monto"
-            value={operacion.monto}
+            value={cheques[0]?.monto || ""}
             type="formattedNumber"
             required
             placeholder="Ingrese el monto"
@@ -101,9 +100,33 @@ export default function EmitirCheque({
           />
         </div>
 
+        <div className="flex gap-2 items-center">
+          <input type="checkbox"
+            checked={esDiferido}
+            onChange={(e) => {
+              setEsDiferido(e.target.checked)
+              if (!e.target.checked) setCheques(prev => [{ ...prev[0], fechaPago: undefined }])
+            }}
+            id="esDiferido" />
+          <label htmlFor='esDiferido'>Fecha de Pago</label>
+          <InputCalendar
+            value={cheques[0]?.fechaPago || ""}
+            disabled={!esDiferido}
+            limit={
+              operacion.fechaOperacion.trim() === "" ? undefined :
+              new Date(operacion.fechaOperacion)
+            }
+            handleChange={(e) => {
+              setCheques(prev => [{ ...prev[0], fechaPago: e.target.value }])
+            }}
+            id='fechaPago'
+            className='disabled:opacity-50 flex-1 block w-full bg-gray-800 rounded py-3 px-6 my-2 leading-tight focus:outline-none'
+          />
+        </div>
+
       </div>
 
-      <div className="flex w-full gap-3">
+      <div className="flex gap-2 items-center w-full">
         <div className="w-full md:  mb-6 md:mb-0">
           <label className="mb-2">Fecha de la Transacción*</label>
           <InputCalendar
