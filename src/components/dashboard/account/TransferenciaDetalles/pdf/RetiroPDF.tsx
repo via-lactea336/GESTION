@@ -1,7 +1,6 @@
 import React from "react";
 import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
 import { getCurrentDate } from "@/lib/getCurrentDate";
-import { obtenerCookie } from "@/lib/obtenerCookie";
 
 // Definición de los tipos de los props
 type TransferReceiptProps = {
@@ -17,9 +16,10 @@ type TransferReceiptProps = {
   numCuentaOrigen: string;
   bancoOrigen: string;
   userName: string;
+  ruc:string|null;
 };
 
-function TransferReceipt({
+function RetiroPDF({
   tipoOperacion,
   dateTime,
   monto,
@@ -32,6 +32,7 @@ function TransferReceipt({
   numCuentaOrigen,
   bancoOrigen,
   userName,
+  ruc
 }: TransferReceiptProps) {
   // Create styles
   const styles = StyleSheet.create({
@@ -80,7 +81,7 @@ function TransferReceipt({
       <Page size="A4" style={styles.page}>
         <View style={[styles.container, styles.section]}>
           <Text style={styles.title}>
-            Comprobante de Transferencia - {tipoOperacion}
+            Comprobante {tipoOperacion}
           </Text>
           <View style={styles.view}>
             <View style={styles.section}>
@@ -96,8 +97,10 @@ function TransferReceipt({
             <Text style={styles.subtitle}>Fecha de Operación:</Text>
             <Text style={styles.text}>{dateTime}</Text>
           </View>
-        </View>
-        <View style={[styles.container, styles.section]}>
+          <View style={styles.view}>
+            <Text style={styles.subtitle}>Nombre del Titular:</Text>
+            <Text style={styles.text}>{nombreOrigen}</Text>
+          </View>
           <View style={styles.view}>
             <Text style={styles.subtitle}>Monto:</Text>
             <Text style={styles.text}>{Number(monto).toLocaleString('es-ES')} Gs.</Text>
@@ -111,31 +114,24 @@ function TransferReceipt({
             <Text style={styles.text}>{concepto}</Text>
           </View>
         </View>
+
         <View style={[styles.container, styles.section]}>
           <Text style={[styles.subtitle, styles.categoria]}>
-            {tipoOperacion === "Debito" ? "Destino" : "Origen"}
+            Persona que retiró el dinero
           </Text>
           <View style={styles.view}>
             <Text style={styles.subtitle}>Nombre:</Text>
             <Text style={styles.text}>{nombreDestino}</Text>
           </View>
           <View style={styles.view}>
-            <Text style={styles.subtitle}>Cuenta:</Text>
-            <Text style={styles.text}>{numCuentaDestino}</Text>
-          </View>
-          <View style={styles.view}>
-            <Text style={styles.subtitle}>Banco:</Text>
-            <Text style={styles.text}>{bancoDestino}</Text>
+            <Text style={styles.subtitle}>Ruc:</Text>
+            <Text style={styles.text}>{ruc}</Text>
           </View>
         </View>
         <View style={[styles.container, styles.section]}>
           <Text style={[styles.subtitle, styles.categoria]}>
-            {tipoOperacion === "Debito" ? "Origen" : "Destino"}
+            Detalles de la cuenta
           </Text>
-          <View style={styles.view}>
-            <Text style={styles.subtitle}>Nombre:</Text>
-            <Text style={styles.text}>{nombreOrigen}</Text>
-          </View>
           <View style={styles.view}>
             <Text style={styles.subtitle}>Cuenta:</Text>
             <Text style={styles.text}>{numCuentaOrigen}</Text>
@@ -154,4 +150,4 @@ function TransferReceipt({
   );
 }
 
-export default TransferReceipt;
+export default RetiroPDF;
