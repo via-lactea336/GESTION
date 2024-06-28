@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useParams, useRouter } from "next/navigation";
 import obtenerOperacionPorId from "../../../../../lib/moduloBanco/operacion/obtenerOperacionPorId";
 import TransferReceipt from "../../../../../components/PDF/TransferenciaDetails";
@@ -27,6 +27,7 @@ export default function PageComponent() {
   const [bancoOrigen, setBancoOrigen] = useState("undefined");
   const [tipoOperacion, setTipoOperacion] = useState("undefined");
   const [tipoOperacionNombre, setTipoOperacionNombre] = useState("undefined");
+  const [ruc, setRuc] = useState<string | null>("undefined");
   const [loading, setLoading] = useState(true);
 
   const { data: session, status } = useSession();
@@ -45,7 +46,7 @@ export default function PageComponent() {
       router.push("not-found");
       return;
     }
-    
+
     const fechaHora = new Date(data.data.fechaOperacion);
     const formattedDateTime = fechaHora.toLocaleString("es-ES", {
       day: "2-digit",
@@ -67,13 +68,14 @@ export default function PageComponent() {
     setNumCuentaOrigen(data.data.cuentaBancariaOrigen.numeroCuenta);
     setBancoOrigen(data.data.cuentaBancariaOrigen.banco.nombre);
     setTipoOperacion(data.data.tipoOperacion.esDebito ? "Debito" : "Credito");
-    setTipoOperacionNombre(data.data.tipoOperacion.nombre)
+    setTipoOperacionNombre(data.data.tipoOperacion.nombre);
+    setRuc(data.data.rucInvolucrado);
     setLoading(false);
   };
 
   useEffect(() => {
     getTransferencia();
-    console.log(tipoOperacionNombre)
+    console.log(tipoOperacionNombre);
   });
 
   const handleCloseButtonClick = () => {
@@ -88,9 +90,8 @@ export default function PageComponent() {
 
   return (
     <div className="flex flex-col items-center justify-center h-full">
-
-      {
-        tipoOperacionNombre == "Retiro" ? <Retiro
+      {tipoOperacionNombre == "Retiro" ? (
+        <Retiro
           tipoOperacion={tipoOperacion}
           tipoOperacionNombre={tipoOperacionNombre}
           dateTime={dateTime}
@@ -103,11 +104,12 @@ export default function PageComponent() {
           nombreOrigen={nombreOrigen}
           numCuentaOrigen={numCuentaOrigen}
           bancoOrigen={bancoOrigen}
-        /> : null}
+          ruc={ruc}
+        />
+      ) : null}
 
-
-      {
-        tipoOperacionNombre == "Depósito" ? <Deposito
+      {tipoOperacionNombre == "Depósito" ? (
+        <Deposito
           tipoOperacion={tipoOperacion}
           tipoOperacionNombre={tipoOperacionNombre}
           dateTime={dateTime}
@@ -120,11 +122,12 @@ export default function PageComponent() {
           nombreOrigen={nombreOrigen}
           numCuentaOrigen={numCuentaOrigen}
           bancoOrigen={bancoOrigen}
-        /> : null
-      }
+          ruc={ruc}
+        />
+      ) : null}
 
-      {
-        tipoOperacionNombre == "Débito bancario" ? <DebitoBancario
+      {tipoOperacionNombre == "Débito bancario" ? (
+        <DebitoBancario
           tipoOperacion={tipoOperacion}
           tipoOperacionNombre={tipoOperacionNombre}
           dateTime={dateTime}
@@ -137,11 +140,12 @@ export default function PageComponent() {
           nombreOrigen={nombreOrigen}
           numCuentaOrigen={numCuentaOrigen}
           bancoOrigen={bancoOrigen}
-        /> : null
-      }
+        />
+      ) : null}
 
-      {
-        tipoOperacionNombre == "Transferencia (Emitida)" || tipoOperacionNombre == "Transferencia (Recibida)" ? <Transferencia
+      {tipoOperacionNombre == "Transferencia (Emitida)" ||
+      tipoOperacionNombre == "Transferencia (Recibida)" ? (
+        <Transferencia
           tipoOperacion={tipoOperacion}
           tipoOperacionNombre={tipoOperacionNombre}
           dateTime={dateTime}
@@ -154,11 +158,11 @@ export default function PageComponent() {
           nombreOrigen={nombreOrigen}
           numCuentaOrigen={numCuentaOrigen}
           bancoOrigen={bancoOrigen}
-        /> : null
-      }
+        />
+      ) : null}
 
-      {
-        tipoOperacionNombre == "Emitir Cheque" ? <EmitirCheque
+      {tipoOperacionNombre == "Emitir Cheque" ? (
+        <EmitirCheque
           tipoOperacion={tipoOperacion}
           tipoOperacionNombre={tipoOperacionNombre}
           dateTime={dateTime}
@@ -171,8 +175,8 @@ export default function PageComponent() {
           nombreOrigen={nombreOrigen}
           numCuentaOrigen={numCuentaOrigen}
           bancoOrigen={bancoOrigen}
-        /> : null
-      }
+        />
+      ) : null}
 
       <div className="w-1/2 py-4 border-gray-300">
         <div className="flex flex-row">

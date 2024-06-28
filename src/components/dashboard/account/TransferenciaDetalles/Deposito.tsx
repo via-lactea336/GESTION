@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
 interface Props {
   tipoOperacion: string;
@@ -15,6 +15,7 @@ interface Props {
   nombreOrigen?: string;
   numCuentaOrigen?: string;
   bancoOrigen?: string;
+  ruc?: string | null;
 }
 
 const Deposito: React.FC<Props> = ({
@@ -30,6 +31,7 @@ const Deposito: React.FC<Props> = ({
   nombreOrigen,
   numCuentaOrigen,
   bancoOrigen,
+  ruc,
 }) => {
   return (
     <>
@@ -62,17 +64,17 @@ const Deposito: React.FC<Props> = ({
       </div>
       <div className="w-1/2 py-4 border-b border-gray-300">
         <div className="flex justify-between w-full">
-          <p className="w-1/3 text-base">Nombre del Depositante:</p>
-          <p className="w-2/3 text-base text-right">{nombreOrigen}</p>
+          <p className="text-base">Nombre del Depositante:</p>
+          <p className="text-base text-right">{nombreDestino}</p>
         </div>
         <div className="flex justify-between w-full">
           <p className="w-1/3 text-base">RUC:</p>
-          <p className="w-2/3 text-base text-right">{numCuentaOrigen}</p>
+          <p className="w-2/3 text-base text-right">{ruc}</p>
         </div>
         <div className="flex justify-between w-full">
           <p className="w-1/3 text-base">Monto retirado:</p>
           <p className="w-2/3 text-base text-right">
-            {Number(monto).toLocaleString('es-PY')}
+            {Number(monto).toLocaleString("es-PY")}
           </p>
         </div>
         <div className="flex justify-between w-full">

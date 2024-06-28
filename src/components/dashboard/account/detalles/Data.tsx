@@ -74,14 +74,14 @@ export default function Data({ userName }: DataProps) {
     esDebito: undefined,
     pagina: 0,
   });
-  const [numeroComprobante, setNumeroComprobante] = useState("")
+  const [numeroComprobante, setNumeroComprobante] = useState("");
 
   const { id } = useParams();
   const router = useRouter();
   const handleNavigation = (path: string) => {
-    return () => {
-      router.push(path);
-    };
+    console.log("click");
+
+    router.push(path);
   };
 
   useEffect(() => {
@@ -147,9 +147,12 @@ export default function Data({ userName }: DataProps) {
     });
   };
 
-  const handelNumeroComprobanteChange = useDebouncedCallback((value:string)=>{
-    setNumeroComprobante(value)
-  }, 300)
+  const handelNumeroComprobanteChange = useDebouncedCallback(
+    (value: string) => {
+      setNumeroComprobante(value);
+    },
+    300
+  );
 
   const changeIndicePagina = async (indice: number) => {
     setIndiceActual(indice);
@@ -329,7 +332,9 @@ export default function Data({ userName }: DataProps) {
           <label className="mr-2 mt-1">N° Comprobante</label>
           <Input
             id="numeroComprobante"
-            onChange={(e) => {handelNumeroComprobanteChange(e.target.value)}}
+            onChange={(e) => {
+              handelNumeroComprobanteChange(e.target.value);
+            }}
             type="text"
             placeholder="Ingrese el n° de comprobante"
             className="bg-gray-800 text-white py-1 px-2 rounded-md mr-3"

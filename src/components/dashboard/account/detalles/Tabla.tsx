@@ -10,8 +10,8 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 type TablaProps = {
-  handleNavigation: (path: string) => () => void;
-  numeroComprobante:string;
+  handleNavigation: (path: string) => void;
+  numeroComprobante: string;
   setindicesPagina: (pagina: number) => void;
   setOperaciones: (operaciones: OperacionAndTipoOperacion[]) => void;
   filtros: {
@@ -29,7 +29,7 @@ export default function Tabla({
   setindicesPagina,
   setOperaciones,
   filtros,
-  numeroComprobante
+  numeroComprobante,
 }: TablaProps) {
   const quantityPerPage = parseInt(process.env.QUANTITY_PER_PAGE || "8");
 
@@ -84,7 +84,7 @@ export default function Tabla({
         esDebito: filtros.esDebito,
         banco: filtros.banco,
         tipoOperacionId: filtros.tipoOperacionId,
-        numeroComprobante:numeroComprobante
+        numeroComprobante: numeroComprobante,
       });
 
       if (typeof operacionesReq === "string") {
@@ -107,7 +107,14 @@ export default function Tabla({
     } finally {
       setLoading(false);
     }
-  }, [id, filtros, quantityPerPage, numeroComprobante, setOperaciones, setindicesPagina]);
+  }, [
+    id,
+    filtros,
+    quantityPerPage,
+    numeroComprobante,
+    setOperaciones,
+    setindicesPagina,
+  ]);
 
   useEffect(() => {
     fetchOperaciones();
@@ -143,7 +150,9 @@ export default function Tabla({
             <span className="text-md mr-2 text-primary-400">Hora</span>
           </td>
           <td>
-            <span className="text-md mr-2 text-primary-400">Tipo Operacion</span>
+            <span className="text-md mr-2 text-primary-400">
+              Tipo Operacion
+            </span>
           </td>
           <td>
             <span className="text-md mr-2 text-primary-400">Concepto</span>
@@ -155,10 +164,17 @@ export default function Tabla({
         {operacionesFiltradas.map((operacion, index) => (
           <tr
             key={index}
-            onClick={handleNavigation(
-              `/dashboard/account/${id}/${operacion.id}`
-            )}
-            className="border-b-2 border-b-gray-700 w-full hover:bg-gray-700 hover:cursor-pointer"
+            onClick={() => {
+              !operacion.tipoOperacion.escondido
+                ? handleNavigation(`/dashboard/account/${id}/${operacion.id}`)
+                : null;
+            }}
+            className={
+              "border-b-2 border-b-gray-700 w-full  " +
+              (operacion.tipoOperacion.escondido
+                ? "cursor-default"
+                : "hover:bg-gray-700 cursor-pointer")
+            }
             title="Ver detalles de la operación"
           >
             <td className="py-2">
@@ -200,7 +216,7 @@ export default function Tabla({
               >
                 {operacion.tipoOperacion.esDebito
                   ? `- ${Number(operacion.monto).toLocaleString("es-PY")} Gs.`
-                  : `+ ${Number(operacion.monto).toLocaleString('es-PY')} Gs.`}
+                  : `+ ${Number(operacion.monto).toLocaleString("es-PY")} Gs.`}
               </span>
             </td>
           </tr>
