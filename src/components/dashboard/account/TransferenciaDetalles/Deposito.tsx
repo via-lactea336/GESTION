@@ -72,7 +72,7 @@ const Deposito: React.FC<Props> = ({
           <p className="w-2/3 text-base text-right">{ruc}</p>
         </div>
         <div className="flex justify-between w-full">
-          <p className="w-1/3 text-base">Monto retirado:</p>
+          <p className="w-1/3 text-base">Monto:</p>
           <p className="w-2/3 text-base text-right">
             {Number(monto).toLocaleString("es-PY")}
           </p>
