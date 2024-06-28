@@ -216,91 +216,88 @@ export default function PageComponent() {
           >
             <PDFDownloadLink
               document={
-                tipoOperacionNombre === "Débito bancario" ?
-                <DebitoBancarioPDF
-                  numComprobante={numComprobante}
-                  concepto={concepto}
-                  nombreDestino={nombreDestino}
-                  numCuentaDestino={numCuentaDestino || ""}
-                  bancoDestino={bancoDestino || ""}
-                  nombreOrigen={nombreOrigen}
-                  numCuentaOrigen={numCuentaOrigen}
-                  tipoOperacion={tipoOperacionNombre}
-                  monto={monto}
-                  dateTime={dateTime}
-                  bancoOrigen={bancoOrigen}
-                  userName={`${user?.nombre}`}
-                />
-                :
-                tipoOperacionNombre === "Depósito" ?
-                <DepositoPDF
-                  numComprobante={numComprobante}
-                  concepto={concepto}
-                  nombreDestino={nombreDestino}
-                  numCuentaDestino={numCuentaDestino || ""}
-                  bancoDestino={bancoDestino || ""}
-                  nombreOrigen={nombreOrigen}
-                  numCuentaOrigen={numCuentaOrigen}
-                  tipoOperacion={tipoOperacionNombre}
-                  monto={monto}
-                  dateTime={dateTime}
-                  bancoOrigen={bancoOrigen}
-                  userName={`${user?.nombre}`}
-                  ruc={ruc}
-                />
-                :
-                tipoOperacionNombre === "Emitir Cheque" ?
-                <EmitirChequePDF 
-                  numComprobante={numComprobante}
-                  concepto={concepto}
-                  nombreDestino={nombreDestino}
-                  numCuentaDestino={numCuentaDestino || ""}
-                  bancoDestino={bancoDestino || ""}
-                  nombreOrigen={nombreOrigen}
-                  numCuentaOrigen={numCuentaOrigen}
-                  tipoOperacion={tipoOperacionNombre}
-                  monto={monto}
-                  dateTime={dateTime}
-                  bancoOrigen={bancoOrigen}
-                  userName={`${user?.nombre}`}
-                />
-                :
-                tipoOperacionNombre === "Retiro" ?
-                <RetiroPDF
-                  numComprobante={numComprobante}
-                  concepto={concepto}
-                  nombreDestino={nombreDestino}
-                  numCuentaDestino={numCuentaDestino || ""}
-                  bancoDestino={bancoDestino || ""}
-                  nombreOrigen={nombreOrigen}
-                  numCuentaOrigen={numCuentaOrigen}
-                  tipoOperacion={tipoOperacionNombre}
-                  monto={monto}
-                  dateTime={dateTime}
-                  bancoOrigen={bancoOrigen}
-                  userName={`${user?.nombre}`}
-                  ruc={ruc}
-                />
-                :
-                tipoOperacionNombre.startsWith("Transferencia") ?
-                <TransferReceipt
-                  numComprobante={numComprobante}
-                  concepto={concepto}
-                  nombreDestino={nombreDestino}
-                  numCuentaDestino={numCuentaDestino || ""}
-                  bancoDestino={bancoDestino || ""}
-                  nombreOrigen={nombreOrigen}
-                  numCuentaOrigen={numCuentaOrigen}
-                  tipoOperacion={tipoOperacion}
-                  monto={monto}
-                  dateTime={dateTime}
-                  bancoOrigen={bancoOrigen}
-                  userName={`${user?.nombre}`}
-                />
-                :
-                <></>
+                tipoOperacionNombre === "Débito bancario" ? (
+                  <DebitoBancarioPDF
+                    numComprobante={numComprobante}
+                    concepto={concepto}
+                    nombreDestino={nombreDestino}
+                    numCuentaDestino={numCuentaDestino || ""}
+                    bancoDestino={bancoDestino || ""}
+                    nombreOrigen={nombreOrigen}
+                    numCuentaOrigen={numCuentaOrigen}
+                    tipoOperacion={tipoOperacionNombre}
+                    monto={monto}
+                    dateTime={dateTime}
+                    bancoOrigen={bancoOrigen}
+                    userName={`${user?.nombre}`}
+                  />
+                ) : tipoOperacionNombre === "Depósito" ? (
+                  <DepositoPDF
+                    numComprobante={numComprobante}
+                    concepto={concepto}
+                    nombreDestino={nombreDestino}
+                    numCuentaDestino={numCuentaDestino || ""}
+                    bancoDestino={bancoDestino || ""}
+                    nombreOrigen={nombreOrigen}
+                    numCuentaOrigen={numCuentaOrigen}
+                    tipoOperacion={tipoOperacionNombre}
+                    monto={monto}
+                    dateTime={dateTime}
+                    bancoOrigen={bancoOrigen}
+                    userName={`${user?.nombre}`}
+                    ruc={ruc}
+                  />
+                ) : tipoOperacionNombre === "Emitir Cheque" ? (
+                  <EmitirChequePDF
+                    numComprobante={numComprobante}
+                    concepto={concepto}
+                    nombreDestino={nombreDestino}
+                    numCuentaDestino={numCuentaDestino || ""}
+                    bancoDestino={bancoDestino || ""}
+                    nombreOrigen={nombreOrigen}
+                    numCuentaOrigen={numCuentaOrigen}
+                    tipoOperacion={tipoOperacionNombre}
+                    monto={monto}
+                    dateTime={dateTime}
+                    bancoOrigen={bancoOrigen}
+                    userName={`${user?.nombre}`}
+                  />
+                ) : tipoOperacionNombre === "Retiro" ? (
+                  <RetiroPDF
+                    numComprobante={numComprobante}
+                    concepto={concepto}
+                    nombreDestino={nombreDestino}
+                    numCuentaDestino={numCuentaDestino || ""}
+                    bancoDestino={bancoDestino || ""}
+                    nombreOrigen={nombreOrigen}
+                    numCuentaOrigen={numCuentaOrigen}
+                    tipoOperacion={tipoOperacionNombre}
+                    monto={monto}
+                    dateTime={dateTime}
+                    bancoOrigen={bancoOrigen}
+                    userName={`${user?.nombre}`}
+                    ruc={ruc}
+                  />
+                ) : tipoOperacionNombre.startsWith("Transferencia") ? (
+                  <TransferReceipt
+                    numComprobante={numComprobante}
+                    concepto={concepto}
+                    nombreDestino={nombreDestino}
+                    numCuentaDestino={numCuentaDestino || ""}
+                    bancoDestino={bancoDestino || ""}
+                    nombreOrigen={nombreOrigen}
+                    numCuentaOrigen={numCuentaOrigen}
+                    tipoOperacion={tipoOperacion}
+                    monto={monto}
+                    dateTime={dateTime}
+                    bancoOrigen={bancoOrigen}
+                    userName={`${user?.nombre}`}
+                  />
+                ) : (
+                  <></>
+                )
               }
-              fileName={`transferencia_${numComprobante}.pdf`}
+              fileName={`Operación_${numComprobante}.pdf`}
             >
               {({ loading, url, error, blob }) =>
                 loading ? <p> Cargando documento... </p> : <p>Descargar</p>

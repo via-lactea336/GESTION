@@ -80,7 +80,8 @@ function TransferReceipt({
       <Page size="A4" style={styles.page}>
         <View style={[styles.container, styles.section]}>
           <Text style={styles.title}>
-            Comprobante de Transferencia - {tipoOperacion}
+            Comprobante de Transferencia{" "}
+            {tipoOperacion === "Credito" ? "Recibida" : "Realizada"}
           </Text>
           <View style={styles.view}>
             <View style={styles.section}>
@@ -100,7 +101,9 @@ function TransferReceipt({
         <View style={[styles.container, styles.section]}>
           <View style={styles.view}>
             <Text style={styles.subtitle}>Monto:</Text>
-            <Text style={styles.text}>{Number(monto).toLocaleString('es-ES')} Gs.</Text>
+            <Text style={styles.text}>
+              {Number(monto).toLocaleString("es-ES")} Gs.
+            </Text>
           </View>
           <View style={styles.view}>
             <Text style={styles.subtitle}>Comprobante:</Text>
